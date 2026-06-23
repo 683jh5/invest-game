@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>모의 금융투자 체험</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Segoe UI',sans-serif;background:#0f0c29;color:#fff;min-height:100vh}
+  .screen{display:none;min-height:100vh;padding:20px;flex-direction:column;align-items:center;justify-content:center}
+  .screen.active{display:flex}
+  .card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:24px;width:100%;max-width:480px}
+  h2{font-size:1.3rem;font-weight:700;margin-bottom:14px}
+  input,select,textarea{width:100%;padding:11px 14px;border-radius:11px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;font-size:1rem;margin-bottom:10px}
+  input::placeholder,textarea::placeholder{color:rgba(255,255,255,.4)}
+  textarea{resize:vertical;min-height:72px}
+  .btn{display:block;width:100%;padding:13px;border-radius:13px;border:none;font-size:1rem;font-weight:700;cursor:pointer;margin-top:7px;transition:all .2s}
+  .btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(102,126,234,.4)}
+  .btn-secondary{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2)}
+  .btn-danger{background:linear-gradient(135deg,#f093fb,#f5576c);color:#fff}
+  .role-btn{display:flex;align-items:center;gap:12px;padding:15px 18px;border-radius:15px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);cursor:pointer;margin-bottom:9px;transition:all .2s}
+  .role-btn:hover{background:rgba(255,255,255,.12);transform:translateX(4px)}
+  .code-box{background:rgba(102,126,234,.12);border:2px dashed #667eea;border-radius:15px;padding:18px;text-align:center;margin-bottom:18px}
+  .code-big{font-size:2.8rem;font-weight:900;letter-spacing:8px;color:#667eea}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .stat-card{background:rgba(255,255,255,.06);border-radius:13px;padding:14px;text-align:center}
+  .stat-val{font-size:1.7rem;font-weight:900}
+  .stat-lbl{font-size:.75rem;color:rgba(255,255,255,.5);margin-top:3px}
+  .timer-big{font-size:2.2rem;font-weight:900;color:#f093fb}
+  .tabs{display:flex;gap:7px;margin-bottom:14px}
+  .tab{flex:1;padding:9px;border-radius:11px;border:none;background:rgba(255,255,255,.07);color:rgba(255,255,255,.5);font-weight:700;cursor:pointer;transition:all .2s;font-size:.9rem}
+  .tab.active{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+  .tab-pane{display:none}
+  .tab-pane.active{display:block}
+  .ranking-table{width:100%;border-collapse:collapse}
+  .ranking-table th{padding:9px;text-align:left;color:rgba(255,255,255,.45);font-size:.78rem;border-bottom:1px solid rgba(255,255,255,.1)}
+  .ranking-table td{padding:9px;border-bottom:1px solid rgba(255,255,255,.06);font-size:.9rem}
+  .rank-num{font-weight:900;font-size:1rem}
+  .r1{color:#ffd700}.r2{color:#c0c0c0}.r3{color:#cd7f32}
+  .pos{color:#48c78e;font-weight:700}.neg{color:#f5576c;font-weight:700}
+  .news-item{background:rgba(255,255,255,.06);border-radius:11px;padding:11px 14px;display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px}
+  .news-del{background:none;border:none;color:#f5576c;cursor:pointer;font-size:1.1rem;flex-shrink:0;margin-left:8px}
+  .stock-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px}
+  .stock-card{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:13px;padding:13px;cursor:pointer;transition:all .2s}
+  .stock-card:hover{background:rgba(102,126,234,.2);border-color:#667eea}
+  .stock-card.sel{background:rgba(102,126,234,.3);border-color:#667eea;box-shadow:0 0 0 2px #667eea44}
+  .s-price{font-size:1.05rem;font-weight:900;margin:3px 0}
+  .tag{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.73rem;font-weight:700}
+  .tag-up{background:rgba(72,199,142,.2);color:#48c78e}
+  .tag-dn{background:rgba(245,87,108,.2);color:#f5576c}
+  .tag-fl{background:rgba(255,255,255,.1);color:#aaa}
+  .money-bar{background:linear-gradient(135deg,#667eea,#764ba2);border-radius:16px;padding:18px;text-align:center;margin-bottom:14px}
+  .money-amt{font-size:2rem;font-weight:900}
+  .news-feed{background:rgba(255,193,7,.08);border:1px solid rgba(255,193,7,.2);border-radius:13px;padding:14px;margin-bottom:14px}
+  .news-feed h3{color:#ffc107;font-size:.88rem;margin-bottom:9px}
+  .nf-entry{font-size:.88rem;line-height:1.6;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+  .nf-entry:last-child{border-bottom:none}
+  .buy-panel{background:rgba(255,255,255,.06);border-radius:13px;padding:14px;margin-bottom:14px}
+  .qty-row{display:flex;align-items:center;gap:9px;margin:10px 0}
+  .qty-btn{width:34px;height:34px;border-radius:9px;border:none;background:rgba(255,255,255,.15);color:#fff;font-size:1.1rem;cursor:pointer}
+  .qty-val{font-size:1.3rem;font-weight:900;min-width:36px;text-align:center}
+  .port-item{background:rgba(255,255,255,.06);border-radius:11px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+  .waiting-box{text-align:center;padding:40px 20px;color:rgba(255,255,255,.5)}
+  .my-rank{font-size:4rem;font-weight:900;background:linear-gradient(135deg,#ffd700,#f093fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .sec-title{font-size:.73rem;font-weight:700;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:2px;margin:16px 0 8px}
+  .badge{padding:5px 14px;border-radius:20px;font-size:.82rem;font-weight:700}
+  .b-wait{background:rgba(255,193,7,.2);color:#ffc107}
+  .b-open{background:rgba(72,199,142,.2);color:#48c78e}
+  .b-done{background:rgba(245,87,108,.2);color:#f5576c}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:11px 22px;border-radius:28px;font-size:.88rem;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+  .toast.show{opacity:1}
+  #screen-teacher{align-items:stretch;max-width:820px;margin:0 auto}
+  #screen-student{align-items:stretch;max-width:500px;margin:0 auto}
+  .t-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:9px}
+  .price-input{width:110px;padding:7px;border-radius:9px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;text-align:right;margin-bottom:0}
+</style>
+</head>
+<body>
+<!-- 로그인 -->
+<div id="screen-login" class="screen active">
+  <div style="text-align:center;margin-bottom:28px">
+    <div style="font-size:3rem">📈</div>
+    <h1 style="font-size:2rem;font-weight:900;background:linear-gradient(135deg,#667eea,#f093fb);-webkit-background-clip:text;-webkit-text-fill-color:transparent">모의 금융투자</h1>
+    <p style="color:rgba(255,255,255,.5);margin-top:6px;font-size:.9rem">체험 프로그램에 오신 걸 환영합니다!</p>
+  </div>
+  <div class="card" style="max-width:370px">
+    <div class="role-btn" id="btn-role-teacher">
+      <div style="font-size:2rem">👩‍🏫</div>
+      <div><div style="font-weight:700">강사 입장</div><div style="font-size:.8rem;color:rgba(255,255,255,.5)">수업 생성 및 관리</div></div>
+    </div>
+    <div class="role-btn" id="btn-role-student">
+      <div style="font-size:2rem">🧑‍💼</div>
+      <div><div style="font-weight:700">학생 입장</div><div style="font-size:.8rem;color:rgba(255,255,255,.5)">수업코드로 참여</div></div>
+    </div>
+  </div>
+  <div id="form-teacher" class="card" style="max-width:370px;margin-top:11px;display:none">
+    <h2>강사 로그인</h2>
+    <input type="text" id="inp-tname" placeholder="강사 이름"/>
+    <input type="password" id="inp-tpw" placeholder="비밀번호"/>
+    <button class="btn btn-primary" id="btn-teacher-login">강사로 시작하기</button>
+    <button class="btn btn-secondary" id="btn-cancel-teacher">취소</button>
+  </div>
+  <div id="form-student" class="card" style="max-width:370px;margin-top:11px;display:none">
+    <h2>학생 입장</h2>
+    <input type="text" id="inp-scode" placeholder="수업 코드" maxlength="6" style="text-transform:uppercase;text-align:center;font-size:1.4rem;letter-spacing:4px"/>
+    <input type="text" id="inp-sname" placeholder="내 이름"/>
+    <button class="btn btn-primary" id="btn-student-login">입장하기</button>
+    <button class="btn btn-secondary" id="btn-cancel-student">취소</button>
+  </div>
+</div>
+<!-- 강사 -->
+<div id="screen-teacher" class="screen" style="padding:20px">
+  <div class="t-header">
+    <div>
+      <h2 style="margin:0">강사 대시보드</h2>
+      <div id="t-name-lbl" style="color:rgba(255,255,255,.5);font-size:.83rem"></div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="t-status-badge" class="badge b-wait">대기중</span>
+      <button class="btn btn-secondary" id="btn-logout" style="width:auto;padding:7px 14px;margin:0;font-size:.83rem">나가기</button>
+    </div>
+  </div>
+  <div class="code-box">
+    <div style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:3px">수업 코드</div>
+    <div class="code-big" id="t-code">------</div>
+    <div style="font-size:.78rem;color:rgba(255,255,255,.5);margin-top:3px">학생들에게 이 코드를 알려주세요</div>
+  </div>
+  <div class="grid2">
+    <div class="stat-card"><div class="stat-val" id="t-count">0</div><div class="stat-lbl">참여 학생</div></div>
+    <div class="stat-card"><div class="stat-val timer-big" id="t-timer">--:--</div><div class="stat-lbl">남은 시간</div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-tab="t-news">📰 뉴스</button>
+    <button class="tab" data-tab="t-ctrl">⚙️ 제어</button>
+    <button class="tab" data-tab="t-rank">🏆 순위</button>
+  </div>
+  <div id="t-news" class="tab-pane active card" style="max-width:100%">
+    <h2>📰 뉴스 등록</h2>
+    <select id="t-news-stock"><option value="">종목 선택 (전체)</option></select>
+    <textarea id="t-news-content" placeholder="뉴스 내용 입력"></textarea>
+    <button class="btn btn-primary" id="btn-add-news">뉴스 등록</button>
+    <div class="sec-title">등록된 뉴스</div>
+    <div id="t-news-list"></div>
+  </div>
+  <div id="t-ctrl" class="tab-pane card" style="max-width:100%">
+    <h2>⚙️ 수업 제어</h2>
+    <div class="sec-title">투자 시간 설정</div>
+    <div style="display:flex;gap:7px;margin-bottom:12px">
+      <button class="btn btn-secondary timer-preset" data-min="3" style="margin:0">3분</button>
+      <button class="btn btn-secondary timer-preset" data-min="5" style="margin:0">5분</button>
+      <button class="btn btn-secondary timer-preset" data-min="10" style="margin:0">10분</button>
+      <button class="btn btn-secondary timer-preset" data-min="15" style="margin:0">15분</button>
+    </div>
+    <div id="t-sel-time" style="color:rgba(255,255,255,.5);font-size:.85rem;margin-bottom:12px">시간을 선택하세요</div>
+    <button class="btn btn-primary" id="btn-open" style="margin-bottom:7px">🟢 투자 시작</button>
+    <button class="btn btn-danger" id="btn-close">🔴 마감 &amp; 결과 공개</button>
+    <div class="sec-title" style="margin-top:20px">종목 현재가 수정</div>
+    <div id="t-stock-editor"></div>
+  </div>
+  <div id="t-rank" class="tab-pane card" style="max-width:100%">
+    <h2>🏆 실시간 순위</h2>
+    <table class="ranking-table">
+      <thead><tr><th>순위</th><th>이름</th><th>총자산</th><th>수익률</th></tr></thead>
+      <tbody id="t-rank-body"></tbody>
+    </table>
+  </div>
+</div>
+<!-- 학생 -->
+<div id="screen-student" class="screen" style="padding:20px">
+  <div style="text-align:center;margin-bottom:16px">
+    <div id="s-name-lbl" style="font-size:1.5rem;font-weight:700"></div>
+    <div id="s-code-lbl" style="color:rgba(255,255,255,.4);font-size:.83rem"></div>
+  </div>
+  <div id="s-waiting" class="waiting-box">
+    <div style="font-size:3rem;margin-bottom:10px">⏳</div>
+    <div style="font-size:1.05rem;font-weight:700;color:#fff;margin-bottom:7px">강사님을 기다리는 중...</div>
+    <div>수업이 시작되면 자동으로 화면이 바뀝니다</div>
+  </div>
+  <div id="s-invest" style="display:none;width:100%">
+    <div class="money-bar">
+      <div style="font-size:.82rem;opacity:.8">보유 현금</div>
+      <div class="money-amt" id="s-cash">₩10,000,000</div>
+      <div style="font-size:.78rem;opacity:.7;margin-top:3px">총 자산: <span id="s-total">₩10,000,000</span></div>
+    </div>
+    <div style="text-align:center;margin-bottom:12px">
+      <div style="font-size:.82rem;color:rgba(255,255,255,.5)">남은 시간</div>
+      <div class="timer-big" id="s-timer">--:--</div>
+    </div>
+    <div class="news-feed">
+      <h3>📰 오늘의 뉴스</h3>
+      <div id="s-news-list"><div style="color:rgba(255,255,255,.4)">뉴스를 기다리는 중...</div></div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="s-buy">📈 투자</button>
+      <button class="tab" data-tab="s-port">💼 포트폴리오</button>
+    </div>
+    <div id="s-buy" class="tab-pane active">
+      <div class="stock-grid" id="s-stock-grid"></div>
+      <div class="buy-panel" id="s-buy-panel" style="display:none">
+        <h3>매수/매도: <span id="bp-name"></span></h3>
+        <div style="font-size:.83rem;color:rgba(255,255,255,.5);margin-bottom:7px">현재가: <span id="bp-price"></span></div>
+        <div class="qty-row">
+          <button class="qty-btn" id="qm10">−10</button>
+          <button class="qty-btn" id="qm1">−</button>
+          <div class="qty-val" id="bp-qty">1</div>
+          <button class="qty-btn" id="qp1">+</button>
+          <button class="qty-btn" id="qp10">+10</button>
+        </div>
+        <div style="font-size:.9rem;margin-bottom:11px">총 금액: <strong id="bp-total"></strong></div>
+        <div style="display:flex;gap:7px">
+          <button class="btn btn-primary" id="btn-buy" style="margin:0">매수</button>
+          <button class="btn btn-danger" id="btn-sell" style="margin:0">매도</button>
+        </div>
+      </div>
+    </div>
+    <div id="s-port" class="tab-pane">
+      <div id="s-portfolio"></div>
+    </div>
+  </div>
+  <div id="s-result" style="display:none;width:100%">
+    <div class="card" style="max-width:100%;text-align:center">
+      <div style="font-size:1.05rem;margin-bottom:7px">🎊 투자 결과</div>
+      <div class="my-rank" id="s-my-rank">#1</div>
+      <div style="margin:11px 0;font-size:1.05rem" id="s-final-asset"></div>
+      <div id="s-final-pct" style="font-size:1.3rem;font-weight:900"></div>
+      <div class="sec-title">전체 순위</div>
+      <table class="ranking-table">
+        <thead><tr><th>순위</th><th>이름</th><th>수익률</th></tr></thead>
+        <tbody id="s-rank-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+// ── Firebase REST API ──
+const FB_URL = 'https://geang-invest-default-rtdb.firebaseio.com';
+async function fbGet(path) {
+  const r = await fetch(`${FB_URL}/${path}.json`);
+  return r.json();
+}
+async function fbSet(path, data) {
+  await fetch(`${FB_URL}/${path}.json`, { method:'PUT', body:JSON.stringify(data) });
+}
+async function fbUpdate(path, data) {
+  await fetch(`${FB_URL}/${path}.json`, { method:'PATCH', body:JSON.stringify(data) });
+}
+async function fbPush(path, data) {
+  const r = await fetch(`${FB_URL}/${path}.json`, { method:'POST', body:JSON.stringify(data) });
+  return r.json();
+}
+async function fbDelete(path) {
+  await fetch(`${FB_URL}/${path}.json`, { method:'DELETE' });
+}
+// ── 상수 ──
+const SEED = 10000000;
+const DEFAULT_STOCKS = [
+  {id:'samsung',name:'삼성전자',price:75000,emoji:'📱'},
+  {id:'kakao',name:'카카오',price:48000,emoji:'💬'},
+  {id:'naver',name:'네이버',price:195000,emoji:'🔍'},
+  {id:'hyundai',name:'현대차',price:210000,emoji:'🚗'},
+  {id:'etf',name:'KOSPI ETF',price:32000,emoji:'📊'},
+  {id:'bond',name:'국채 ETF',price:100000,emoji:'🏦'},
+];
+// ── 상태 ──
+let role=null, myName='', myCode='';
+let sessionStatus='waiting', sessionTimerEnd=null;
+let timerIv=null, pollIv=null;
+let stockPrices={}, studentData={cash:SEED,portfolio:{}};
+let selStock=null, buyQty=1, pendingMin=null;
+// ── 유틸 ──
+const $=id=>document.getElementById(id);
+function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
+function fmt(n){return '₩'+Math.round(n).toLocaleString('ko-KR')}
+function pctStr(p){return (p>=0?'+':'')+p.toFixed(2)+'%'}
+function pctCls(p){return p>=0?'pos':'neg'}
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('screen-'+id).classList.add('active')}
+function genCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let r='';for(let i=0;i<6;i++)r+=c[Math.floor(Math.random()*c.length)];return r}
+// ── 탭 ──
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',function(){
+    const group=this.closest('.tabs');
+    group.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+    const name=this.dataset.tab;
+    // 같은 부모 컨테이너 안의 tab-pane들
+    const container=group.parentElement;
+    container.querySelectorAll('.tab-pane').forEach(p=>{p.classList.remove('active')});
+    const pane=$(name);
+    if(pane) pane.classList.add('active');
+  });
+});
+// ── 폼 토글 ──
+$('btn-role-teacher').onclick=()=>{$('form-teacher').style.display='block';$('form-student').style.display='none'};
+$('btn-role-student').onclick=()=>{$('form-student').style.display='block';$('form-teacher').style.display='none'};
+$('btn-cancel-teacher').onclick=()=>$('form-teacher').style.display='none';
+$('btn-cancel-student').onclick=()=>$('form-student').style.display='none';
+// ── 강사 로그인 ──
+$('btn-teacher-login').onclick=async()=>{
+  myName=$('inp-tname').value.trim();
+  const pw=$('inp-tpw').value.trim();
+  if(!myName)return toast('이름을 입력해주세요');
+  if(!pw)return toast('비밀번호를 입력해주세요');
+  myCode=genCode();
+  const stocks={};
+  DEFAULT_STOCKS.forEach(s=>{stocks[s.id]={name:s.name,price:s.price,origPrice:s.price,emoji:s.emoji}});
+  await fbSet('classes/'+myCode,{teacherName:myName,pw,code:myCode,status:'waiting',timerEnd:null,stocks,news:{},students:{}});
+  role='teacher';
+  $('t-code').textContent=myCode;
+  $('t-name-lbl').textContent=myName+' 강사님';
+  showScreen('teacher');
+  startPoll();
+};
+// ── 학생 로그인 ──
+$('btn-student-login').onclick=async()=>{
+  const code=$('inp-scode').value.trim().toUpperCase();
+  myName=$('inp-sname').value.trim();
+  if(code.length!==6)return toast('6자리 코드를 입력해주세요');
+  if(!myName)return toast('이름을 입력해주세요');
+  const data=await fbGet('classes/'+code);
+  if(!data)return toast('존재하지 않는 코드입니다');
+  myCode=code;
+  const ex=await fbGet(`classes/${myCode}/students/${myName}`);
+  if(!ex){
+    await fbSet(`classes/${myCode}/students/${myName}`,{cash:SEED,portfolio:{},totalAsset:SEED});
+  } else {
+    studentData.cash=ex.cash; studentData.portfolio=ex.portfolio||{};
+  }
+  role='student';
+  $('s-name-lbl').textContent=myName+' 님';
+  $('s-code-lbl').textContent='수업 코드: '+myCode;
+  showScreen('student');
+  startPoll();
+};
+// ── 로그아웃 ──
+$('btn-logout').onclick=()=>{
+  if(pollIv)clearInterval(pollIv);
+  if(timerIv)clearInterval(timerIv);
+  role=null;myName='';myCode='';
+  showScreen('login');
+  $('form-teacher').style.display='none';
+  $('form-student').style.display='none';
+};
+// ── 폴링 (1초마다 DB 읽기) ──
+async function startPoll(){
+  if(pollIv)clearInterval(pollIv);
+  await poll();
+  pollIv=setInterval(poll,1500);
+}
+async function poll(){
+  if(!myCode)return;
+  const data=await fbGet('classes/'+myCode);
+  if(!data)return;
+  stockPrices=data.stocks||{};
+  sessionStatus=data.status||'waiting';
+  sessionTimerEnd=data.timerEnd||null;
+  if(role==='teacher'){
+    updateStatusBadge();
+    $('t-count').textContent=Object.keys(data.students||{}).length;
+    renderTeacherRanking(data.students||{});
+    renderTeacherNews(data.news||{});
+    renderStockEditor();
+    updateNewsSelect();
+    if(sessionTimerEnd&&sessionStatus==='open') startTimer('t-timer');
+  } else {
+    updateStudentScreen();
+    renderStudentNews(data.news||{});
+    renderStudentStocks();
+    if(data.students&&data.students[myName]){
+      const d=data.students[myName];
+      studentData.cash=d.cash;
+      studentData.portfolio=d.portfolio||{};
+    }
+    updateStudentAsset();
+    renderPortfolio();
+    if(sessionStatus==='closed') renderStudentResult(data.students||{});
+    if(sessionTimerEnd&&sessionStatus==='open') startTimer('s-timer');
+  }
+}
+// ── 타이머 ──
+function startTimer(elId){
+  if(timerIv)clearInterval(timerIv);
+  timerIv=setInterval(()=>{
+    if(!sessionTimerEnd)return;
+    const left=Math.max(0,sessionTimerEnd-Date.now());
+    const m=Math.floor(left/60000),s=Math.floor((left%60000)/1000);
+    const el=$(elId);
+    if(el)el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    if(left===0){clearInterval(timerIv);if(role==='teacher')doClose();}
+  },500);
+}
+// ── 시간 프리셋 ──
+document.querySelectorAll('.timer-preset').forEach(btn=>{
+  btn.onclick=function(){
+    pendingMin=parseInt(this.dataset.min);
+    $('t-sel-time').textContent=`⏱ ${pendingMin}분 설정됨`;
+    document.querySelectorAll('.timer-preset').forEach(b=>b.style.background='rgba(255,255,255,.1)');
+    this.style.background='rgba(102,126,234,.4)';
+  };
+});
+// ── 세션 제어 ──
+$('btn-open').onclick=async()=>{
+  if(!pendingMin)return toast('시간을 먼저 선택해주세요');
+  const end=Date.now()+pendingMin*60000;
+  await fbUpdate('classes/'+myCode,{status:'open',timerEnd:end});
+  toast('투자가 시작됐습니다!');
+};
+$('btn-close').onclick=doClose;
+async function doClose(){
+  if(timerIv)clearInterval(timerIv);
+  const data=await fbGet('classes/'+myCode);
+  const students=data.students||{};
+  const sp=data.stocks||{};
+  const updates={};
+  Object.entries(students).forEach(([name,d])=>{
+    let total=d.cash||0;
+    Object.entries(d.portfolio||{}).forEach(([sid,qty])=>{total+=(sp[sid]?.price||0)*qty});
+    updates[`classes/${myCode}/students/${name}/totalAsset`]=total;
+  });
+  updates[`classes/${myCode}/status`]='closed';
+  // REST API는 multi-path update 불가 → 순차 처리
+  await fbUpdate('classes/'+myCode,{status:'closed'});
+  for(const [name,d] of Object.entries(students)){
+    let total=d.cash||0;
+    Object.entries(d.portfolio||{}).forEach(([sid,qty])=>{total+=(sp[sid]?.price||0)*qty});
+    await fbUpdate(`classes/${myCode}/students/${name}`,{totalAsset:total});
+  }
+  toast('마감됐습니다!');
+}
+// ── 뉴스 ──
+$('btn-add-news').onclick=async()=>{
+  const stock=$('t-news-stock').value;
+  const content=$('t-news-content').value.trim();
+  if(!content)return toast('뉴스 내용을 입력하세요');
+  await fbPush(`classes/${myCode}/news`,{
+    stock:stock||'전체',content,
+    time:new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})
+  });
+  $('t-news-content').value='';
+  toast('뉴스 등록!');
+};
+function renderTeacherNews(news){
+  const el=$('t-news-list');
+  const items=Object.entries(news).reverse();
+  if(!items.length){el.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:.85rem">등록된 뉴스 없음</div>';return}
+  el.innerHTML=items.map(([id,n])=>`
+    <div class="news-item">
+      <div><div style="font-size:.73rem;color:#ffc107;margin-bottom:2px">[${n.stock}] ${n.time}</div><div style="font-size:.88rem">${n.content}</div></div>
+      <button class="news-del" onclick="delNews('${id}')">🗑</button>
+    </div>`).join('');
+}
+function delNews(id){fbDelete(`classes/${myCode}/news/${id}`)}
+function renderStudentNews(news){
+  const el=$('s-news-list');
+  const items=Object.values(news).reverse();
+  if(!items.length){el.innerHTML='<div style="color:rgba(255,255,255,.4)">아직 뉴스가 없습니다</div>';return}
+  el.innerHTML=items.map(n=>`<div class="nf-entry"><span style="color:#ffc107;font-size:.73rem">[${n.stock}] ${n.time}</span><br>${n.content}</div>`).join('');
+}
+function updateNewsSelect(){
+  $('t-news-stock').innerHTML='<option value="">종목 선택 (전체)</option>'+
+    Object.values(stockPrices).map(s=>`<option value="${s.name}">${s.emoji} ${s.name}</option>`).join('');
+}
+// ── 종목 에디터 ──
+function renderStockEditor(){
+  const el=$('t-stock-editor');if(!el)return;
+  el.innerHTML=Object.entries(stockPrices).map(([id,s])=>`
+    <div style="background:rgba(255,255,255,.06);border-radius:11px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:7px">
+      <div>${s.emoji} ${s.name}</div>
+      <div style="display:flex;align-items:center;gap:7px">
+        <input class="price-input" type="number" value="${s.price}" onchange="updatePrice('${id}',this.value)">
+        <span style="font-size:.75rem;color:rgba(255,255,255,.4)">원</span>
+      </div>
+    </div>`).join('');
+}
+function updatePrice(id,val){
+  const p=parseInt(val);
+  if(p>0)fbUpdate(`classes/${myCode}/stocks/${id}`,{price:p});
+}
+// ── 상태 배지 ──
+function updateStatusBadge(){
+  const el=$('t-status-badge');if(!el)return;
+  el.className='badge';
+  if(sessionStatus==='waiting'){el.classList.add('b-wait');el.textContent='대기중'}
+  else if(sessionStatus==='open'){el.classList.add('b-open');el.textContent='투자 진행중'}
+  else{el.classList.add('b-done');el.textContent='마감됨'}
+}
+// ── 학생 화면 ──
+function updateStudentScreen(){
+  $('s-waiting').style.display='none';
+  $('s-invest').style.display='none';
+  $('s-result').style.display='none';
+  if(sessionStatus==='waiting')$('s-waiting').style.display='flex';
+  else if(sessionStatus==='open'){$('s-invest').style.display='block';if(sessionTimerEnd)startTimer('s-timer')}
+  else $('s-result').style.display='block';
+}
+// ── 학생 종목 ──
+function renderStudentStocks(){
+  const grid=$('s-stock-grid');if(!grid)return;
+  grid.innerHTML=Object.entries(stockPrices).map(([id,s])=>{
+    const pct=((s.price-(s.origPrice||s.price))/(s.origPrice||s.price)*100);
+    const tag=pct>0?'tag-up':pct<0?'tag-dn':'tag-fl';
+    return `<div class="stock-card${selStock===id?' sel':''}" onclick="selectStock('${id}')">
+      <div style="font-size:1.4rem">${s.emoji}</div>
+      <div style="font-weight:700;font-size:.92rem">${s.name}</div>
+      <div class="s-price">${fmt(s.price)}</div>
+      <span class="tag ${tag}">${pctStr(pct)}</span>
+    </div>`;
+  }).join('');
+}
+function selectStock(id){
+  selStock=id;buyQty=1;
+  renderStudentStocks();
+  const s=stockPrices[id];
+  $('s-buy-panel').style.display='block';
+  $('bp-name').textContent=s.emoji+' '+s.name;
+  $('bp-price').textContent=fmt(s.price);
+  updateBuyTotal();
+}
+function updateBuyTotal(){
+  if(!selStock)return;
+  $('bp-qty').textContent=buyQty;
+  $('bp-total').textContent=fmt((stockPrices[selStock]?.price||0)*buyQty);
+}
+$('qm10').onclick=()=>{buyQty=Math.max(0,buyQty-10);updateBuyTotal()};
+$('qm1').onclick=()=>{buyQty=Math.max(0,buyQty-1);updateBuyTotal()};
+$('qp1').onclick=()=>{buyQty++;updateBuyTotal()};
+$('qp10').onclick=()=>{buyQty+=10;updateBuyTotal()};
+$('btn-buy').onclick=async()=>{
+  if(!selStock||buyQty<=0)return toast('종목과 수량을 선택하세요');
+  const price=stockPrices[selStock]?.price||0,cost=price*buyQty;
+  if(cost>studentData.cash)return toast('현금이 부족합니다');
+  studentData.cash-=cost;
+  studentData.portfolio[selStock]=(studentData.portfolio[selStock]||0)+buyQty;
+  await saveStudent();toast(`${stockPrices[selStock].name} ${buyQty}주 매수!`);
+};
+$('btn-sell').onclick=async()=>{
+  if(!selStock||buyQty<=0)return toast('종목과 수량을 선택하세요');
+  const owned=studentData.portfolio[selStock]||0;
+  if(buyQty>owned)return toast(`보유 수량(${owned}주) 부족`);
+  studentData.cash+=(stockPrices[selStock]?.price||0)*buyQty;
+  studentData.portfolio[selStock]=owned-buyQty;
+  if(studentData.portfolio[selStock]===0)delete studentData.portfolio[selStock];
+  await saveStudent();toast(`${stockPrices[selStock].name} ${buyQty}주 매도!`);
+};
+async function saveStudent(){
+  let total=studentData.cash;
+  Object.entries(studentData.portfolio).forEach(([sid,qty])=>{total+=(stockPrices[sid]?.price||0)*qty});
+  await fbUpdate(`classes/${myCode}/students/${myName}`,{cash:studentData.cash,portfolio:studentData.portfolio,totalAsset:total});
+}
+function updateStudentAsset(){
+  let total=studentData.cash;
+  Object.entries(studentData.portfolio).forEach(([sid,qty])=>{total+=(stockPrices[sid]?.price||0)*qty});
+  $('s-cash').textContent=fmt(studentData.cash);
+  $('s-total').textContent=fmt(total);
+}
+function renderPortfolio(){
+  const el=$('s-portfolio');
+  const items=Object.entries(studentData.portfolio).filter(([,q])=>q>0);
+  if(!items.length){el.innerHTML='<div style="color:rgba(255,255,255,.4);text-align:center;padding:20px">보유 종목 없음</div>';return}
+  el.innerHTML=items.map(([sid,qty])=>{
+    const s=stockPrices[sid]||{name:sid,price:0,emoji:'📈',origPrice:0};
+    const val=s.price*qty,orig=(s.origPrice||s.price)*qty,pct=((val-orig)/orig*100);
+    return `<div class="port-item">
+      <div><div style="font-weight:700">${s.emoji} ${s.name}</div><div style="font-size:.78rem;color:rgba(255,255,255,.5)">${qty}주 · ${fmt(s.price)}/주</div></div>
+      <div style="text-align:right"><div style="font-weight:700">${fmt(val)}</div><div class="${pctCls(pct)}" style="font-size:.8rem">${pctStr(pct)}</div></div>
+    </div>`;
+  }).join('');
+}
+// ── 순위 ──
+function renderTeacherRanking(students){
+  const list=Object.entries(students).map(([name,d])=>{
+    let total=d.cash||0;
+    Object.entries(d.portfolio||{}).forEach(([sid,qty])=>{total+=(stockPrices[sid]?.price||0)*qty});
+    return{name,total};
+  }).sort((a,b)=>b.total-a.total);
+  $('t-rank-body').innerHTML=list.map((s,i)=>{
+    const pct=((s.total-SEED)/SEED*100),rc=i===0?'r1':i===1?'r2':i===2?'r3':'';
+    return `<tr><td><span class="rank-num ${rc}">#${i+1}</span></td><td>${s.name}</td><td>${fmt(s.total)}</td><td class="${pctCls(pct)}">${pctStr(pct)}</td></tr>`;
+  }).join('');
+}
+function renderStudentResult(students){
+  const list=Object.entries(students).map(([name,d])=>({name,total:d.totalAsset||SEED})).sort((a,b)=>b.total-a.total);
+  const idx=list.findIndex(s=>s.name===myName);
+  const myTotal=list[idx]?.total||SEED,myPct=((myTotal-SEED)/SEED*100);
+  $('s-my-rank').textContent=`#${idx+1}`;
+  $('s-final-asset').textContent='최종 자산: '+fmt(myTotal);
+  const pe=$('s-final-pct');pe.textContent=pctStr(myPct);pe.className=pctCls(myPct);
+  $('s-rank-body').innerHTML=list.map((s,i)=>{
+    const pct=((s.total-SEED)/SEED*100),rc=i===0?'r1':i===1?'r2':i===2?'r3':'';
+    const me=s.name===myName?'background:rgba(102,126,234,.2);':'';
+    return `<tr style="${me}"><td><span class="rank-num ${rc}">#${i+1}</span></td><td>${s.name}${s.name===myName?' 👈':''}</td><td class="${pctCls(pct)}">${pctStr(pct)}</td></tr>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
