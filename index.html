@@ -201,6 +201,7 @@
   <div id="t-rank" class="tab-pane card" style="max-width:100%">
     <h2>🏆 실시간 순위</h2>
     <div style="font-size:.76rem;color:var(--ink2);margin-bottom:8px">화살표 = 직전 분기 대비 순위 변동 · 분기Δ = 직전 분기 수익률</div>
+    <button class="btn btn-secondary" id="btn-save-csv" style="margin-bottom:12px">📥 결과 저장 (엑셀·CSV)</button>
     <table class="ranking-table">
       <thead><tr><th>순위</th><th>이름</th><th>총자산</th><th>누적</th><th>분기Δ</th></tr></thead>
       <tbody id="t-rank-body"></tbody>
@@ -556,6 +557,25 @@ function renderStockEditor(){
   el.innerHTML=Object.entries(stockPrices).map(([id,s])=>`<div style="background:var(--card2);border:1px solid var(--border);border-radius:11px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><div>${s.emoji} ${s.name}</div><div style="display:flex;align-items:center;gap:7px"><input class="price-input" type="number" value="${s.price}" onchange="updatePrice('${id}',this.value)"><span style="font-size:.75rem;color:var(--ink2)">원</span></div></div>`).join('');
 }
 function updatePrice(id,v){const p=parseInt(v);if(p>0)fbUpdate(`classes/${myCode}/stocks/${id}`,{price:p});}
+// ── 결과 CSV 저장 ──
+$('btn-save-csv').onclick=async()=>{
+  const data=await fbGet('classes/'+myCode);if(!data)return toast('데이터를 불러오지 못했어요');
+  const students=data.students||{},sp=data.stocks||{};
+  const list=Object.entries(students).map(([name,d])=>({name,total:assetOf(d,sp),qr:d.lastQReturn})).sort((a,b)=>b.total-a.total);
+  if(!list.length)return toast('저장할 학생 결과가 없어요');
+  let csv='순위,이름,최종 자산,손익,수익률(%),직전 분기 수익률(%)\n';
+  list.forEach((s,i)=>{
+    const pl=s.total-SEED, pct=(pl/SEED*100).toFixed(2);
+    const qr=(s.qr!=null&&!isNaN(s.qr))?Number(s.qr).toFixed(2):'';
+    csv+=`${i+1},"${(s.name||'').replace(/"/g,'""')}",${Math.round(s.total)},${Math.round(pl)},${pct},${qr}\n`;
+  });
+  const today=new Date();const ymd=today.toISOString().slice(0,10);
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`투자결과_${myCode}_${sessionQuarter}분기_${ymd}.csv`;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+  toast('결과를 CSV로 저장했어요');
+};
 function renderSettle(){
   document.querySelectorAll('.settle-opt').forEach(b=>{b.style.background=(b.dataset.mode===settleMode)?'#cdd8bb':'';});
   const el=$('settle-desc');if(el)el.textContent=(settleMode==='auto')?'매 분기 시작 시 보유 종목이 현재가로 자동 정산되어 전액 현금으로 바뀝니다. 수익이 바로 현금에 반영돼요.':'종목을 계속 보유합니다. 현금이 필요하면 직접 매도하세요 (현실적).';
