@@ -156,6 +156,12 @@
   </div>
   <div id="t-ctrl" class="tab-pane active card" style="max-width:100%">
     <h2>⚙️ 수업 제어</h2>
+    <div class="sec-title">정산 방식 (수업 시작 전 선택)</div>
+    <div style="display:flex;gap:7px;margin-bottom:6px">
+      <button class="btn btn-secondary settle-opt" data-mode="carry" style="margin:0">📈 보유 이월</button>
+      <button class="btn btn-secondary settle-opt" data-mode="auto" style="margin:0">💵 분기 자동정산</button>
+    </div>
+    <div id="settle-desc" style="color:var(--ink2);font-size:.8rem;margin-bottom:14px"></div>
     <div class="sec-title">분기별 투자 시간 (선택)</div>
     <div style="display:flex;gap:7px;margin-bottom:10px">
       <button class="btn btn-secondary timer-preset" data-min="1" style="margin:0">1분</button>
@@ -269,7 +275,7 @@
         </div>
       </div>
       <div id="s-rev-rank" style="font-size:.95rem;margin-bottom:6px"></div>
-      <div style="color:var(--ink2);font-size:.85rem">강사님이 다음 분기를 시작하면 자동으로 넘어갑니다…</div>
+      <div id="s-rev-note" style="color:var(--ink2);font-size:.85rem">강사님이 다음 분기를 시작하면 자동으로 넘어갑니다…</div>
       <div class="sec-title" style="text-align:left">내 보유 종목</div>
       <div id="s-rev-holdings" style="text-align:left"></div>
     </div>
@@ -354,7 +360,7 @@ const QUARTER_NEWS={
 };
 // ── 상태 ── status: waiting / trading / review / closed
 let role=null, myName='', myCode='';
-let sessionStatus='waiting', sessionTimerEnd=null, sessionQuarter=1;
+let sessionStatus='waiting', sessionTimerEnd=null, sessionQuarter=1, settleMode='carry';
 let timerIv=null, pollIv=null, endingGuard=false;
 let stockPrices={}, studentData={cash:SEED,portfolio:{},avgCost:{},trades:[]};
 let selStock=null, buyQty=1, pendingSec=null;
@@ -402,7 +408,7 @@ $('btn-teacher-login').onclick=async()=>{
   myCode=genCode();
   const stocks={};DEFAULT_STOCKS.forEach(s=>{stocks[s.id]={name:s.name,price:s.price,origPrice:s.price,emoji:s.emoji,cap:s.cap}});
   const news={};Object.keys(QUARTER_NEWS).forEach(q=>{QUARTER_NEWS[q].forEach((n,i)=>{news['q'+q+'_'+i]={stock:n.stock,content:n.content,type:n.type,q:parseInt(q),time:q+'분기'};});});
-  await fbSet('classes/'+myCode,{teacherName:myName,pw,code:myCode,status:'waiting',timerEnd:null,quarter:1,stocks,news,students:{}});
+  await fbSet('classes/'+myCode,{teacherName:myName,pw,code:myCode,status:'waiting',timerEnd:null,quarter:1,settleMode:'carry',stocks,news,students:{}});
   role='teacher';$('t-code').textContent=myCode;$('t-name-lbl').textContent=myName+' 강사님';
   showScreen('teacher');startPoll();
 };
@@ -429,7 +435,7 @@ async function startPoll(){if(pollIv)clearInterval(pollIv);await poll();pollIv=s
 async function poll(){
   if(!myCode)return;
   const data=await fbGet('classes/'+myCode);if(!data)return;
-  stockPrices=data.stocks||{};sessionStatus=data.status||'waiting';sessionTimerEnd=data.timerEnd||null;sessionQuarter=data.quarter||1;
+  stockPrices=data.stocks||{};sessionStatus=data.status||'waiting';sessionTimerEnd=data.timerEnd||null;sessionQuarter=data.quarter||1;settleMode=data.settleMode||'carry';
   if(role==='teacher'){
     updateStatusBadge();
     $('t-count').textContent=Object.keys(data.students||{}).length;
@@ -443,6 +449,7 @@ async function poll(){
     $('btn-next-q').style.display=(sessionStatus==='review'&&sessionQuarter<TOTAL_Q)?'block':'none';
     $('btn-final').style.display=(sessionStatus==='review'&&sessionQuarter>=TOTAL_Q)?'block':'none';
     $('t-phase-lbl').textContent=(sessionStatus==='trading')?'투자 진행 중':(sessionStatus==='review')?`${sessionQuarter}분기 결과 발표 중`:'';
+    renderSettle();
     renderTeacherRanking(data.students||{});
     renderTeacherNews(data.news||{});
     renderStockEditor();updateNewsSelect();
@@ -487,7 +494,14 @@ async function startQuarter(q,isFirst){
   if(isFirst){
     const sp=data.stocks||{};const ns={};Object.entries(sp).forEach(([id,s])=>{ns[id]={...s,price:(PRICES[0][id]!=null?PRICES[0][id]:s.price)}});
     upd.stocks=ns;
-    for(const [name] of Object.entries(data.students||{})){await fbUpdate(`classes/${myCode}/students/${name}`,{roundStartAsset:SEED,lastQReturn:null,prevRank:0});}
+    for(const [name] of Object.entries(data.students||{})){await fbUpdate(`classes/${myCode}/students/${name}`,{cash:SEED,portfolio:{},avgCost:{},totalAsset:SEED,roundStartAsset:SEED,lastQReturn:null,prevRank:0});}
+  } else if((data.settleMode||'carry')==='auto'){
+    // 분기 자동정산: 보유 종목을 현재가로 전액 현금화
+    const sp=data.stocks||{};
+    for(const [name,d] of Object.entries(data.students||{})){
+      const total=assetOf(d,sp);
+      await fbUpdate(`classes/${myCode}/students/${name}`,{cash:total,portfolio:{},avgCost:{},totalAsset:total,roundStartAsset:total});
+    }
   }
   await fbUpdate('classes/'+myCode,upd);
   endingGuard=false;
@@ -542,6 +556,11 @@ function renderStockEditor(){
   el.innerHTML=Object.entries(stockPrices).map(([id,s])=>`<div style="background:var(--card2);border:1px solid var(--border);border-radius:11px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><div>${s.emoji} ${s.name}</div><div style="display:flex;align-items:center;gap:7px"><input class="price-input" type="number" value="${s.price}" onchange="updatePrice('${id}',this.value)"><span style="font-size:.75rem;color:var(--ink2)">원</span></div></div>`).join('');
 }
 function updatePrice(id,v){const p=parseInt(v);if(p>0)fbUpdate(`classes/${myCode}/stocks/${id}`,{price:p});}
+function renderSettle(){
+  document.querySelectorAll('.settle-opt').forEach(b=>{b.style.background=(b.dataset.mode===settleMode)?'#cdd8bb':'';});
+  const el=$('settle-desc');if(el)el.textContent=(settleMode==='auto')?'매 분기 시작 시 보유 종목이 현재가로 자동 정산되어 전액 현금으로 바뀝니다. 수익이 바로 현금에 반영돼요.':'종목을 계속 보유합니다. 현금이 필요하면 직접 매도하세요 (현실적).';
+}
+document.querySelectorAll('.settle-opt').forEach(b=>{b.onclick=()=>{if(sessionStatus!=='waiting')return toast('수업 시작 전에만 변경할 수 있어요');settleMode=b.dataset.mode;if(myCode)fbUpdate('classes/'+myCode,{settleMode});renderSettle();toast(settleMode==='auto'?'분기 자동정산 모드':'보유 이월 모드');};});
 function updateStatusBadge(){
   const el=$('t-status-badge');if(!el)return;el.className='badge';
   if(sessionStatus==='waiting'){el.classList.add('b-wait');el.textContent='대기중';}
@@ -651,6 +670,7 @@ function renderStudentReview(students){
   const arr=Object.entries(students).map(([n,d])=>({n,total:assetOf(d,stockPrices)})).sort((a,b)=>b.total-a.total);
   const idx=arr.findIndex(s=>s.n===myName);
   $('s-rev-rank').innerHTML=`현재 <b>${arr.length}명 중 ${idx+1}위</b> · 누적 <span class="${pctCls((total-SEED)/SEED)}">${pctStr((total-SEED)/SEED*100)}</span>`;
+  const note=$('s-rev-note');if(note)note.textContent=(settleMode==='auto')?'💵 이번 분기 수익이 다음 분기에 전액 현금으로 정산됩니다. 강사님이 시작하면 넘어가요…':'강사님이 다음 분기를 시작하면 자동으로 넘어갑니다…';
   $('s-rev-holdings').innerHTML=holdingsHTML();
 }
 // 강사 순위
