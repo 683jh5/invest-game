@@ -146,13 +146,20 @@
   <div id="t-ctrl" class="tab-pane card" style="max-width:100%">
     <h2>⚙️ 수업 제어</h2>
     <div class="sec-title">투자 시간 설정</div>
-    <div style="display:flex;gap:7px;margin-bottom:12px">
+    <div style="display:flex;gap:7px;margin-bottom:10px">
       <button class="btn btn-secondary timer-preset" data-min="3" style="margin:0">3분</button>
       <button class="btn btn-secondary timer-preset" data-min="5" style="margin:0">5분</button>
       <button class="btn btn-secondary timer-preset" data-min="10" style="margin:0">10분</button>
       <button class="btn btn-secondary timer-preset" data-min="15" style="margin:0">15분</button>
     </div>
-    <div id="t-sel-time" style="color:rgba(255,255,255,.5);font-size:.85rem;margin-bottom:12px">시간을 선택하세요</div>
+    <div style="display:flex;gap:7px;align-items:center;margin-bottom:10px">
+      <input type="number" id="t-min" min="0" max="180" placeholder="분" class="price-input" style="width:64px;text-align:center">
+      <span style="color:rgba(255,255,255,.5);font-size:.9rem">분</span>
+      <input type="number" id="t-sec" min="0" max="59" placeholder="초" class="price-input" style="width:64px;text-align:center">
+      <span style="color:rgba(255,255,255,.5);font-size:.9rem">초</span>
+      <button class="btn btn-secondary" id="btn-set-custom" style="margin:0;width:auto;padding:8px 16px">설정</button>
+    </div>
+    <div id="t-sel-time" style="color:rgba(255,255,255,.5);font-size:.85rem;margin-bottom:12px">시간을 선택하세요 (예: 1분 30초)</div>
     <button class="btn btn-primary" id="btn-open" style="margin-bottom:7px">🟢 투자 시작</button>
     <button class="btn btn-danger" id="btn-close">🔴 마감 &amp; 결과 공개</button>
     <div class="sec-title" style="margin-top:20px">종목 현재가 수정</div>
@@ -256,19 +263,35 @@ async function fbDelete(path) {
 // ── 상수 ──
 const SEED = 10000000;
 const DEFAULT_STOCKS = [
-  {id:'samsung',name:'삼성전자',price:75000,emoji:'📱'},
-  {id:'kakao',name:'카카오',price:48000,emoji:'💬'},
-  {id:'naver',name:'네이버',price:195000,emoji:'🔍'},
-  {id:'hyundai',name:'현대차',price:210000,emoji:'🚗'},
-  {id:'etf',name:'KOSPI ETF',price:32000,emoji:'📊'},
-  {id:'bond',name:'국채 ETF',price:100000,emoji:'🏦'},
+  {id:'samsung',name:'삼성전자',price:75000,emoji:'📱',cap:'약 1,850조'},
+  {id:'skhynix',name:'SK하이닉스',price:480000,emoji:'🧠',cap:'약 1,660조'},
+  {id:'kakao',name:'카카오',price:48000,emoji:'💬',cap:'약 22조'},
+  {id:'naver',name:'네이버',price:195000,emoji:'🔍',cap:'약 33조'},
+  {id:'hyundai',name:'현대차',price:210000,emoji:'🚗',cap:'약 50조'},
+  {id:'etf',name:'KOSPI ETF',price:32000,emoji:'📊',cap:'지수 ETF'},
+  {id:'bond',name:'국채 ETF',price:100000,emoji:'🏦',cap:'채권 ETF'},
+];
+// ── 사전 등록 뉴스 (실제=최신 뉴스 기반 / 가상=게임 시나리오) ──
+// 실제 뉴스는 2026년 6월 검색 결과 기반 요약. 시점에 따라 달라질 수 있음.
+const DEFAULT_NEWS = [
+  {stock:'SK하이닉스',type:'real',content:'HBM 수요 랠리에 SK하이닉스 장중 시총 2,000조 돌파…25년 만에 삼성전자 제치고 코스피 시총 1위 (출처: MBC·TradingKey, 2026.6)'},
+  {stock:'삼성전자',type:'real',content:'삼성전자, 평택 P4 증설 앞당겨 2026년 HBM 생산능력 50% 확대…업계 최초 HBM4 양산 출하 시작 (출처: 테크월드·매일산업뉴스, 2026)'},
+  {stock:'전체',type:'real',content:'AI 수요 폭증으로 메모리 공급 격차 2028년까지 심화 전망…반도체 슈퍼사이클 지속 (출처: EPNC, 2026)'},
+  {stock:'카카오',type:'real',content:'삼성증권, 카카오 목표주가 7.3만→5.9만원 하향…최근 6개월 약 19% 하락 (출처: 한국경제TV, 2026.4)'},
+  {stock:'네이버',type:'real',content:'코스피 6,000선에도 네이버·카카오 눈높이 하향…네이버 주가 21만원선 (출처: 한국경제TV, 2026.4)'},
+  {stock:'현대차',type:'real',content:'현대차그룹, 2026년 신차 14종 파상공세로 글로벌 톱3 굳히기…하이브리드·보급형 EV 확대 (출처: 포인트데일리, 2026)'},
+  {stock:'전체',type:'sim',content:'[가상] 글로벌 AI 인프라 투자 확대 기대감에 코스피 강세 출발, 외국인 순매수 유입'},
+  {stock:'KOSPI ETF',type:'sim',content:'[가상] 지수 상승 베팅 유입…기관·외국인 동반 매수로 ETF 거래 급증'},
+  {stock:'국채 ETF',type:'sim',content:'[가상] 한국은행 기준금리 동결 전망에 채권값 강세, 안전자산 선호 확대'},
+  {stock:'카카오',type:'sim',content:'[가상] 카카오, 신규 AI 비서 서비스 출시 임박 소식에 투자심리 회복 기대'},
+  {stock:'삼성전자',type:'sim',content:'[가상] 삼성전자, 대형 파운드리 수주설에 장중 변동성 확대'},
 ];
 // ── 상태 ──
 let role=null, myName='', myCode='';
 let sessionStatus='waiting', sessionTimerEnd=null;
 let timerIv=null, pollIv=null;
-let stockPrices={}, studentData={cash:SEED,portfolio:{}};
-let selStock=null, buyQty=1, pendingMin=null;
+let stockPrices={}, studentData={cash:SEED,portfolio:{},avgCost:{}};
+let selStock=null, buyQty=1, pendingSec=null;
 // ── 유틸 ──
 const $=id=>document.getElementById(id);
 function toast(msg){const el=$('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500)}
@@ -296,6 +319,15 @@ $('btn-role-teacher').onclick=()=>{$('form-teacher').style.display='block';$('fo
 $('btn-role-student').onclick=()=>{$('form-student').style.display='block';$('form-teacher').style.display='none'};
 $('btn-cancel-teacher').onclick=()=>$('form-teacher').style.display='none';
 $('btn-cancel-student').onclick=()=>$('form-student').style.display='none';
+// ── 강사 비밀 진입 (#teacher) ── 학생에게는 강사 버튼이 보이지 않음
+function applyTeacherGate(){
+  const isT=location.hash.toLowerCase()==='#teacher';
+  $('btn-role-teacher').style.display=isT?'flex':'none';
+  if(isT){$('form-teacher').style.display='block';$('form-student').style.display='none';}
+  else{$('form-teacher').style.display='none';}
+}
+applyTeacherGate();
+window.addEventListener('hashchange',applyTeacherGate);
 // ── 강사 로그인 ──
 $('btn-teacher-login').onclick=async()=>{
   myName=$('inp-tname').value.trim();
@@ -304,8 +336,10 @@ $('btn-teacher-login').onclick=async()=>{
   if(!pw)return toast('비밀번호를 입력해주세요');
   myCode=genCode();
   const stocks={};
-  DEFAULT_STOCKS.forEach(s=>{stocks[s.id]={name:s.name,price:s.price,origPrice:s.price,emoji:s.emoji}});
-  await fbSet('classes/'+myCode,{teacherName:myName,pw,code:myCode,status:'waiting',timerEnd:null,stocks,news:{},students:{}});
+  DEFAULT_STOCKS.forEach(s=>{stocks[s.id]={name:s.name,price:s.price,origPrice:s.price,emoji:s.emoji,cap:s.cap}});
+  const news={};
+  DEFAULT_NEWS.forEach((n,i)=>{news['p'+String(i).padStart(2,'0')]={stock:n.stock,content:n.content,type:n.type,time:'사전등록'}});
+  await fbSet('classes/'+myCode,{teacherName:myName,pw,code:myCode,status:'waiting',timerEnd:null,stocks,news,students:{}});
   role='teacher';
   $('t-code').textContent=myCode;
   $('t-name-lbl').textContent=myName+' 강사님';
@@ -323,9 +357,9 @@ $('btn-student-login').onclick=async()=>{
   myCode=code;
   const ex=await fbGet(`classes/${myCode}/students/${myName}`);
   if(!ex){
-    await fbSet(`classes/${myCode}/students/${myName}`,{cash:SEED,portfolio:{},totalAsset:SEED});
+    await fbSet(`classes/${myCode}/students/${myName}`,{cash:SEED,portfolio:{},avgCost:{},totalAsset:SEED});
   } else {
-    studentData.cash=ex.cash; studentData.portfolio=ex.portfolio||{};
+    studentData.cash=ex.cash; studentData.portfolio=ex.portfolio||{}; studentData.avgCost=ex.avgCost||{};
   }
   role='student';
   $('s-name-lbl').textContent=myName+' 님';
@@ -371,6 +405,7 @@ async function poll(){
       const d=data.students[myName];
       studentData.cash=d.cash;
       studentData.portfolio=d.portfolio||{};
+      studentData.avgCost=d.avgCost||{};
     }
     updateStudentAsset();
     renderPortfolio();
@@ -390,19 +425,30 @@ function startTimer(elId){
     if(left===0){clearInterval(timerIv);if(role==='teacher')doClose();}
   },500);
 }
-// ── 시간 프리셋 ──
+// ── 시간 설정 (분/초) ──
+function secLabel(sec){const m=Math.floor(sec/60),s=sec%60;return (m?`${m}분 `:'')+(s?`${s}초`:(m?'':'0초'))}
+function resetPresetHighlight(){document.querySelectorAll('.timer-preset').forEach(b=>b.style.background='rgba(255,255,255,.1)')}
 document.querySelectorAll('.timer-preset').forEach(btn=>{
   btn.onclick=function(){
-    pendingMin=parseInt(this.dataset.min);
-    $('t-sel-time').textContent=`⏱ ${pendingMin}분 설정됨`;
-    document.querySelectorAll('.timer-preset').forEach(b=>b.style.background='rgba(255,255,255,.1)');
+    pendingSec=parseInt(this.dataset.min)*60;
+    $('t-sel-time').textContent=`⏱ ${secLabel(pendingSec)} 설정됨`;
+    resetPresetHighlight();
     this.style.background='rgba(102,126,234,.4)';
+    $('t-min').value='';$('t-sec').value='';
   };
 });
+$('btn-set-custom').onclick=function(){
+  const m=parseInt($('t-min').value)||0, s=parseInt($('t-sec').value)||0;
+  const total=m*60+s;
+  if(total<=0)return toast('분 또는 초를 입력하세요');
+  pendingSec=total;
+  $('t-sel-time').textContent=`⏱ ${secLabel(pendingSec)} 설정됨`;
+  resetPresetHighlight();
+};
 // ── 세션 제어 ──
 $('btn-open').onclick=async()=>{
-  if(!pendingMin)return toast('시간을 먼저 선택해주세요');
-  const end=Date.now()+pendingMin*60000;
+  if(!pendingSec)return toast('시간을 먼저 선택해주세요');
+  const end=Date.now()+pendingSec*1000;
   await fbUpdate('classes/'+myCode,{status:'open',timerEnd:end});
   toast('투자가 시작됐습니다!');
 };
@@ -440,13 +486,18 @@ $('btn-add-news').onclick=async()=>{
   $('t-news-content').value='';
   toast('뉴스 등록!');
 };
+function typeTag(t){
+  if(t==='real')return '<span class="tag tag-up" style="margin-right:5px">실제</span>';
+  if(t==='sim')return '<span class="tag" style="background:rgba(118,75,162,.35);color:#cbb6ff;margin-right:5px">가상</span>';
+  return '';
+}
 function renderTeacherNews(news){
   const el=$('t-news-list');
   const items=Object.entries(news).reverse();
   if(!items.length){el.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:.85rem">등록된 뉴스 없음</div>';return}
   el.innerHTML=items.map(([id,n])=>`
     <div class="news-item">
-      <div><div style="font-size:.73rem;color:#ffc107;margin-bottom:2px">[${n.stock}] ${n.time}</div><div style="font-size:.88rem">${n.content}</div></div>
+      <div><div style="font-size:.73rem;color:#ffc107;margin-bottom:3px">${typeTag(n.type)}[${n.stock}] ${n.time||''}</div><div style="font-size:.88rem">${n.content}</div></div>
       <button class="news-del" onclick="delNews('${id}')">🗑</button>
     </div>`).join('');
 }
@@ -455,7 +506,7 @@ function renderStudentNews(news){
   const el=$('s-news-list');
   const items=Object.values(news).reverse();
   if(!items.length){el.innerHTML='<div style="color:rgba(255,255,255,.4)">아직 뉴스가 없습니다</div>';return}
-  el.innerHTML=items.map(n=>`<div class="nf-entry"><span style="color:#ffc107;font-size:.73rem">[${n.stock}] ${n.time}</span><br>${n.content}</div>`).join('');
+  el.innerHTML=items.map(n=>`<div class="nf-entry"><span style="font-size:.73rem">${typeTag(n.type)}<span style="color:#ffc107">[${n.stock}] ${n.time||''}</span></span><br>${n.content}</div>`).join('');
 }
 function updateNewsSelect(){
   $('t-news-stock').innerHTML='<option value="">종목 선택 (전체)</option>'+
@@ -505,6 +556,7 @@ function renderStudentStocks(){
       <div style="font-weight:700;font-size:.92rem">${s.name}</div>
       <div class="s-price">${fmt(s.price)}</div>
       <span class="tag ${tag}">${pctStr(pct)}</span>
+      <div style="font-size:.68rem;color:rgba(255,255,255,.45);margin-top:5px">시총 ${s.cap||'-'}</div>
     </div>`;
   }).join('');
 }
@@ -531,7 +583,11 @@ $('btn-buy').onclick=async()=>{
   const price=stockPrices[selStock]?.price||0,cost=price*buyQty;
   if(cost>studentData.cash)return toast('현금이 부족합니다');
   studentData.cash-=cost;
-  studentData.portfolio[selStock]=(studentData.portfolio[selStock]||0)+buyQty;
+  const prevQty=studentData.portfolio[selStock]||0;
+  const prevAvg=studentData.avgCost[selStock]||0;
+  const newQty=prevQty+buyQty;
+  studentData.avgCost[selStock]=Math.round((prevQty*prevAvg+buyQty*price)/newQty);
+  studentData.portfolio[selStock]=newQty;
   await saveStudent();toast(`${stockPrices[selStock].name} ${buyQty}주 매수!`);
 };
 $('btn-sell').onclick=async()=>{
@@ -540,13 +596,13 @@ $('btn-sell').onclick=async()=>{
   if(buyQty>owned)return toast(`보유 수량(${owned}주) 부족`);
   studentData.cash+=(stockPrices[selStock]?.price||0)*buyQty;
   studentData.portfolio[selStock]=owned-buyQty;
-  if(studentData.portfolio[selStock]===0)delete studentData.portfolio[selStock];
+  if(studentData.portfolio[selStock]===0){delete studentData.portfolio[selStock];delete studentData.avgCost[selStock];}
   await saveStudent();toast(`${stockPrices[selStock].name} ${buyQty}주 매도!`);
 };
 async function saveStudent(){
   let total=studentData.cash;
   Object.entries(studentData.portfolio).forEach(([sid,qty])=>{total+=(stockPrices[sid]?.price||0)*qty});
-  await fbUpdate(`classes/${myCode}/students/${myName}`,{cash:studentData.cash,portfolio:studentData.portfolio,totalAsset:total});
+  await fbUpdate(`classes/${myCode}/students/${myName}`,{cash:studentData.cash,portfolio:studentData.portfolio,avgCost:studentData.avgCost,totalAsset:total});
 }
 function updateStudentAsset(){
   let total=studentData.cash;
@@ -558,14 +614,34 @@ function renderPortfolio(){
   const el=$('s-portfolio');
   const items=Object.entries(studentData.portfolio).filter(([,q])=>q>0);
   if(!items.length){el.innerHTML='<div style="color:rgba(255,255,255,.4);text-align:center;padding:20px">보유 종목 없음</div>';return}
-  el.innerHTML=items.map(([sid,qty])=>{
-    const s=stockPrices[sid]||{name:sid,price:0,emoji:'📈',origPrice:0};
-    const val=s.price*qty,orig=(s.origPrice||s.price)*qty,pct=((val-orig)/orig*100);
+  let totVal=0,totCostSum=0;
+  const rows=items.map(([sid,qty])=>{
+    const s=stockPrices[sid]||{name:sid,price:0,emoji:'📈'};
+    const avg=studentData.avgCost[sid]||s.origPrice||s.price;
+    const val=s.price*qty, costBasis=avg*qty;
+    const pl=val-costBasis, pct=costBasis?((val-costBasis)/costBasis*100):0;
+    totVal+=val; totCostSum+=costBasis;
     return `<div class="port-item">
-      <div><div style="font-weight:700">${s.emoji} ${s.name}</div><div style="font-size:.78rem;color:rgba(255,255,255,.5)">${qty}주 · ${fmt(s.price)}/주</div></div>
-      <div style="text-align:right"><div style="font-weight:700">${fmt(val)}</div><div class="${pctCls(pct)}" style="font-size:.8rem">${pctStr(pct)}</div></div>
+      <div>
+        <div style="font-weight:700">${s.emoji} ${s.name}</div>
+        <div style="font-size:.76rem;color:rgba(255,255,255,.5)">${qty}주 · 현재 ${fmt(s.price)} · 평균매입 ${fmt(avg)}</div>
+        <div style="font-size:.68rem;color:rgba(255,255,255,.4)">시총 ${s.cap||'-'}</div>
+      </div>
+      <div style="text-align:right">
+        <div style="font-weight:700">${fmt(val)}</div>
+        <div class="${pctCls(pl)}" style="font-size:.8rem">${(pl>=0?'+':'')}${fmt(pl).replace('₩','₩')} (${pctStr(pct)})</div>
+      </div>
     </div>`;
   }).join('');
+  const totPl=totVal-totCostSum, totPct=totCostSum?((totVal-totCostSum)/totCostSum*100):0;
+  const summary=`<div class="port-item" style="background:rgba(102,126,234,.18)">
+    <div style="font-weight:700">📦 보유 합계 평가</div>
+    <div style="text-align:right">
+      <div style="font-weight:700">${fmt(totVal)}</div>
+      <div class="${pctCls(totPl)}" style="font-size:.8rem">${(totPl>=0?'+':'')}${fmt(totPl)} (${pctStr(totPct)})</div>
+    </div>
+  </div>`;
+  el.innerHTML=summary+rows;
 }
 // ── 순위 ──
 function renderTeacherRanking(students){
