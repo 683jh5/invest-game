@@ -93,6 +93,7 @@
   .review-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;text-align:center}
   .big-pct{font-size:2.4rem;font-weight:900}
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 <!-- 로그인 -->
@@ -124,7 +125,8 @@
   <div id="form-student" class="card" style="max-width:370px;margin-top:11px;display:none">
     <h2>학생 입장</h2>
     <input type="text" id="inp-scode" placeholder="수업 코드" maxlength="6" style="text-transform:uppercase;text-align:center;font-size:1.4rem;letter-spacing:4px"/>
-    <input type="text" id="inp-sname" placeholder="내 이름"/>
+    <input type="text" id="inp-snum" placeholder="학번 (숫자)" inputmode="numeric" maxlength="6"/>
+    <input type="text" id="inp-sname" placeholder="내 이름 (2글자 이상)"/>
     <button class="btn btn-primary" id="btn-student-login">입장하기</button>
     <button class="btn btn-secondary" id="btn-cancel-student">취소</button>
   </div>
@@ -158,6 +160,9 @@
   </div>
   <div id="t-ctrl" class="tab-pane active card" style="max-width:100%">
     <h2>⚙️ 수업 제어</h2>
+    <div class="sec-title">총 분기 수 (수업 시작 전)</div>
+    <div id="qcount-row" style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap"></div>
+    <div style="font-size:.8rem;color:var(--ink2);margin-bottom:14px">5분기부터는 가격이 자동으로 오르내려요 (강사가 수동 조정하면 그 가격이 우선). 5분기 이후 뉴스는 뉴스 탭에서 직접 등록해 주세요.</div>
     <div class="sec-title">분기별 정산 방식</div>
     <div id="settle-rows" style="margin-bottom:6px"></div>
     <div id="settle-desc" style="color:var(--ink2);font-size:.8rem;margin-bottom:14px">각 분기를 마감하고 다음 분기로 넘어갈 때 적용돼요. 보유 이월 = 종목 그대로 유지 · 자동 정산 = 전액 현금화</div>
@@ -208,7 +213,7 @@
   <div id="t-rank" class="tab-pane card" style="max-width:100%">
     <h2>🏆 실시간 순위</h2>
     <div style="font-size:.76rem;color:var(--ink2);margin-bottom:8px">화살표 = 직전 분기 대비 순위 변동 · 분기Δ = 직전 분기 수익률</div>
-    <button class="btn btn-secondary" id="btn-save-csv" style="margin-bottom:12px">📥 결과 저장 (엑셀·CSV)</button>
+    <button class="btn btn-secondary" id="btn-save-csv" style="margin-bottom:12px">📥 결과 저장 (학생별 엑셀 시트)</button>
     <table class="ranking-table">
       <thead><tr><th>순위</th><th>이름</th><th>총자산</th><th>누적</th><th>분기Δ</th></tr></thead>
       <tbody id="t-rank-body"></tbody>
@@ -327,7 +332,7 @@ async function fbUpdate(p,d){await fetch(`${FB_URL}/${p}.json`,{method:'PATCH',b
 async function fbPush(p,d){const r=await fetch(`${FB_URL}/${p}.json`,{method:'POST',body:JSON.stringify(d)});return r.json();}
 async function fbDelete(p){await fetch(`${FB_URL}/${p}.json`,{method:'DELETE'});}
 // ── 상수 ──
-const SEED=10000000, TOTAL_Q=4;
+const SEED=10000000, DEFAULT_TOTAL_Q=4, MIN_Q=2, MAX_Q=8;
 const DEFAULT_STOCKS=[
   {id:'samsung',name:'삼성전자',price:75000,emoji:'📱',cap:'약 1,850조'},
   {id:'skhynix',name:'SK하이닉스',price:480000,emoji:'🧠',cap:'약 1,660조'},
@@ -346,24 +351,25 @@ const PRICES=[
 ];
 const QUARTER_NEWS={
   1:[
-    {stock:'SK하이닉스',type:'real',content:'HBM 수요 랠리에 SK하이닉스 시총 삼성전자 추월…AI 반도체 강세 (출처: MBC·TradingKey, 2026.6)'},
-    {stock:'삼성전자',type:'real',content:'삼성전자, 평택 P4 증설·업계 첫 HBM4 양산 출하 시작 (출처: 테크월드, 2026)'},
+    {stock:'SK하이닉스',type:'real',content:'SK하이닉스, 40조 투자로 HBM 정면승부…"내년 삼성 추월" 전망까지 (출처: 뉴데일리경제, 2026.8)'},
+    {stock:'삼성전자',type:'real',content:'삼성·SK하이닉스, HBM 너머 차세대 AI 메모리 주도권 경쟁 본격화 (출처: 글로벌이코노믹, 2026.8)'},
     {stock:'전체',type:'sim',content:'[가상] 글로벌 AI 데이터센터 투자 확대 발표…반도체 동반 강세 기대'},
   ],
   2:[
-    {stock:'전체',type:'sim',content:'[가상] 미국 빅테크 AI 실적 호조에 코스피 강세 지속, 외국인 순매수 유입'},
-    {stock:'현대차',type:'real',content:'현대차, 신차 14종·하이브리드 확대로 판매 호조 (출처: 포인트데일리, 2026)'},
-    {stock:'카카오',type:'real',content:'삼성증권, 카카오 목표가 7.3만→5.9만원 하향…플랫폼 부진 (출처: 한국경제TV, 2026.4)'},
+    {stock:'현대차',type:'real',content:'현대차·기아, 미국서 하이브리드 판매 52% 급증…역대급 실적 (출처: 인사이트, 2026)'},
+    {stock:'카카오',type:'real',content:'AI 기대감 엇갈린 네카오…네이버 "비중 확대", 카카오 "목표가 하향" (출처: 이데일리, 2026)'},
+    {stock:'전체',type:'sim',content:'[가상] 외국인 순매수 유입…코스피 대형주 강세 지속'},
   ],
   3:[
-    {stock:'전체',type:'sim',content:'[가상] 반도체 고점 논란·차익실현 매물 출회…IT 변동성 확대'},
-    {stock:'국채 ETF',type:'sim',content:'[가상] 한국은행 기준금리 동결…안전자산 채권 강세'},
-    {stock:'카카오',type:'sim',content:'[가상] 카카오, AI 비서 출시 기대감에 반등 시도'},
+    {stock:'전체',type:'sim',content:'[가상] 반도체 고점 논란에 차익실현 매물…IT 변동성 확대'},
+    {stock:'현대차',type:'real',content:'현대차, 매출 82조 역대 최대에도 이익 1.8조 줄어…관세 부담 (출처: 뉴스와, 2026.7)'},
+    {stock:'카카오',type:'real',content:'네이버·카카오 2분기 나란히 호실적…하반기는 AI 수익화 승부 (출처: 이투데이, 2026.7)'},
+    {stock:'국채 ETF',type:'sim',content:'[가상] 시장 불안에 안전자산 선호…채권 가격 강세'},
   ],
   4:[
-    {stock:'SK하이닉스',type:'sim',content:'[가상] HBM4 양산 본격화·수요 재확인…반도체 재상승'},
-    {stock:'전체',type:'real',content:'AI 수요로 메모리 공급부족 2028년까지 지속 전망 (출처: EPNC, 2026)'},
-    {stock:'현대차',type:'sim',content:'[가상] 외국인 순매수 재유입…대형주 중심 상승'},
+    {stock:'SK하이닉스',type:'real',content:'"HBM이 이끄는 메모리 슈퍼사이클" 전망 (출처: SK하이닉스 뉴스룸, 2026)'},
+    {stock:'삼성전자',type:'sim',content:'[가상] HBM4 공급 부족 심화…메모리 가격 재상승'},
+    {stock:'전체',type:'sim',content:'[가상] 외국인 매수 재유입…대형주 중심 상승 마무리'},
   ],
 };
 // ── 상태 ── status: waiting / trading / review / closed
@@ -372,7 +378,7 @@ const TEACHER_KEY='hot2026'; // ← 강사 인증코드 (원하는 값으로 바
 let sessionStatus='waiting', sessionTimerEnd=null, sessionQuarter=1, settleMode='carry', settleModes={};
 let timerIv=null, pollIv=null, endingGuard=false;
 let stockPrices={}, studentData={cash:SEED,portfolio:{},avgCost:{},trades:[]};
-let selStock=null, buyQty=1, pendingSec=null, classSeed=SEED;
+let selStock=null, buyQty=1, pendingSec=null, classSeed=SEED, totalQ=DEFAULT_TOTAL_Q;
 let studentNewsCache=[], lastSeenNews=0;
 // ── 유틸 ──
 const $=id=>document.getElementById(id);
@@ -429,15 +435,18 @@ $('btn-teacher-login').onclick=async()=>{
   myCode=genCode();
   const stocks={};DEFAULT_STOCKS.forEach(s=>{stocks[s.id]={name:s.name,price:s.price,origPrice:s.price,emoji:s.emoji,cap:s.cap}});
   const news={};Object.keys(QUARTER_NEWS).forEach(q=>{QUARTER_NEWS[q].forEach((n,i)=>{news['q'+q+'_'+i]={stock:n.stock,content:n.content,type:n.type,q:parseInt(q),time:q+'분기'};});});
-  const sm={};for(let q=1;q<TOTAL_Q;q++)sm['q'+q]='carry';
-  await fbSet('classes/'+myCode,{teacherName:myName,pw,code:myCode,status:'waiting',timerEnd:null,quarter:1,settleMode:'carry',settleModes:sm,seed:SEED,stocks,news,students:{}});
+  const sm={};for(let q=1;q<MAX_Q;q++)sm['q'+q]='carry';
+  await fbSet('classes/'+myCode,{teacherName:myName,pw,code:myCode,status:'waiting',timerEnd:null,quarter:1,settleMode:'carry',settleModes:sm,seed:SEED,totalQ:DEFAULT_TOTAL_Q,stocks,news,students:{}});
   role='teacher';$('t-code').textContent=myCode;$('t-name-lbl').textContent=myName+' 강사님';
   saveSession();showScreen('teacher');startPoll();
 };
 $('btn-student-login').onclick=async()=>{
-  const code=$('inp-scode').value.trim().toUpperCase();myName=$('inp-sname').value.trim();
+  const code=$('inp-scode').value.trim().toUpperCase();
+  const snum=$('inp-snum').value.trim(), sname=$('inp-sname').value.trim();
   if(code.length!==6)return toast('6자리 코드를 입력해주세요');
-  if(!myName)return toast('이름을 입력해주세요');
+  if(!/^\d{1,6}$/.test(snum))return toast('학번은 숫자로 입력해주세요');
+  if(sname.length<2)return toast('이름은 2글자 이상 입력해주세요');
+  myName=snum+' '+sname;
   const data=await fbGet('classes/'+code);
   if(!data)return toast('존재하지 않는 코드입니다');
   myCode=code;
@@ -459,6 +468,7 @@ function clearSession(){try{localStorage.removeItem('geng_invest_session')}catch
 async function tryRestore(){
   let s=null;try{s=JSON.parse(localStorage.getItem('geng_invest_session'))}catch(e){}
   if(!s||!s.role||!s.myCode||!s.myName)return;
+  if(s.role==='teacher'&&location.hash.toLowerCase()!=='#teacher')return; // 강사 복귀는 강사용 주소에서만
   const data=await fbGet('classes/'+s.myCode);
   if(!data){clearSession();return;}
   role=s.role;myName=s.myName;myCode=s.myCode;
@@ -472,21 +482,21 @@ async function startPoll(){if(pollIv)clearInterval(pollIv);await poll();pollIv=s
 async function poll(){
   if(!myCode)return;
   const data=await fbGet('classes/'+myCode);if(!data)return;
-  stockPrices=data.stocks||{};sessionStatus=data.status||'waiting';sessionTimerEnd=data.timerEnd||null;sessionQuarter=data.quarter||1;settleMode=data.settleMode||'carry';settleModes=data.settleModes||{};classSeed=data.seed||SEED;
+  stockPrices=data.stocks||{};sessionStatus=data.status||'waiting';sessionTimerEnd=data.timerEnd||null;sessionQuarter=data.quarter||1;settleMode=data.settleMode||'carry';settleModes=data.settleModes||{};classSeed=data.seed||SEED;totalQ=data.totalQ||DEFAULT_TOTAL_Q;
   if(role==='teacher'){
     updateStatusBadge();
     $('t-count').textContent=Object.keys(data.students||{}).length;
     $('t-quarter-stat').textContent=(sessionStatus==='waiting')?'-':sessionQuarter+'Q';
-    $('t-quarter-lbl').textContent=`${sessionQuarter} / ${TOTAL_Q} 분기`;
+    $('t-quarter-lbl').textContent=`${sessionQuarter} / ${totalQ} 분기`;
     const onGame=(sessionStatus==='trading'||sessionStatus==='review');
     $('btn-open').style.display=(sessionStatus==='waiting')?'block':'none';
     $('t-quarter-box').style.display=onGame?'block':'none';
     $('btn-force-end').style.display=onGame?'block':'none';
     $('btn-end-q').style.display=(sessionStatus==='trading')?'block':'none';
-    $('btn-next-q').style.display=(sessionStatus==='review'&&sessionQuarter<TOTAL_Q)?'block':'none';
-    $('btn-final').style.display=(sessionStatus==='review'&&sessionQuarter>=TOTAL_Q)?'block':'none';
+    $('btn-next-q').style.display=(sessionStatus==='review'&&sessionQuarter<totalQ)?'block':'none';
+    $('btn-final').style.display=(sessionStatus==='review'&&sessionQuarter>=totalQ)?'block':'none';
     $('t-phase-lbl').textContent=(sessionStatus==='trading')?'투자 진행 중':(sessionStatus==='review')?`${sessionQuarter}분기 결과 발표 중`:'';
-    renderSettle();
+    renderQCount();renderSettle();
     renderTeacherRanking(data.students||{});
     renderTeacherNews(data.news||{});
     renderStockEditor();updateNewsSelect();renderSeedEditor(data.students||{});
@@ -494,7 +504,7 @@ async function poll(){
   }else{
     if(data.students&&data.students[myName]){const d=data.students[myName];studentData.cash=d.cash;studentData.portfolio=d.portfolio||{};studentData.avgCost=d.avgCost||{};studentData.trades=tradesArr(d.trades);}
     updateStudentScreen(data);
-    $('s-quarter').textContent=(sessionStatus==='trading')?`📅 ${sessionQuarter} / ${TOTAL_Q} 분기 진행 중`:'';
+    $('s-quarter').textContent=(sessionStatus==='trading')?`📅 ${sessionQuarter} / ${totalQ} 분기 진행 중`:'';
     $('s-timer-box').style.display=(sessionTimerEnd&&sessionStatus==='trading')?'block':'none';
     renderStudentNews(data.news||{});renderStudentStocks();updateStudentAsset();renderPortfolio();renderTradesList();renderStudentRankLive(data.students||{});
     if(sessionStatus==='review')renderStudentReview(data.students||{});
@@ -547,16 +557,29 @@ async function startQuarter(q,isFirst){
   endingGuard=false;
   toast(isFirst?'1분기 투자 시작!':`${q}분기 투자 시작!`);
 }
+// 5분기 이후 자동 가격 변동 (채권은 안정적, ETF는 중간, 주식은 크게)
+function nextRandomPrice(id,p){
+  const range=(id==='bond')?0.025:(id==='etf')?0.06:0.15;
+  const r=(Math.random()*2-1)*range+0.01;
+  return Math.max(100,Math.round(p*(1+r)/100)*100);
+}
 // 분기 마감 (review)
 async function endQuarter(){
   if(endingGuard)return;endingGuard=true;
   if(timerIv)clearInterval(timerIv);
   const data=await fbGet('classes/'+myCode);if(!data){endingGuard=false;return;}
   const q=data.quarter||1, students=data.students||{}, sp=data.stocks||{};
-  const idx=Math.min(q,PRICES.length-1);
   const old=Object.entries(students).map(([n,d])=>({n,t:assetOf(d,sp)})).sort((a,b)=>b.t-a.t);
   const prevRank={};old.forEach((s,i)=>prevRank[s.n]=i+1);
-  const np=PRICES[idx];const ns={};Object.entries(sp).forEach(([id,s])=>{ns[id]={...s,price:(np[id]!=null?np[id]:s.price)}});
+  const ns={};
+  if(q<PRICES.length){
+    // 1~4분기: 시나리오 가격 적용
+    const np=PRICES[q];
+    Object.entries(sp).forEach(([id,s])=>{ns[id]={...s,price:(np[id]!=null?np[id]:s.price)}});
+  }else{
+    // 5분기 이후: 현재가(강사 수동 조정 포함) 기준 자동 랜덤 변동
+    Object.entries(sp).forEach(([id,s])=>{ns[id]={...s,price:nextRandomPrice(id,s.price)}});
+  }
   await fbUpdate('classes/'+myCode,{stocks:ns,status:'review',timerEnd:null});
   for(const [name,d] of Object.entries(students)){
     const start=d.roundStartAsset||d.seed||SEED;const nt=assetOf(d,ns);const qret=start?(nt-start)/start*100:0;
@@ -630,12 +653,34 @@ $('btn-save-csv').onclick=async()=>{
   const students=data.students||{},sp=data.stocks||{};
   const list=Object.entries(students).map(([name,d])=>({name,total:assetOf(d,sp),qr:d.lastQReturn,seed:d.seed||data.seed||SEED,trades:tradesArr(d.trades)})).sort((a,b)=>b.total-a.total);
   if(!list.length)return toast('저장할 학생 결과가 없어요');
-  const qCols=[];for(let q=1;q<=TOTAL_Q;q++)qCols.push(q+'분기 거래');
+  if(typeof XLSX!=='undefined'){
+    // 학생별 시트로 나눈 엑셀(.xlsx) 저장
+    const wb=XLSX.utils.book_new();
+    const sum=[['순위','이름','시작 자본금','최종 자산','손익','수익률(%)','직전 분기 수익률(%)']];
+    list.forEach((s,i)=>{const pl=s.total-s.seed;sum.push([i+1,s.name,s.seed,Math.round(s.total),Math.round(pl),+(pl/s.seed*100).toFixed(2),(s.qr!=null&&!isNaN(s.qr))?+Number(s.qr).toFixed(2):'']);});
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sum),'전체 요약');
+    const used={};
+    list.forEach((s,i)=>{
+      let nm=(s.name||'학생').replace(/[\\\/\?\*\[\]:]/g,'').slice(0,25)||'학생';
+      if(used[nm]!=null){used[nm]++;nm=nm+'_'+used[nm];}else{used[nm]=0;}
+      const pl=s.total-s.seed;
+      const rows=[['이름',s.name],['순위',(i+1)+' / '+list.length],['시작 자본금',s.seed],['최종 자산',Math.round(s.total)],['손익',Math.round(pl)],['수익률(%)',+(pl/s.seed*100).toFixed(2)],[],['분기','종목','구분','수량(주)','단가(원)','거래금액(원)']];
+      s.trades.slice().sort((a,b)=>(a.q||0)-(b.q||0)).forEach(t=>rows.push([t.q+'분기',t.name,t.type==='buy'?'매수':'매도',t.qty,t.price||'',t.price?t.price*t.qty:'']));
+      if(!s.trades.length)rows.push(['거래 내역 없음']);
+      XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),nm);
+    });
+    const ymd2=new Date().toISOString().slice(0,10);
+    XLSX.writeFile(wb,`투자결과_${myCode}_${sessionQuarter}분기_${ymd2}.xlsx`);
+    toast('학생별 시트로 엑셀 저장 완료!');
+    return;
+  }
+  // (백업) 엑셀 라이브러리를 못 불러온 경우 CSV로 저장
+  const qCols=[];for(let q=1;q<=totalQ;q++)qCols.push(q+'분기 거래');
   let csv='순위,이름,시작 자본금,최종 자산,손익,수익률(%),직전 분기 수익률(%),'+qCols.join(',')+'\n';
   list.forEach((s,i)=>{
     const pl=s.total-s.seed, pct=(pl/s.seed*100).toFixed(2);
     const qr=(s.qr!=null&&!isNaN(s.qr))?Number(s.qr).toFixed(2):'';
-    const qCells=[];for(let q=1;q<=TOTAL_Q;q++)qCells.push('"'+qTradeSummary(s.trades,q).replace(/"/g,'""')+'"');
+    const qCells=[];for(let q=1;q<=totalQ;q++)qCells.push('"'+qTradeSummary(s.trades,q).replace(/"/g,'""')+'"');
     csv+=`${i+1},"${(s.name||'').replace(/"/g,'""')}",${s.seed},${Math.round(s.total)},${Math.round(pl)},${pct},${qr},${qCells.join(',')}\n`;
   });
   csv+='\n거래 상세\n이름,분기,종목,구분,수량(주),단가(원),거래금액(원)\n';
@@ -651,11 +696,22 @@ $('btn-save-csv').onclick=async()=>{
   document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
   toast('결과를 CSV로 저장했어요');
 };
+function renderQCount(){
+  const el=$('qcount-row');if(!el)return;
+  let h='';for(let n=MIN_Q;n<=MAX_Q;n++){h+=`<button class="btn btn-secondary" style="margin:0;flex:1;min-width:42px;padding:9px 0;font-size:.9rem;${totalQ===n?'background:#cdd8bb;font-weight:900;':''}" onclick="setTotalQ(${n})">${n}</button>`;}
+  el.innerHTML=h;
+}
+function setTotalQ(n){
+  if(sessionStatus!=='waiting')return toast('수업 시작 전에만 변경할 수 있어요');
+  totalQ=n;if(myCode)fbUpdate('classes/'+myCode,{totalQ:n});
+  renderQCount();renderSettle();
+  toast('총 '+n+'분기로 설정!');
+}
 function qMode(q){return settleModes['q'+q]||settleMode||'carry';}
 function renderSettle(){
   const el=$('settle-rows');if(!el)return;
   let h='';
-  for(let q=1;q<TOTAL_Q;q++){
+  for(let q=1;q<totalQ;q++){
     const m=qMode(q);
     const past=(sessionStatus!=='waiting'&&sessionQuarter>q);
     h+=`<div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;${past?'opacity:.45':''}">
