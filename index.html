@@ -125,8 +125,8 @@
   <div id="form-student" class="card" style="max-width:370px;margin-top:11px;display:none">
     <h2>학생 입장</h2>
     <input type="text" id="inp-scode" placeholder="수업 코드" maxlength="6" style="text-transform:uppercase;text-align:center;font-size:1.4rem;letter-spacing:4px"/>
-    <input type="text" id="inp-snum" placeholder="학번 (숫자)" inputmode="numeric" maxlength="6"/>
-    <input type="text" id="inp-sname" placeholder="내 이름 (2글자 이상)"/>
+    <input type="text" id="inp-snum" placeholder="학번 (예시: 10101)" inputmode="numeric" maxlength="6"/>
+    <input type="text" id="inp-sname" placeholder="이름 (예시: 홍길동)"/>
     <button class="btn btn-primary" id="btn-student-login">입장하기</button>
     <button class="btn btn-secondary" id="btn-cancel-student">취소</button>
   </div>
@@ -444,7 +444,7 @@ $('btn-student-login').onclick=async()=>{
   const code=$('inp-scode').value.trim().toUpperCase();
   const snum=$('inp-snum').value.trim(), sname=$('inp-sname').value.trim();
   if(code.length!==6)return toast('6자리 코드를 입력해주세요');
-  if(!/^\d{1,6}$/.test(snum))return toast('학번은 숫자로 입력해주세요');
+  if(!/^\d{3,6}$/.test(snum))return toast('학번을 숫자로 입력해주세요 (예: 10101)');
   if(sname.length<2)return toast('이름은 2글자 이상 입력해주세요');
   myName=snum+' '+sname;
   const data=await fbGet('classes/'+code);
