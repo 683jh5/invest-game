@@ -136,7 +136,8 @@
     <button class="btn gold" id="j-go" style="margin-top:6px">장터 입장</button>
     <p class="mute center" style="font-size:14px">같은 코드 · 상단 · 이름으로 다시 들어오면 내 장부가 이어져요</p>
   </div>
-  <p class="center mute" style="margin-top:22px;font-size:14px"><a href="#teacher" style="color:var(--mute)">강사용</a></p>
+  <p class="center mute" style="margin-top:22px;font-size:14px"><a href="#teacher" style="color:var(--mute)">강사용</a> · <a href="#" id="j-check" style="color:var(--mute)">연결 점검</a></p>
+  <div id="j-checkout" class="card hide" style="max-width:640px;margin:14px auto 0;font-size:15px;line-height:1.7;text-align:center"></div>
 </div>
 
 <!-- ============ 학생: 장터 ============ -->
@@ -297,10 +298,14 @@ const DB=DEMO?{
   async update(p,d){const o=this._r();const [c,k]=this._nav(o,p,true);c[k]=Object.assign(c[k]||{},JSON.parse(JSON.stringify(d)));this._w(o)},
   async del(p){return this.set(p,null)}
 }:{
-  async get(p){const r=await fetch(`${FB_URL}/${p}.json`);if(!r.ok)throw new Error('net');return r.json()},
-  async set(p,d){const r=await fetch(`${FB_URL}/${p}.json`,{method:'PUT',body:JSON.stringify(d)});if(!r.ok)throw new Error('net')},
-  async update(p,d){const r=await fetch(`${FB_URL}/${p}.json`,{method:'PATCH',body:JSON.stringify(d)});if(!r.ok)throw new Error('net')},
-  async del(p){await fetch(`${FB_URL}/${p}.json`,{method:'DELETE'})}
+  async _f(p,opt){let r;
+    try{r=await fetch(`${FB_URL}/${p}.json`,opt)}catch(e){const er=new Error('blocked');er.kind='blocked';throw er}
+    if(!r.ok){let t='';try{t=(await r.json()).error||''}catch(_){}const er=new Error(t||('HTTP '+r.status));er.kind=(r.status===401||r.status===403)?'denied':'http';er.status=r.status;throw er}
+    return r.json()},
+  async get(p){return this._f(p)},
+  async set(p,d){return this._f(p,{method:'PUT',body:JSON.stringify(d)})},
+  async update(p,d){return this._f(p,{method:'PATCH',body:JSON.stringify(d)})},
+  async del(p){return this._f(p,{method:'DELETE'})}
 };
 
 /* ================= 공통 ================= */
@@ -309,7 +314,13 @@ const fmt=n=>Math.round(n).toLocaleString('ko-KR');
 const pct=r=>(r>0?'+':'')+(r*100).toFixed(1)+'%';
 const cls=r=>r>0.00001?'up':(r<-0.00001?'down':'');
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-let toastT;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2200)}
+function netMsg(e){
+  if(e&&e.kind==='denied')return `저장소가 막혀 있어요 (Firebase 규칙: ${e.message}). 강사님께 알려 주세요`;
+  if(e&&e.kind==='blocked')return '이 페이지에서 저장소(firebaseio.com)로 연결할 수 없어요. 게시한 곳이나 학교·기관 네트워크가 막고 있을 수 있어요';
+  if(e&&e.kind==='http')return `저장소 오류: ${e.message}`;
+  return '연결이 잠시 안 돼요. 다시 눌러 주세요 ('+(e&&e.message||'알 수 없음')+')';
+}
+let toastT;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),m.length>40?6000:2200)}
 function show(id){['v-join','v-play','v-tlogin','v-teacher'].forEach(v=>$(v).classList.toggle('hide',v!==id))}
 function genCode(){const a='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<4;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
 function genId(){return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
@@ -354,7 +365,7 @@ $('j-go').onclick=async()=>{
     if(!pid){pid=genId();await DB.set(ROOT(code)+'/players/'+pid,{name,team,cash:START,hold:{},beliefs:{},log:[],joined:Date.now()});toast('입장 완료! 1,000냥을 받았어요')}
     else toast('다시 오셨네요. 장부를 이어서 열어요');
     S.code=code;S.pid=pid;saveSess();startPlay();
-  }catch(e){toast('연결이 잠시 안 돼요. 다시 눌러 주세요')}
+  }catch(e){console.error(e);toast(netMsg(e))}
 };
 $('p-out').onclick=()=>{if(!confirm('이 기기에서 나갈까요? 같은 코드·상단·이름으로 다시 들어오면 이어져요'))return;localStorage.removeItem(SKEY);S={code:null,pid:null,me:null,meta:null,pick:null,busy:false,players:null};show('v-join')};
 
@@ -492,7 +503,7 @@ $('t-go').onclick=async()=>{
     else{do{code=genCode()}while(await DB.get(ROOT(code)+'/meta'));await newMarket(code)}
     T.code=code;try{localStorage.setItem(TKEY,code)}catch(e){}
     startTeacher();
-  }catch(e){toast('연결이 잠시 안 돼요. 다시 눌러 주세요')}
+  }catch(e){console.error(e);toast(netMsg(e))}
 };
 async function newMarket(code){await DB.set(ROOT(code),{meta:{status:'waiting',day:0,endsAt:null,teams:+$('t-teams').value,created:Date.now()}})}
 let tpoll=null,ttick=null;
@@ -614,6 +625,14 @@ $('c-csv').onclick=()=>{
   const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`장터거래소_${T.code}.csv`;a.click();
 };
+
+$('j-check').onclick=async e=>{e.preventDefault();const o=$('j-checkout');o.classList.remove('hide');o.innerHTML='점검 중...';
+  const res=[];const P='classes/JT-PING/ping';
+  try{await DB.get(P);res.push('① 읽기: 성공')}catch(err){res.push('① 읽기: 실패 → '+netMsg(err))}
+  try{await DB.set(P,{t:Date.now()});res.push('② 쓰기: 성공')}catch(err){res.push('② 쓰기: 실패 → '+netMsg(err))}
+  try{await DB.del(P);res.push('③ 지우기: 성공')}catch(err){res.push('③ 지우기: 실패 → '+netMsg(err))}
+  res.push('<span class="mute">페이지 주소: '+esc(location.origin+location.pathname)+(DEMO?' · 연습 모드':'')+'</span>');
+  o.innerHTML=res.join('<br>')};
 
 /* ================= 시작 ================= */
 function route(){
