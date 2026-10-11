@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>청파 장터 거래소</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4EBDD; --card:#FFFBF3; --card2:#FDF6EA; --line:#D9C4A3;
+    --ink:#33221A; --body:#5E4632; --mute:#9A8268;
+    --gold:#D9A441; --goldtxt:#8A5E0C; --door:#5A3D26;
+    --up:#D6453D; --down:#2F6FD0; --ok:#3F7D4E;
+    --gov:#2F6FD0; --letter:#8A5E0C; --rumor:#B0457A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:'Noto Sans KR','Apple SD Gothic Neo',sans-serif;min-height:100vh}
+  body{background:radial-gradient(ellipse at 50% -10%, #FFF6E4 0%, var(--bg) 55%) fixed}
+  button{font-family:inherit;cursor:pointer;border:none}
+  input,select,textarea{font-family:inherit;font-size:17px;padding:12px 14px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);width:100%}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+  .wrap{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+  .hide{display:none!important}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:18px}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .grow{flex:1}
+  h1{font-size:30px;font-weight:900;letter-spacing:-0.5px}
+  h2{font-size:22px;font-weight:800}
+  h3{font-size:18px;font-weight:800}
+  .mute{color:var(--mute)}
+  .btn{padding:12px 18px;border-radius:12px;font-size:17px;font-weight:800;background:var(--door);color:#FFF6E4}
+  .btn:hover{filter:brightness(1.08)}
+  .btn.gold{background:var(--gold);color:var(--ink)}
+  .btn.line{background:#fff;color:var(--ink);border:2px solid var(--line)}
+  .btn.red{background:var(--up);color:#fff}
+  .btn.blue{background:var(--down);color:#fff}
+  .btn.sm{padding:8px 12px;font-size:15px;border-radius:10px}
+  .btn:disabled{opacity:.35;cursor:not-allowed;filter:none}
+  .up{color:var(--up)} .down{color:var(--down)}
+  .pill{display:inline-block;padding:4px 12px;border-radius:999px;font-weight:800;font-size:14px}
+  .hero{text-align:center;padding:28px 0 18px}
+  .hero .door{width:84px;height:110px;margin:0 auto 14px;border:4px solid #D4B98C;border-bottom:none;border-radius:42px 42px 0 0;background:linear-gradient(180deg,#F7D9A0 0%,#D9A441 20%,#6E4C30 70%,#3B2A20 100%);box-shadow:0 0 40px rgba(217,164,65,.45)}
+  .hero p{color:var(--body);margin-top:6px;font-size:17px}
+  .center{text-align:center}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:center;vertical-align:middle;padding:10px 6px;border-bottom:1px solid #EADBC2;font-size:16px}
+  th{background:#33221A;color:#FBF6EE;font-weight:700;font-size:15px}
+  th:first-child{border-radius:10px 0 0 0} th:last-child{border-radius:0 10px 0 0}
+  .num{font-variant-numeric:tabular-nums}
+  #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--ink);color:#FFF6E4;padding:12px 20px;border-radius:12px;font-weight:700;opacity:0;transition:.25s;pointer-events:none;z-index:99;max-width:90vw;text-align:center}
+  #toast.on{opacity:1}
+  .demo-badge{position:fixed;bottom:10px;left:10px;background:#B0457A;color:#fff;font-weight:800;font-size:13px;padding:4px 10px;border-radius:999px;z-index:98}
+
+  /* status banner */
+  .banner{border-radius:18px;padding:16px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;color:#FFF6E4;background:linear-gradient(90deg,#3B2A20,#5A3D26)}
+  .banner .t{font-size:22px;font-weight:900}
+  .banner .s{opacity:.85;font-size:15px}
+  .banner .timer{margin-left:auto;font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;color:#F7D9A0}
+  .banner.open{background:linear-gradient(90deg,#8A5E0C,#D9A441);color:var(--ink)}
+  .banner.open .timer{color:var(--ink)}
+  .banner.final{background:linear-gradient(90deg,#33221A,#6E4C30 60%,#D9A441)}
+
+  /* stats */
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .stat{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:14px;text-align:center}
+  .stat .v{font-size:26px;font-weight:900;font-variant-numeric:tabular-nums}
+  .stat .l{font-size:14px;color:var(--mute);font-weight:700;margin-top:2px}
+
+  /* news */
+  .news{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .src{border-radius:16px;padding:14px;background:#fff;border:2px solid var(--line);display:flex;flex-direction:column;gap:8px;text-align:left}
+  .src .h{display:flex;align-items:center;gap:8px;font-weight:900;font-size:17px}
+  .src .b{font-size:16px;line-height:1.55;color:var(--body)}
+  .src.pick{cursor:pointer;transition:.15s}
+  .src.pick:hover{transform:translateY(-2px)}
+  .src.sel{border-width:3px;box-shadow:0 6px 18px rgba(51,34,26,.15)}
+  .src.gov .h{color:var(--gov)} .src.gov.sel{border-color:var(--gov)}
+  .src.letter .h{color:var(--letter)} .src.letter.sel{border-color:var(--letter)}
+  .src.rumor .h{color:var(--rumor)} .src.rumor.sel{border-color:var(--rumor)}
+  .lead{font-size:16px;color:var(--body);text-align:center;margin:4px 0 12px}
+
+  /* market */
+  .mkt td.name{text-align:center;font-weight:800}
+  .mkt .kind{display:block;font-size:12px;font-weight:600;color:var(--mute)}
+  .qtybtn{display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+  .event{background:#33221A;color:#FFF6E4;border-radius:14px;padding:14px 18px;font-size:18px;font-weight:700;text-align:center;line-height:1.5}
+  .log li{list-style:none;padding:6px 0;border-bottom:1px dashed #EADBC2;font-size:15px;text-align:center}
+
+  /* teacher */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap}
+  .tab{padding:10px 16px;border-radius:12px;background:#fff;border:2px solid var(--line);font-weight:800;font-size:16px;color:var(--body)}
+  .tab.on{background:var(--ink);color:#FFF6E4;border-color:var(--ink)}
+  .ctrl{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+  .bar{height:18px;border-radius:9px;background:#EADBC2;overflow:hidden;display:flex}
+  .bar span{display:block;height:100%}
+  .code-big{font-size:46px;font-weight:900;letter-spacing:6px;color:var(--goldtxt)}
+
+  /* big board */
+  #board{position:fixed;inset:0;z-index:50;background:radial-gradient(ellipse at 50% 0%, #4A3427 0%, #2B1E16 60%, #1F1611 100%);color:#FFF6E4;padding:28px 40px;overflow:auto}
+  #board h1{font-size:46px;text-align:center}
+  #board .sub{font-size:22px;text-align:center;opacity:.85;margin-top:4px}
+  #board .timer{font-size:72px;font-weight:900;text-align:center;color:#F7D9A0;font-variant-numeric:tabular-nums}
+  #board table th{background:#D9A441;color:#33221A;font-size:22px}
+  #board table td{font-size:26px;border-bottom:1px solid rgba(255,246,228,.15);color:#FFF6E4}
+  #board .up{color:#FF7A6E} #board .down{color:#7FB2FF}
+  #board .event{background:rgba(217,164,65,.18);border:2px solid #D9A441;font-size:26px}
+  #board .close{position:fixed;top:16px;right:20px}
+
+  @media (max-width:760px){
+    .stats{grid-template-columns:1fr 1fr 1fr}
+    .stat .v{font-size:20px}
+    .news{grid-template-columns:1fr}
+    th,td{font-size:14px;padding:8px 3px}
+    .banner .timer{font-size:26px}
+  }
+</style>
+</head>
+<body>
+<div id="toast"></div>
+
+<!-- ============ 학생: 입장 ============ -->
+<div id="v-join" class="wrap hide">
+  <div class="hero">
+    <div class="door"></div>
+    <h1>청파 장터 거래소</h1>
+    <p>세 번의 장날 동안 1,000냥을 지키고 불려라</p>
+  </div>
+  <div class="card" style="max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:12px">
+    <label class="center" style="font-weight:800">장터 코드</label>
+    <input id="j-code" maxlength="6" placeholder="예: GJ7K" style="text-transform:uppercase;text-align:center;font-size:24px;font-weight:900;letter-spacing:4px">
+    <label class="center" style="font-weight:800">우리 상단</label>
+    <select id="j-team"></select>
+    <label class="center" style="font-weight:800">이름(닉네임)</label>
+    <input id="j-name" maxlength="10" placeholder="진짜 이름 대신 닉네임도 좋아요" style="text-align:center">
+    <button class="btn gold" id="j-go" style="margin-top:6px">장터 입장</button>
+    <p class="mute center" style="font-size:14px">같은 코드 · 상단 · 이름으로 다시 들어오면 내 장부가 이어져요</p>
+  </div>
+  <p class="center mute" style="margin-top:22px;font-size:14px"><a href="#teacher" style="color:var(--mute)">강사용</a></p>
+</div>
+
+<!-- ============ 학생: 장터 ============ -->
+<div id="v-play" class="wrap hide" style="display:flex;flex-direction:column;gap:14px">
+  <div class="row" style="justify-content:center">
+    <span class="pill" style="background:var(--ink);color:#FFF6E4" id="p-who"></span>
+    <span class="pill" style="background:#fff;border:2px solid var(--line)" id="p-code"></span>
+    <button class="btn line sm" id="p-out">나가기</button>
+  </div>
+  <div class="banner" id="p-banner"><div><div class="t" id="p-bt"></div><div class="s" id="p-bs"></div></div><div class="timer" id="p-timer"></div></div>
+  <div class="stats">
+    <div class="stat"><div class="v" id="p-cash">-</div><div class="l">가진 냥</div></div>
+    <div class="stat"><div class="v" id="p-val">-</div><div class="l">내 재산(냥)</div></div>
+    <div class="stat"><div class="v" id="p-ret">-</div><div class="l">수익률</div></div>
+  </div>
+
+  <div id="p-finalbox" class="card hide center"></div>
+  <div id="p-eventbox" class="event hide"></div>
+
+  <div id="p-newsbox" class="card hide">
+    <h2 class="center" id="p-ntitle"></h2>
+    <p class="lead" id="p-nlead"></p>
+    <div class="news" id="p-news"></div>
+    <div id="p-beliefform" style="margin-top:14px;display:flex;flex-direction:column;gap:10px">
+      <p class="center" style="font-weight:800">이번 장날, 누구 말을 가장 믿나요? 위에서 하나를 눌러 고르세요</p>
+      <input id="p-why" maxlength="60" placeholder="이유 한 줄 (예: 관청은 사실만 알려 줘서)" style="text-align:center">
+      <button class="btn gold" id="p-belief">이걸로 정하고 주문 시작</button>
+    </div>
+    <p id="p-beliefdone" class="center hide" style="font-weight:800;color:var(--ok)"></p>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:center;margin-bottom:10px"><h2>장터 시세</h2><span class="mute" id="p-mhint" style="font-size:14px"></span></div>
+    <table class="mkt"><thead><tr><th>종목</th><th>값(1주)</th><th>지난 장보다</th><th>내 보유</th><th>사기</th><th>팔기</th></tr></thead><tbody id="p-mkt"></tbody></table>
+    <p class="mute center" style="font-size:13px;margin-top:8px">수수료는 없어요 · 1주 또는 10주씩 · 오르면 빨강 ▲, 내리면 파랑 ▼</p>
+  </div>
+
+  <div class="card">
+    <div class="row" style="justify-content:center;margin-bottom:8px"><h2>내 장부</h2><button class="btn line sm" id="p-copy">내 기록 복사</button></div>
+    <ul class="log" id="p-log"></ul>
+    <p class="mute center" style="font-size:13px;margin-top:8px">복사한 기록은 Gemini 기록장에 붙여 넣어요</p>
+  </div>
+</div>
+
+<!-- ============ 강사: 로그인 ============ -->
+<div id="v-tlogin" class="wrap hide">
+  <div class="hero"><div class="door"></div><h1>장터 거래소 · 강사</h1><p>장터 코드를 만들거나, 이미 만든 코드로 들어가요</p></div>
+  <div class="card" style="max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:12px">
+    <label class="center" style="font-weight:800">강사 인증코드</label>
+    <input id="t-key" type="password" style="text-align:center">
+    <label class="center" style="font-weight:800">장터 코드 (비우면 새로 만들어요)</label>
+    <input id="t-code" maxlength="6" style="text-transform:uppercase;text-align:center;font-size:22px;font-weight:900;letter-spacing:4px">
+    <label class="center" style="font-weight:800">상단 수</label>
+    <select id="t-teams"><option value="7">7개 (광주)</option><option value="5">5개 (울산)</option><option value="6">6개</option><option value="8">8개</option></select>
+    <button class="btn gold" id="t-go">들어가기</button>
+  </div>
+  <p class="center mute" style="margin-top:22px;font-size:14px"><a href="#" style="color:var(--mute)">학생 화면으로</a></p>
+</div>
+
+<!-- ============ 강사: 진행 ============ -->
+<div id="v-teacher" class="wrap hide" style="display:flex;flex-direction:column;gap:14px">
+  <div class="row" style="justify-content:space-between">
+    <div><span class="mute" style="font-weight:800">장터 코드</span> <span class="code-big" id="t-codeview"></span></div>
+    <div class="row"><span class="pill" style="background:#fff;border:2px solid var(--line)" id="t-count"></span><button class="btn gold" id="t-board">큰 화면 띄우기</button></div>
+  </div>
+  <div class="banner" id="t-banner"><div><div class="t" id="t-bt"></div><div class="s" id="t-bs"></div></div><div class="timer" id="t-timer"></div></div>
+  <div class="card">
+    <h3 class="center" style="margin-bottom:10px">진행 버튼</h3>
+    <div class="ctrl">
+      <button class="btn gold" id="c-open">첫째 장 열기</button>
+      <button class="btn" id="c-close">이번 장 마감</button>
+      <button class="btn line" id="c-final">최종 결과 공개</button>
+    </div>
+    <div class="row" style="justify-content:center;margin-top:12px">
+      <span class="mute" style="font-weight:700">장 시간</span>
+      <button class="btn line sm tm" data-m="5">5분</button>
+      <button class="btn line sm tm" data-m="6">6분</button>
+      <button class="btn line sm tm" data-m="7">7분</button>
+      <button class="btn line sm" id="c-plus">+1분</button>
+      <span class="mute" style="font-size:14px" id="t-tmset"></span>
+    </div>
+    <p class="mute center" style="font-size:13px;margin-top:10px">진행 표(D-07): 첫째 장 6분 → 마감 2분 → 둘째 장 5분 → 마감 2분 → 셋째 장 5분 → 마감 2분 → 최종 결과</p>
+  </div>
+  <div class="tabs" id="t-tabs">
+    <button class="tab on" data-t="mkt">시세</button>
+    <button class="tab" data-t="rank">수익률 순위</button>
+    <button class="tab" data-t="belief">누구 말을 믿었나</button>
+    <button class="tab" data-t="ppl">참가자</button>
+  </div>
+  <div class="card" id="tt-mkt"></div>
+  <div class="card hide" id="tt-rank"></div>
+  <div class="card hide" id="tt-belief"></div>
+  <div class="card hide" id="tt-ppl"></div>
+  <div class="row" style="justify-content:center">
+    <button class="btn line sm" id="c-csv">CSV 내려받기</button>
+    <button class="btn line sm" id="c-back">한 단계 되돌리기</button>
+    <button class="btn line sm" id="c-reset" style="color:var(--up)">처음부터 다시(기록 삭제)</button>
+    <button class="btn line sm" id="c-leave">강사 화면 나가기</button>
+  </div>
+</div>
+
+<!-- ============ 큰 화면 ============ -->
+<div id="board" class="hide">
+  <button class="btn gold sm close" id="b-close">닫기</button>
+  <h1 id="b-title"></h1>
+  <p class="sub" id="b-sub"></p>
+  <div class="timer" id="b-timer"></div>
+  <div id="b-body" style="max-width:1400px;margin:18px auto 0;display:flex;flex-direction:column;gap:18px"></div>
+</div>
+
+<script>
+/* ================= 데이터 ================= */
+const ITEMS=[
+  {k:'silk',   n:'비단 상단',   kind:'상단의 몫 · 서하연',  P:[50,80,48,62]},
+  {k:'ship',   n:'해운 상단',   kind:'상단의 몫 · 바다슬',  P:[60,84,42,59]},
+  {k:'ginseng',n:'인삼 상단',   kind:'상단의 몫 · 길도겸',  P:[40,44,40,48]},
+  {k:'salt',   n:'소금 상단',   kind:'상단의 몫 · 채다온',  P:[20,20,24,23]},
+  {k:'pottery',n:'도자기 상단', kind:'상단의 몫 · 온새미',  P:[30,36,29,33]},
+  {k:'basket', n:'장터 꾸러미', kind:'다섯 상단을 조금씩',  P:[100,126,101,121]},
+  {k:'bond',   n:'관청 차용증', kind:'관청에 빌려준 증서',  P:[100,103,106,109]},
+  {k:'dragon', n:'용비늘 증서', kind:'소문으로 값이 움직임',P:[20,40,12,14]},
+  {k:'vault',  n:'금고',        kind:'맡기면 장마다 1냥(1%)',P:[100,101,102,103]},
+];
+const START=1000;
+const SRC={gov:{n:'관청 방',c:'var(--gov)'},letter:{n:'행수 편지',c:'var(--letter)'},rumor:{n:'골목 소문',c:'var(--rumor)'}};
+const NEWS={
+  1:{t:'첫째 장 · 바닷길이 열렸다',lead:'3년 동안 서쪽 바다를 막던 해적 무리가 붙잡혔다는 소식에 항구가 들썩여요.',
+     gov:'해적을 소탕했다. 다음 달부터 서쪽 바닷길을 다시 연다. 방파제 차용증 이자는 약속대로 준다.',
+     letter:'서하연(비단): 벌써 배 세 척을 빌려 두었습니다!<br>채다온(소금): 바다가 열리든 닫히든 사람은 소금을 먹습니다.',
+     rumor:'용비늘 증서를 가진 사람은 복이 들어온대. (누가 처음 한 말인지 모름)'},
+  2:{t:'둘째 장 · 검은 구름',lead:'하늘이 어두워지고 갈매기가 육지로 날아들어요. 장터는 용비늘 이야기로 들떠 있어요.',
+     gov:'남쪽 바다에 큰 바람이 다가온다. 모든 배는 항구에 묶어 두라. 바닷물이 넘쳐 아랫마을 염전이 잠겼다.',
+     letter:'바다슬(해운): 우리 배는 튼튼합니다. 걱정 마십시오!<br>온새미(도자기): 다음 배에 그릇 500점을 싣습니다.',
+     rumor:'용비늘이 이번 장에도 두 배 간대! 우리 사촌이 그러더라.'},
+  3:{t:'셋째 장 · 다시 돛을 올리다',lead:'태풍이 지나간 항구에 망치 소리가 울려요. 하지만 겁먹은 얼굴들이 많아요.',
+     gov:'항구 수리가 끝났다. 배들이 다시 출항한다. 아랫마을 염전이 다시 소금을 만들기 시작했다.',
+     letter:'길도겸(인삼): 올해 홍삼 주문이 작년의 두 배입니다.',
+     rumor:'이제 다 끝났어. 전부 팔고 금고에 넣어야 살아!'}
+};
+const CLOSE={
+  1:'무역선이 비단을 가득 싣고 돌아왔다. 용비늘을 사려는 사람이 몰렸다.',
+  2:'태풍에 배가 부서졌다. 용비늘 소문은 가짜로 드러나 값이 폭락했다. 소금은 올랐다.',
+  3:'배들이 돌아오고 장터에 사람이 다시 모였다. 소금 값은 제자리를 찾았다.'
+};
+const DAYNAME=['','첫째','둘째','셋째'];
+const TEACHER_KEY='hot2026'; // ← 강사 인증코드 (index.html과 같은 값)
+
+/* ================= 저장소 (Firebase REST / 데모) ================= */
+const DEMO=/[?&]demo\b/.test(location.search);
+const FB_URL='https://geang-invest-default-rtdb.firebaseio.com';
+const ROOT=c=>`classes/JT-${c}`;
+const DB=DEMO?{
+  _r(){try{return JSON.parse(localStorage.getItem('jt_demo_db')||'{}')}catch(e){return {}}},
+  _w(o){localStorage.setItem('jt_demo_db',JSON.stringify(o))},
+  _nav(o,p,mk){const a=p.split('/').filter(Boolean);let cur=o;for(let i=0;i<a.length-1;i++){if(cur[a[i]]==null||typeof cur[a[i]]!=='object'){if(!mk)return [null,null];cur[a[i]]={}}cur=cur[a[i]]}return [cur,a[a.length-1]]},
+  async get(p){const o=this._r();const [c,k]=this._nav(o,p,false);return c?JSON.parse(JSON.stringify(c[k]??null)):null},
+  async set(p,d){const o=this._r();const [c,k]=this._nav(o,p,true);if(d==null)delete c[k];else c[k]=JSON.parse(JSON.stringify(d));this._w(o)},
+  async update(p,d){const o=this._r();const [c,k]=this._nav(o,p,true);c[k]=Object.assign(c[k]||{},JSON.parse(JSON.stringify(d)));this._w(o)},
+  async del(p){return this.set(p,null)}
+}:{
+  async get(p){const r=await fetch(`${FB_URL}/${p}.json`);if(!r.ok)throw new Error('net');return r.json()},
+  async set(p,d){const r=await fetch(`${FB_URL}/${p}.json`,{method:'PUT',body:JSON.stringify(d)});if(!r.ok)throw new Error('net')},
+  async update(p,d){const r=await fetch(`${FB_URL}/${p}.json`,{method:'PATCH',body:JSON.stringify(d)});if(!r.ok)throw new Error('net')},
+  async del(p){await fetch(`${FB_URL}/${p}.json`,{method:'DELETE'})}
+};
+
+/* ================= 공통 ================= */
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString('ko-KR');
+const pct=r=>(r>0?'+':'')+(r*100).toFixed(1)+'%';
+const cls=r=>r>0.00001?'up':(r<-0.00001?'down':'');
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let toastT;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2200)}
+function show(id){['v-join','v-play','v-tlogin','v-teacher'].forEach(v=>$(v).classList.toggle('hide',v!==id))}
+function genCode(){const a='ABCDEFGHJKMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<4;i++)s+=a[Math.floor(Math.random()*a.length)];return s}
+function genId(){return 'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+/* 가격 지점: 대기 0, 장 열림 d → d-1 값으로 거래, 마감 d → d 값, 최종 3 */
+function pIdx(m){if(!m)return 0;if(m.status==='open')return m.day-1;if(m.status==='final')return 3;return m.day||0}
+function priceOf(k,i){return ITEMS.find(x=>x.k===k).P[i]}
+function valueAt(cash,hold,i){let v=cash;for(const it of ITEMS)v+=(hold?.[it.k]||0)*it.P[i];return v}
+function timeLeft(m){if(!m||m.status!=='open'||!m.endsAt)return null;return Math.max(0,m.endsAt-Date.now())}
+function mmss(ms){if(ms==null)return '';const s=Math.ceil(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+function bannerText(m){
+  if(!m)return ['장터 준비 중',''];
+  if(m.status==='waiting')return ['장터가 곧 열려요','강사님이 첫째 장을 열 때까지 기다려요. 시작 값을 미리 살펴보세요.'];
+  if(m.status==='open')return [`${DAYNAME[m.day]} 장 · 거래 중`,NEWS[m.day].t];
+  if(m.status==='closed')return [`${DAYNAME[m.day]} 장 마감`,m.day<3?'값이 바뀌었어요. 다음 장날을 기다려요.':'세 번의 장날이 모두 끝났어요. 최종 결과를 기다려요.'];
+  return ['최종 결과','세 번의 장날 동안 1,000냥은 어떻게 되었을까요?'];
+}
+/* 장부 다시 계산: 장날별 수익률 */
+function replay(p,uptoDay){ // uptoDay 이전 장날 거래까지 반영한 현금·보유
+  let cash=START,hold={};for(const e of (p.log||[])){if(e.d>=uptoDay)continue;cash-=e.q*e.p;hold[e.k]=(hold[e.k]||0)+e.q}return {cash,hold}
+}
+function dayReturn(p,d){const b=replay(p,d),a=replay(p,d+1);const vb=valueAt(b.cash,b.hold,d-1);return vb>0?valueAt(a.cash,a.hold,d)/vb-1:0}
+
+/* ================= 학생 ================= */
+const SKEY='jangteo_session'+(DEMO?'_demo':'');
+let S={code:null,pid:null,me:null,meta:null,pick:null,busy:false,players:null};
+function loadSess(){try{return JSON.parse(localStorage.getItem(SKEY)||'null')}catch(e){return null}}
+function saveSess(){try{localStorage.setItem(SKEY,JSON.stringify({code:S.code,pid:S.pid}))}catch(e){}}
+
+function fillTeams(n){const sel=$('j-team');const cur=sel.value;sel.innerHTML='';for(let i=1;i<=n;i++){const o=document.createElement('option');o.value=i;o.textContent=`${i}상단`;sel.appendChild(o)}if(cur&&cur<=n)sel.value=cur}
+fillTeams(7);
+$('j-code').addEventListener('change',async()=>{const c=$('j-code').value.trim().toUpperCase();if(!c)return;try{const m=await DB.get(ROOT(c)+'/meta');if(m)fillTeams(m.teams||7)}catch(e){}});
+
+$('j-go').onclick=async()=>{
+  const code=$('j-code').value.trim().toUpperCase(),team=+$('j-team').value,name=$('j-name').value.trim();
+  if(!code)return toast('장터 코드를 넣어 주세요');
+  if(!name)return toast('이름(닉네임)을 넣어 주세요');
+  try{
+    const meta=await DB.get(ROOT(code)+'/meta');
+    if(!meta)return toast('없는 장터 코드예요. 다시 확인해 주세요');
+    const players=await DB.get(ROOT(code)+'/players')||{};
+    let pid=Object.keys(players).find(id=>players[id].name===name&&players[id].team===team);
+    if(!pid){pid=genId();await DB.set(ROOT(code)+'/players/'+pid,{name,team,cash:START,hold:{},beliefs:{},log:[],joined:Date.now()});toast('입장 완료! 1,000냥을 받았어요')}
+    else toast('다시 오셨네요. 장부를 이어서 열어요');
+    S.code=code;S.pid=pid;saveSess();startPlay();
+  }catch(e){toast('연결이 잠시 안 돼요. 다시 눌러 주세요')}
+};
+$('p-out').onclick=()=>{if(!confirm('이 기기에서 나갈까요? 같은 코드·상단·이름으로 다시 들어오면 이어져요'))return;localStorage.removeItem(SKEY);S={code:null,pid:null,me:null,meta:null,pick:null,busy:false,players:null};show('v-join')};
+
+let pollT=null,tickT=null;
+async function startPlay(){
+  show('v-play');
+  await pullPlay();
+  clearInterval(pollT);clearInterval(tickT);
+  pollT=setInterval(pullPlay,1500);
+  tickT=setInterval(()=>{const l=timeLeft(S.meta);$('p-timer').textContent=l==null?'':mmss(l);if(l===0&&S.meta?.status==='open')renderPlay()},500);
+}
+async function pullPlay(){
+  try{
+    const [meta,me]=await Promise.all([DB.get(ROOT(S.code)+'/meta'),DB.get(ROOT(S.code)+'/players/'+S.pid)]);
+    if(!meta||!me){toast('장터가 초기화되었어요. 다시 입장해 주세요');localStorage.removeItem(SKEY);clearInterval(pollT);show('v-join');return}
+    const changed=JSON.stringify(meta)!==JSON.stringify(S.meta);
+    S.meta=meta;if(!S.busy)S.me=me;
+    if(meta.status==='final'&&(!S.players||changed||Math.random()<0.15))S.players=await DB.get(ROOT(S.code)+'/players')||{};
+    renderPlay();
+  }catch(e){}
+}
+function canTrade(){const m=S.meta;if(!m||m.status!=='open')return false;if(timeLeft(m)===0)return false;return !!S.me?.beliefs?.[m.day]}
+function renderPlay(){
+  const m=S.meta,me=S.me;if(!m||!me)return;
+  const i=pIdx(m);
+  $('p-who').textContent=`${me.team}상단 · ${me.name}`;$('p-code').textContent=`장터 ${S.code}`;
+  const [bt,bs]=bannerText(m);$('p-bt').textContent=bt;$('p-bs').textContent=bs;
+  $('p-banner').className='banner'+(m.status==='open'?' open':'')+(m.status==='final'?' final':'');
+  const l=timeLeft(m);$('p-timer').textContent=l==null?'':mmss(l);
+  if(l===0)$('p-bs').textContent='시간 끝! 주문을 멈춰요. 곧 마감해요.';
+  const v=valueAt(me.cash,me.hold,i),r=v/START-1;
+  $('p-cash').textContent=fmt(me.cash);$('p-val').textContent=fmt(v);
+  $('p-ret').textContent=pct(r);$('p-ret').className='v '+cls(r);
+  // 마감 사건
+  const eb=$('p-eventbox');
+  if((m.status==='closed'||m.status==='final')&&m.day>0){eb.classList.remove('hide');eb.innerHTML=`<span style="color:#F7D9A0">${DAYNAME[m.day]} 장 마감 소식</span><br>${CLOSE[m.day]}`}else eb.classList.add('hide');
+  // 소식 + 믿음 선택
+  const nb=$('p-newsbox');
+  if(m.status==='open'){
+    nb.classList.remove('hide');const N=NEWS[m.day];
+    $('p-ntitle').textContent=N.t;$('p-nlead').textContent=N.lead;
+    const chosen=me.beliefs?.[m.day];
+    const sel=chosen?chosen.src:S.pick;
+    $('p-news').innerHTML=['gov','letter','rumor'].map(s=>`<div class="src ${s} ${chosen?'':'pick'} ${sel===s?'sel':''}" data-s="${s}"><div class="h">${SRC[s].n}${sel===s?' ✓':''}</div><div class="b">${N[s]}</div></div>`).join('');
+    if(!chosen)document.querySelectorAll('#p-news .src.pick').forEach(el=>el.onclick=()=>{S.pick=el.dataset.s;renderPlay()});
+    $('p-beliefform').classList.toggle('hide',!!chosen);
+    $('p-beliefdone').classList.toggle('hide',!chosen);
+    if(chosen)$('p-beliefdone').textContent=`이번 장날 나는 「${SRC[chosen.src].n}」을 믿어요 · ${chosen.why}`;
+  }else nb.classList.add('hide');
+  // 시세
+  const prev=Math.max(0,i-1),ok=canTrade();
+  $('p-mhint').textContent=m.status==='open'?(ok?'· 지금 이 값으로 사고팔아요':(me.beliefs?.[m.day]?'· 시간이 끝났어요':'· 먼저 믿을 소식을 골라요')):'· 장날이 열리면 사고팔 수 있어요';
+  $('p-mkt').innerHTML=ITEMS.map(it=>{
+    const p=it.P[i],pp=it.P[prev],ch=i>0?p/pp-1:0,h=me.hold?.[it.k]||0;
+    const chs=i===0?'<span class="mute">-</span>':`<span class="${cls(ch)}">${ch>0?'▲':ch<0?'▼':''}${ch===0?'–':Math.abs(Math.round(ch*100))+'%'}</span>`;
+    const dis=ok?'':'disabled';
+    return `<tr><td class="name">${it.n}<span class="kind">${it.kind}</span></td><td class="num" style="font-weight:800">${fmt(p)}냥</td><td>${chs}</td><td class="num">${h?h+'주':'<span class="mute">0</span>'}</td>
+      <td><div class="qtybtn"><button class="btn red sm" ${dis} onclick="trade('${it.k}',1)">1</button><button class="btn red sm" ${dis} onclick="trade('${it.k}',10)">10</button></div></td>
+      <td><div class="qtybtn"><button class="btn blue sm" ${ok&&h>=1?'':'disabled'} onclick="trade('${it.k}',-1)">1</button><button class="btn blue sm" ${ok&&h>=10?'':'disabled'} onclick="trade('${it.k}',-10)">10</button><button class="btn line sm" ${ok&&h>0?'':'disabled'} onclick="trade('${it.k}',-${h})">전부</button></div></td></tr>`;
+  }).join('');
+  // 장부
+  const log=me.log||[];
+  let html='';
+  for(let d=1;d<=3;d++){
+    const b=me.beliefs?.[d],es=log.filter(e=>e.d===d);
+    if(!b&&!es.length)continue;
+    html+=`<li style="font-weight:800;color:var(--goldtxt)">${DAYNAME[d]} 장${b?` · 믿은 소식: ${SRC[b.src].n} (${esc(b.why)})`:''}</li>`;
+    html+=es.map(e=>`<li>${priceName(e.k)} ${Math.abs(e.q)}주 <b class="${e.q>0?'up':'down'}">${e.q>0?'샀어요':'팔았어요'}</b> · ${fmt(e.p)}냥씩 = ${fmt(Math.abs(e.q*e.p))}냥</li>`).join('');
+    if((m.status==='closed'&&m.day>=d)||m.status==='final'||(m.day>d)){const dr=dayReturn(me,d);html+=`<li class="mute">${DAYNAME[d]} 장 결과: <b class="${cls(dr)}">${pct(dr)}</b></li>`}
+  }
+  $('p-log').innerHTML=html||'<li class="mute">아직 거래가 없어요</li>';
+  // 최종
+  const fb=$('p-finalbox');
+  if(m.status==='final'&&S.players){
+    const arr=Object.entries(S.players).map(([id,p])=>({id,...p,v:valueAt(p.cash,p.hold,3)})).sort((a,b)=>b.v-a.v);
+    const rank=arr.findIndex(x=>x.id===S.pid)+1;
+    const teams={};arr.forEach(p=>{(teams[p.team]=teams[p.team]||[]).push(p.v)});
+    const tarr=Object.entries(teams).map(([t,vs])=>({t:+t,avg:vs.reduce((a,b)=>a+b,0)/vs.length})).sort((a,b)=>b.avg-a.avg);
+    const trank=tarr.findIndex(x=>x.t===me.team)+1;
+    fb.classList.remove('hide');
+    fb.innerHTML=`<h2>세 번의 장날이 끝났어요</h2><p style="font-size:44px;font-weight:900;margin:8px 0" class="${cls(r)}">${pct(r)}</p>
+      <p style="font-size:18px">1,000냥 → <b>${fmt(v)}냥</b> · 개인 ${rank}등 / ${arr.length}명 · ${me.team}상단은 ${trank}등 / ${tarr.length}상단</p>
+      <p class="mute" style="margin-top:10px">순위보다 중요한 질문: 나는 누구 말을 믿었고, 그 선택은 맞았나요?</p>`;
+  }else fb.classList.add('hide');
+}
+function priceName(k){return ITEMS.find(x=>x.k===k).n}
+async function trade(k,q){
+  if(!canTrade()||S.busy)return;
+  const m=S.meta,i=pIdx(m),p=priceOf(k,i),me=JSON.parse(JSON.stringify(S.me));
+  me.hold=me.hold||{};me.log=me.log||[];
+  if(q>0&&me.cash<q*p)return toast(`냥이 모자라요 (${fmt(q*p)}냥 필요)`);
+  if(q<0&&(me.hold[k]||0)<-q)return toast('가진 것보다 많이 팔 수 없어요');
+  me.cash-=q*p;me.hold[k]=(me.hold[k]||0)+q;if(!me.hold[k])delete me.hold[k];
+  me.log.push({d:m.day,k,q,p,t:Date.now()});
+  S.busy=true;S.me=me;renderPlay();
+  try{await DB.set(ROOT(S.code)+'/players/'+S.pid,me);toast(`${priceName(k)} ${Math.abs(q)}주 ${q>0?'샀어요':'팔았어요'}`)}
+  catch(e){toast('저장이 안 됐어요. 다시 눌러 주세요');S.me=await DB.get(ROOT(S.code)+'/players/'+S.pid)}
+  S.busy=false;renderPlay();
+}
+$('p-belief').onclick=async()=>{
+  const m=S.meta;if(!m||m.status!=='open')return;
+  if(!S.pick)return toast('관청 방 · 행수 편지 · 골목 소문 중 하나를 눌러 고르세요');
+  const why=$('p-why').value.trim();if(!why)return toast('이유를 한 줄 적어 주세요');
+  try{await DB.update(ROOT(S.code)+'/players/'+S.pid+'/beliefs',{[m.day]:{src:S.pick,why}});
+    S.me.beliefs=S.me.beliefs||{};S.me.beliefs[m.day]={src:S.pick,why};S.pick=null;$('p-why').value='';renderPlay();toast('좋아요! 이제 주문할 수 있어요')}
+  catch(e){toast('저장이 안 됐어요. 다시 눌러 주세요')}
+};
+$('p-copy').onclick=async()=>{
+  const me=S.me,m=S.meta;if(!me)return;const i=pIdx(m),v=valueAt(me.cash,me.hold,i);
+  let t=`[청파 장터 거래소 기록] ${me.team}상단 · ${me.name}\n`;
+  for(let d=1;d<=3;d++){
+    const b=me.beliefs?.[d],es=(me.log||[]).filter(e=>e.d===d);if(!b&&!es.length)continue;
+    t+=`\n■ ${DAYNAME[d]} 장 (${NEWS[d].t})\n`;
+    if(b)t+=`- 믿은 소식: ${SRC[b.src].n} / 이유: ${b.why}\n`;
+    const sum={};es.forEach(e=>{sum[e.k]=(sum[e.k]||0)+e.q});
+    const lines=Object.entries(sum).filter(([k,q])=>q).map(([k,q])=>`${priceName(k)} ${q>0?q+'주 삼':(-q)+'주 팖'}`);
+    t+=`- 거래: ${lines.length?lines.join(', '):'없음'}\n`;
+    if(m.day>d||(m.day===d&&m.status!=='open')||m.status==='final')t+=`- 이 장의 결과: ${pct(dayReturn(me,d))}\n`;
+  }
+  const held=ITEMS.filter(it=>me.hold?.[it.k]).map(it=>`${it.n} ${me.hold[it.k]}주`);
+  t+=`\n지금 내 재산: ${fmt(v)}냥 (${pct(v/START-1)})\n가진 것: 현금 ${fmt(me.cash)}냥${held.length?', '+held.join(', '):''}\n`;
+  t+=`\n돌아보기: 나는 누구 말을 믿었고, 그 선택은 맞았나? → `;
+  try{await navigator.clipboard.writeText(t);toast('복사했어요! 기록장에 붙여 넣으세요')}
+  catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('복사했어요! 기록장에 붙여 넣으세요')}catch(_){prompt('아래 글을 복사하세요',t)}ta.remove()}
+};
+
+/* ================= 강사 ================= */
+let T={code:null,meta:null,players:{},tab:'mkt',min:6,boardOn:false};
+const TKEY='jangteo_teacher'+(DEMO?'_demo':'');
+$('t-go').onclick=async()=>{
+  if(($('t-key').value||'').trim()!==TEACHER_KEY)return toast('강사 인증코드가 올바르지 않아요');
+  let code=$('t-code').value.trim().toUpperCase();
+  try{
+    if(code){const m=await DB.get(ROOT(code)+'/meta');if(!m){if(!confirm(`${code} 장터가 없어요. 이 코드로 새로 만들까요?`))return;await newMarket(code)}}
+    else{do{code=genCode()}while(await DB.get(ROOT(code)+'/meta'));await newMarket(code)}
+    T.code=code;try{localStorage.setItem(TKEY,code)}catch(e){}
+    startTeacher();
+  }catch(e){toast('연결이 잠시 안 돼요. 다시 눌러 주세요')}
+};
+async function newMarket(code){await DB.set(ROOT(code),{meta:{status:'waiting',day:0,endsAt:null,teams:+$('t-teams').value,created:Date.now()}})}
+let tpoll=null,ttick=null;
+async function startTeacher(){
+  show('v-teacher');$('t-codeview').textContent=T.code;
+  await pullT();clearInterval(tpoll);clearInterval(ttick);
+  tpoll=setInterval(pullT,2000);
+  ttick=setInterval(()=>{const l=timeLeft(T.meta);const s=l==null?'':mmss(l);$('t-timer').textContent=s;$('b-timer').textContent=l==null?'':(l===0?'시간 끝!':s)},500);
+}
+async function pullT(){try{const d=await DB.get(ROOT(T.code))||{};T.meta=d.meta;T.players=d.players||{};renderT()}catch(e){}}
+async function setMeta(o){await DB.update(ROOT(T.code)+'/meta',o);await pullT()}
+$('c-open').onclick=async()=>{const m=T.meta;if(!m)return;
+  const next=m.status==='waiting'?1:(m.status==='closed'&&m.day<3?m.day+1:null);
+  if(!next)return toast(m.status==='open'?'지금 장이 열려 있어요. 먼저 마감하세요':'더 열 장날이 없어요');
+  await setMeta({status:'open',day:next,endsAt:Date.now()+T.min*60000});toast(`${DAYNAME[next]} 장을 열었어요 (${T.min}분)`)};
+$('c-close').onclick=async()=>{if(T.meta?.status!=='open')return toast('열린 장이 없어요');await setMeta({status:'closed',endsAt:null});toast(`${DAYNAME[T.meta.day]} 장을 마감했어요`)};
+$('c-final').onclick=async()=>{if(!(T.meta?.status==='closed'&&T.meta.day===3))return toast('셋째 장을 마감한 뒤에 공개할 수 있어요');await setMeta({status:'final'});toast('최종 결과를 공개했어요')};
+document.querySelectorAll('.tm').forEach(b=>b.onclick=()=>{T.min=+b.dataset.m;renderT();toast(`다음 장날을 ${T.min}분으로 열어요`)});
+$('c-plus').onclick=async()=>{if(T.meta?.status!=='open')return toast('열린 장이 없어요');await setMeta({endsAt:Math.max(Date.now(),T.meta.endsAt||Date.now())+60000});toast('1분 늘렸어요')};
+$('c-back').onclick=async()=>{const m=T.meta;if(!m)return;let o=null;
+  if(m.status==='final')o={status:'closed',day:3};
+  else if(m.status==='closed')o={status:'open',endsAt:Date.now()+60000};
+  else if(m.status==='open')o=m.day===1?{status:'waiting',day:0,endsAt:null}:{status:'closed',day:m.day-1,endsAt:null};
+  if(!o)return;if(!confirm('한 단계 되돌릴까요? (학생 거래 기록은 그대로 남아요)'))return;await setMeta(o)};
+$('c-reset').onclick=async()=>{if(!confirm('모든 학생의 장부를 지우고 처음(대기)으로 돌릴까요?'))return;if(!confirm('정말 지울까요? 되돌릴 수 없어요'))return;
+  await DB.set(ROOT(T.code),{meta:{status:'waiting',day:0,endsAt:null,teams:T.meta?.teams||7,created:Date.now()}});await pullT();toast('처음으로 돌렸어요')};
+$('c-leave').onclick=()=>{clearInterval(tpoll);clearInterval(ttick);try{localStorage.removeItem(TKEY)}catch(e){}location.hash='';location.reload()};
+$('t-tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;T.tab=b.dataset.t;renderT()};
+$('t-board').onclick=()=>{T.boardOn=true;$('board').classList.remove('hide');renderBoard()};
+$('b-close').onclick=()=>{T.boardOn=false;$('board').classList.add('hide')};
+
+function rows(){const i=pIdx(T.meta);return Object.entries(T.players).map(([id,p])=>{const v=valueAt(p.cash,p.hold,i);return {id,...p,v,r:v/START-1}})}
+function teamRows(arr){const t={};arr.forEach(p=>{(t[p.team]=t[p.team]||[]).push(p)});return Object.entries(t).map(([k,ps])=>({team:+k,n:ps.length,r:ps.reduce((a,b)=>a+b.r,0)/ps.length})).sort((a,b)=>b.r-a.r)}
+function marketTable(big){
+  const m=T.meta,i=pIdx(m),prev=Math.max(0,i-1);
+  return `<table><thead><tr><th>종목</th>${big?'':'<th>시작</th>'}<th>${m.status==='open'?'지금 거래 값':'지금 값'}</th><th>지난 장보다</th>${big?'':'<th>시작보다</th>'}</tr></thead><tbody>${ITEMS.map(it=>{
+    const p=it.P[i],ch=i>0?p/it.P[prev]-1:0,tot=p/it.P[0]-1;
+    return `<tr><td style="font-weight:800">${it.n}</td>${big?'':`<td class="num">${it.P[0]}냥</td>`}<td class="num" style="font-weight:900">${p}냥</td><td class="${cls(ch)}">${i===0?'-':(ch>0?'▲':ch<0?'▼':'')+(ch===0?'–':Math.abs(Math.round(ch*100))+'%')}</td>${big?'':`<td class="${cls(tot)}">${i===0?'-':pct(tot)}</td>`}</tr>`}).join('')}</tbody></table>`;
+}
+function beliefStats(){
+  const arr=Object.values(T.players),m=T.meta,out=[];
+  for(let d=1;d<=3;d++){
+    const done=(m.day>d)||(m.day===d&&m.status!=='open')||m.status==='final';
+    const g={gov:[],letter:[],rumor:[]};let none=0;
+    arr.forEach(p=>{const b=p.beliefs?.[d];if(!b){none++;return}g[b.src].push(done?dayReturn(p,d):null)});
+    if(m.day<d&&m.status!=='final')continue;
+    out.push({d,done,g,none,tot:arr.length});
+  }
+  return out;
+}
+function beliefHTML(big){
+  const st=beliefStats();if(!st.length)return '<p class="mute center">장날이 열리면 학생들이 고른 소식이 여기에 모여요</p>';
+  return st.map(({d,done,g,none,tot})=>{
+    const n=g.gov.length+g.letter.length+g.rumor.length||1;
+    const bar=`<div class="bar" style="${big?'height:30px;border-radius:15px':''}">${['gov','letter','rumor'].map(s=>`<span style="width:${g[s].length/n*100}%;background:${SRC[s].c}"></span>`).join('')}</div>`;
+    const cells=['gov','letter','rumor'].map(s=>{const a=g[s],avg=done&&a.length?a.reduce((x,y)=>x+y,0)/a.length:null;
+      return `<td><b style="color:${big?'#FFF6E4':SRC[s].c}">${a.length}명</b>${avg==null?'':`<br><span class="${cls(avg)}" style="font-weight:800">이 장 ${pct(avg)}</span>`}</td>`}).join('');
+    return `<div style="margin-bottom:16px"><h3 class="center" style="margin-bottom:8px">${NEWS[d].t}</h3>${bar}
+      <table style="margin-top:8px"><thead><tr>${['gov','letter','rumor'].map(s=>`<th>${SRC[s].n}</th>`).join('')}</tr></thead><tbody><tr>${cells}</tr></tbody></table>
+      ${none&&!big?`<p class="mute center" style="font-size:13px;margin-top:4px">아직 안 고른 학생 ${none}명 / ${tot}명</p>`:''}</div>`}).join('')
+    +(big?'':'<p class="mute center" style="font-size:13px">"이 장"은 그 장날에 그 소식을 믿은 학생들이 그 장 하나에서 낸 평균 수익률이에요(장 마감 뒤 표시).</p>');
+}
+function rankHTML(big,limit){
+  const arr=rows().sort((a,b)=>b.v-a.v),tr=teamRows(arr);
+  if(!arr.length)return '<p class="mute center">아직 들어온 학생이 없어요</p>';
+  const ind=arr.slice(0,limit||arr.length).map((p,k)=>`<tr><td>${k+1}</td><td>${p.team}상단</td><td style="font-weight:800">${esc(p.name)}</td><td class="num">${fmt(p.v)}냥</td><td class="${cls(p.r)}" style="font-weight:800">${pct(p.r)}</td></tr>`).join('');
+  const tm=tr.map((t,k)=>`<tr><td>${k+1}</td><td style="font-weight:800">${t.team}상단</td><td>${t.n}명</td><td class="${cls(t.r)}" style="font-weight:800">${pct(t.r)}</td></tr>`).join('');
+  return `<div style="display:grid;grid-template-columns:${big?'1fr 1.4fr':'1fr'};gap:18px">
+    <div><h3 class="center" style="margin-bottom:8px">상단별 평균 수익률</h3><table><thead><tr><th>순위</th><th>상단</th><th>인원</th><th>평균</th></tr></thead><tbody>${tm}</tbody></table></div>
+    <div><h3 class="center" style="margin-bottom:8px">개인 수익률${limit?` (상위 ${limit}명)`:''}</h3><table><thead><tr><th>순위</th><th>상단</th><th>이름</th><th>재산</th><th>수익률</th></tr></thead><tbody>${ind}</tbody></table></div></div>`;
+}
+function renderT(){
+  const m=T.meta;if(!m)return;
+  const [bt,bs]=bannerText(m);$('t-bt').textContent=bt;$('t-bs').textContent=bs;
+  $('t-banner').className='banner'+(m.status==='open'?' open':'')+(m.status==='final'?' final':'');
+  const n=Object.keys(T.players).length,picked=m.status==='open'?Object.values(T.players).filter(p=>p.beliefs?.[m.day]).length:null;
+  $('t-count').textContent=`참가 ${n}명`+(picked!=null?` · 소식 고름 ${picked}명`:'');
+  const nextDay=m.status==='waiting'?1:(m.status==='closed'&&m.day<3?m.day+1:null);
+  $('c-open').textContent=nextDay?`${DAYNAME[nextDay]} 장 열기 (${T.min}분)`:'장 열기';
+  $('c-open').disabled=!nextDay;$('c-close').disabled=m.status!=='open';$('c-final').disabled=!(m.status==='closed'&&m.day===3);
+  $('t-tmset').textContent=`다음 장: ${T.min}분`;
+  document.querySelectorAll('.tm').forEach(b=>b.classList.toggle('gold',+b.dataset.m===T.min));
+  document.querySelectorAll('#t-tabs .tab').forEach(b=>b.classList.toggle('on',b.dataset.t===T.tab));
+  ['mkt','rank','belief','ppl'].forEach(t=>$('tt-'+t).classList.toggle('hide',t!==T.tab));
+  if(T.tab==='mkt')$('tt-mkt').innerHTML=((m.status==='closed'||m.status==='final')&&m.day?`<div class="event" style="margin-bottom:12px">${CLOSE[m.day]}</div>`:'')+marketTable(false)
+    +(m.status==='open'?`<div style="margin-top:14px"><h3 class="center">${NEWS[m.day].t}</h3><p class="lead">${NEWS[m.day].lead}</p><div class="news">${['gov','letter','rumor'].map(s=>`<div class="src ${s}"><div class="h">${SRC[s].n}</div><div class="b">${NEWS[m.day][s]}</div></div>`).join('')}</div></div>`:'');
+  if(T.tab==='rank')$('tt-rank').innerHTML=rankHTML(false);
+  if(T.tab==='belief')$('tt-belief').innerHTML=beliefHTML(false);
+  if(T.tab==='ppl'){
+    const arr=rows().sort((a,b)=>a.team-b.team||a.name.localeCompare(b.name));
+    $('tt-ppl').innerHTML=arr.length?`<table><thead><tr><th>상단</th><th>이름</th><th>거래 수</th>${[1,2,3].map(d=>`<th>${DAYNAME[d]} 장 믿음</th>`).join('')}<th>수익률</th><th></th></tr></thead><tbody>${arr.map(p=>`<tr><td>${p.team}상단</td><td style="font-weight:800">${esc(p.name)}</td><td>${(p.log||[]).length}</td>${[1,2,3].map(d=>{const b=p.beliefs?.[d];return `<td title="${esc(b?.why||'')}">${b?`<b style="color:${SRC[b.src].c}">${SRC[b.src].n}</b><br><span class="mute" style="font-size:13px">${esc(b.why)}</span>`:'<span class="mute">-</span>'}</td>`}).join('')}<td class="${cls(p.r)}" style="font-weight:800">${pct(p.r)}</td><td><button class="btn line sm" onclick="kick('${p.id}')">빼기</button></td></tr>`).join('')}</tbody></table>`:'<p class="mute center">아직 들어온 학생이 없어요</p>';
+  }
+  if(T.boardOn)renderBoard();
+}
+async function kick(id){const p=T.players[id];if(!p||!confirm(`${p.team}상단 ${p.name} 학생을 장터에서 뺄까요? (장부가 지워져요)`))return;await DB.del(ROOT(T.code)+'/players/'+id);await pullT()}
+function renderBoard(){
+  const m=T.meta;if(!m)return;const [bt,bs]=bannerText(m);
+  $('b-title').textContent=m.status==='open'?NEWS[m.day].t:bt;
+  $('b-sub').textContent=m.status==='open'?`${DAYNAME[m.day]} 장 · 지금 거래 중 · 장터 코드 ${T.code}`:(m.status==='waiting'?`장터 코드 ${T.code} · 지금 ${Object.keys(T.players).length}명 입장`:bs);
+  let h='';
+  if(m.status==='open'){
+    const N=NEWS[m.day];
+    h+=`<p style="text-align:center;font-size:24px;opacity:.9">${N.lead}</p><div class="news">${['gov','letter','rumor'].map(s=>`<div class="src" style="background:rgba(255,246,228,.08);border-color:rgba(217,164,65,.6)"><div class="h" style="font-size:26px;color:#F7D9A0">${SRC[s].n}</div><div class="b" style="font-size:22px;color:#FFF6E4">${N[s]}</div></div>`).join('')}</div>`;
+    h+=marketTable(true);
+  }else if(m.status==='waiting'){
+    h+=`<p style="text-align:center;font-size:120px;font-weight:900;letter-spacing:16px;color:#F7D9A0">${T.code}</p>`+marketTable(true);
+  }else if(m.status==='closed'){
+    h+=`<div class="event">${CLOSE[m.day]}</div>`+marketTable(true)+`<div>${beliefHTML(true)}</div>`;
+  }else{
+    h+=rankHTML(true,10)+`<div>${beliefHTML(true)}</div>`;
+  }
+  $('b-body').innerHTML=h;
+}
+$('c-csv').onclick=()=>{
+  const arr=rows().sort((a,b)=>b.v-a.v);
+  const head=['순위','상단','이름','재산','수익률',...[1,2,3].flatMap(d=>[`${DAYNAME[d]}장 믿음`,`${DAYNAME[d]}장 이유`,`${DAYNAME[d]}장 수익률`]),'거래 수'];
+  const q=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
+  const lines=[head.map(q).join(',')].concat(arr.map((p,k)=>[k+1,p.team+'상단',p.name,Math.round(p.v),(p.r*100).toFixed(1)+'%',...[1,2,3].flatMap(d=>{const b=p.beliefs?.[d];const done=(T.meta.day>d)||(T.meta.day===d&&T.meta.status!=='open')||T.meta.status==='final';return [b?SRC[b.src].n:'',b?.why||'',done?(dayReturn(p,d)*100).toFixed(1)+'%':'']}),(p.log||[]).length].map(q).join(',')));
+  const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`장터거래소_${T.code}.csv`;a.click();
+};
+
+/* ================= 시작 ================= */
+function route(){
+  if(DEMO&&!document.querySelector('.demo-badge')){const b=document.createElement('div');b.className='demo-badge';b.textContent='연습 모드 (이 브라우저에만 저장)';document.body.appendChild(b)}
+  if(location.hash==='#teacher'){
+    clearInterval(pollT);clearInterval(tickT);
+    let c=null;try{c=localStorage.getItem(TKEY)}catch(e){}
+    if(c){T.code=c;startTeacher()}else show('v-tlogin');
+    return;
+  }
+  clearInterval(tpoll);clearInterval(ttick);
+  const s=loadSess();
+  const qc=(location.search.match(/[?&]code=([A-Za-z0-9]+)/)||[])[1];
+  if(qc)$('j-code').value=qc.toUpperCase();
+  if(s&&s.code&&s.pid){S.code=s.code;S.pid=s.pid;startPlay()}else{show('v-join');if(qc)$('j-code').dispatchEvent(new Event('change'))}
+}
+window.addEventListener('hashchange',route);
+route();
+</script>
+</body>
+</html>
