@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>청파 장터 거래소</title>
+<title>시간상단 · 청파 장터 거래소</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -96,6 +96,56 @@
   .bar span{display:block;height:100%}
   .code-big{font-size:46px;font-weight:900;letter-spacing:6px;color:var(--goldtxt)}
 
+  /* ===== 시간상단 공통 ===== */
+  .stack{display:flex;flex-direction:column;gap:14px}
+  .tabs.st{justify-content:center}
+  .tabs.st .tab{padding:9px 14px;font-size:15px}
+  .sign-era{font-size:14px;font-weight:800;color:var(--goldtxt);letter-spacing:1px}
+  .sign-big{display:inline-block;margin-top:6px;padding:10px 26px;border-radius:14px;background:linear-gradient(180deg,#5A3D26,#33221A);color:#F7D9A0;font-size:30px;font-weight:900;letter-spacing:1px;box-shadow:0 6px 18px rgba(51,34,26,.18)}
+  .grade{display:inline-block;padding:3px 10px;border-radius:999px;color:#fff;font-weight:800;font-size:14px}
+  .g1{background:#3F7D4E}.g2{background:#6B8E3A}.g3{background:#B8892C}.g4{background:#C9772E}.g5{background:#D6453D}
+  .meter{position:relative;height:16px;border-radius:8px;background:linear-gradient(90deg,#F2C9C4 0%,#F2C9C4 50%,#F6DDB8 50%,#F6DDB8 60%,#F3E6B6 60%,#F3E6B6 70%,#DCE6C4 70%,#DCE6C4 80%,#CFE3D3 80%);border:1px solid var(--line);margin:10px auto 4px;max-width:520px}
+  .meter i{position:absolute;top:-5px;width:6px;height:24px;border-radius:3px;background:var(--ink);transform:translateX(-3px)}
+  .meter-l{position:relative;height:16px;max-width:520px;margin:0 auto;font-size:12px;color:var(--mute)}
+  .meter-l span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+  .tchips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  .tchips span{padding:8px 16px;border-radius:12px;background:var(--ink);color:#F7D9A0;font-weight:900;font-size:18px}
+  .hist li{list-style:none;padding:6px 0;border-bottom:1px dashed #EADBC2;font-size:15px;text-align:center}
+  .vault{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+  .vi{border:2px solid var(--line);border-radius:16px;padding:14px;background:#fff;display:flex;flex-direction:column;gap:8px;text-align:center}
+  .vi .vh{font-weight:900;font-size:16px}
+  .vi.locked{background:#F1E6D3;color:var(--mute);border-style:dashed;justify-content:center;min-height:120px}
+  .vi.locked svg{margin:0 auto}
+  .vi.ch{border-color:#C9A3B8}
+  .snip{background:var(--card2);border:1px dashed var(--line);border-radius:10px;padding:10px 12px;font-size:15px;line-height:1.6;color:var(--body);text-align:left}
+  .scn{border:2px solid var(--line);border-radius:16px;padding:14px;background:#fff;text-align:center}
+  .scn .q{font-weight:800;font-size:16px;line-height:1.55;margin-bottom:10px}
+  .ab{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .ab button{padding:12px;border-radius:12px;border:2px solid var(--line);background:var(--card2);font-size:15px;font-weight:700;color:var(--ink);line-height:1.45}
+  .ab button.on{border-color:var(--ink);background:var(--ink);color:#FFF6E4}
+  .sc{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8px}
+  .sc button{width:48px;height:44px;border-radius:10px;border:2px solid var(--line);background:#fff;font-weight:900;font-size:17px;color:var(--ink)}
+  .sc button.on{background:var(--gold);border-color:var(--goldtxt)}
+  .axis{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center;max-width:520px;margin:6px auto}
+  .axis .al{font-weight:800;font-size:14px;text-align:center}
+  .axis .bar span{background:var(--gold)}
+  .tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+  .tcard{border:2px solid var(--line);border-radius:16px;background:#fff;padding:14px;display:flex;flex-direction:column;gap:8px;text-align:center}
+  .tcard .tno{display:inline-block;min-width:30px;padding:2px 8px;border-radius:8px;background:var(--ink);color:#FFF6E4;font-weight:900;margin-right:6px}
+  .tcard .lab{font-size:13px;color:var(--mute);font-weight:700}
+  .tcard input,.tcard select{padding:8px 10px;font-size:15px;border-radius:10px}
+  .tcard .sep{border-top:1px dashed #EADBC2;padding-top:8px}
+  .mini{display:grid;grid-template-columns:1fr 1.4fr auto;gap:6px}
+  .rcard{max-width:560px;margin:0 auto;border:3px solid var(--gold);border-radius:22px;background:linear-gradient(180deg,#FFFBF3,#FBF0DC);padding:26px 22px;text-align:center;box-shadow:0 10px 30px rgba(51,34,26,.12)}
+  .rcard .rk{font-size:13px;font-weight:800;letter-spacing:3px;color:var(--goldtxt)}
+  .rcard .rn{font-size:30px;font-weight:900;margin-top:8px}
+  .rcard .rg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .rcard .rg div{background:#fff;border:2px solid var(--line);border-radius:14px;padding:12px 8px}
+  .rcard .rg b{display:block;font-size:20px;font-weight:900;margin-top:2px}
+  .rcard .rg span{font-size:13px;color:var(--mute);font-weight:700}
+  .rcard .rl{margin-top:14px;font-size:15px;word-break:break-all;color:var(--body)}
+  .rcard .rp{margin-top:12px;font-size:19px;font-weight:800;line-height:1.5}
+
   /* big board */
   #board{position:fixed;inset:0;z-index:50;background:radial-gradient(ellipse at 50% 0%, #4A3427 0%, #2B1E16 60%, #1F1611 100%);color:#FFF6E4;padding:28px 40px;overflow:auto}
   #board h1{font-size:46px;text-align:center}
@@ -106,6 +156,11 @@
   #board .up{color:#FF7A6E} #board .down{color:#7FB2FF}
   #board .event{background:rgba(217,164,65,.18);border:2px solid #D9A441;font-size:26px}
   #board .close{position:fixed;top:16px;right:20px}
+  #board .bviews{position:fixed;top:16px;left:20px;display:flex;gap:6px;z-index:2}
+  #board .bviews .btn{background:rgba(255,246,228,.1);color:#FFF6E4;border:1px solid rgba(217,164,65,.5)}
+  #board .bviews .btn.gold{background:#D9A441;color:#33221A}
+  #board .bar{background:rgba(255,246,228,.15)}
+  #board .mute{color:rgba(255,246,228,.6)}
 
   @media (max-width:760px){
     .stats{grid-template-columns:1fr 1fr 1fr}
@@ -113,6 +168,22 @@
     .news{grid-template-columns:1fr}
     th,td{font-size:14px;padding:8px 3px}
     .banner .timer{font-size:26px}
+    .ab{grid-template-columns:1fr}
+    .sign-big{font-size:24px;padding:8px 18px}
+    .tgrid{grid-template-columns:1fr}
+    .rcard .rn{font-size:24px}
+    #board{padding:64px 14px 20px}
+  }
+  @media print{
+    @page{margin:12mm}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    html,body{background:#fff!important;min-height:0}
+    #toast,.demo-badge,#board,#v-join,#v-tlogin,#v-teacher{display:none!important}
+    #v-play{padding:0!important}
+    #v-play>*{display:none!important}
+    #v-play>#st-card{display:block!important}
+    #st-card>*{display:none!important}
+    #st-card>.rcard{display:block!important;box-shadow:none;margin-top:10mm}
   }
 </style>
 </head>
@@ -123,8 +194,8 @@
 <div id="v-join" class="wrap hide">
   <div class="hero">
     <div class="door"></div>
-    <h1>청파 장터 거래소</h1>
-    <p>세 번의 장날 동안 1,000냥을 지키고 불려라</p>
+    <h1>시간상단</h1>
+    <p>청파 장터에서 시작해 우리 상단의 앱까지</p>
   </div>
   <div class="card" style="max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:12px">
     <label class="center" style="font-weight:800">장터 코드</label>
@@ -133,20 +204,30 @@
     <select id="j-team"></select>
     <label class="center" style="font-weight:800">이름(닉네임)</label>
     <input id="j-name" maxlength="10" placeholder="진짜 이름 대신 닉네임도 좋아요" style="text-align:center">
-    <button class="btn gold" id="j-go" style="margin-top:6px">장터 입장</button>
-    <p class="mute center" style="font-size:14px">같은 코드 · 상단 · 이름으로 다시 들어오면 내 장부가 이어져요</p>
+    <button class="btn gold" id="j-go" style="margin-top:6px">입장</button>
+    <p class="mute center" style="font-size:14px">같은 코드 · 상단 · 이름으로 다시 들어오면 내 기록이 이어져요</p>
   </div>
   <p class="center mute" style="margin-top:22px;font-size:14px"><a href="#teacher" style="color:var(--mute)">강사용</a> · <a href="#" id="j-check" style="color:var(--mute)">연결 점검</a></p>
   <div id="j-checkout" class="card hide" style="max-width:640px;margin:14px auto 0;font-size:15px;line-height:1.7;text-align:center"></div>
 </div>
 
-<!-- ============ 학생: 장터 ============ -->
+<!-- ============ 학생: 진행 ============ -->
 <div id="v-play" class="wrap hide" style="display:flex;flex-direction:column;gap:14px">
   <div class="row" style="justify-content:center">
     <span class="pill" style="background:var(--ink);color:#FFF6E4" id="p-who"></span>
     <span class="pill" style="background:#fff;border:2px solid var(--line)" id="p-code"></span>
     <button class="btn line sm" id="p-out">나가기</button>
   </div>
+  <div class="tabs st" id="p-tabs">
+    <button class="tab" data-s="mkt">장터</button>
+    <button class="tab" data-s="team">우리 상단</button>
+    <button class="tab" data-s="test">테스트</button>
+    <button class="tab" data-s="inv">투자</button>
+    <button class="tab" data-s="card">결과 카드</button>
+  </div>
+
+  <!-- 장터 -->
+  <section id="st-mkt" class="stack">
   <div class="banner" id="p-banner"><div><div class="t" id="p-bt"></div><div class="s" id="p-bs"></div></div><div class="timer" id="p-timer"></div></div>
   <div class="stats">
     <div class="stat"><div class="v" id="p-cash">-</div><div class="l">가진 냥</div></div>
@@ -180,11 +261,48 @@
     <ul class="log" id="p-log"></ul>
     <p class="mute center" style="font-size:13px;margin-top:8px">복사한 기록은 Gemini 기록장에 붙여 넣어요</p>
   </div>
+  </section>
+
+  <!-- 우리 상단 -->
+  <section id="st-team" class="stack hide">
+    <div class="card center" id="tm-sign"></div>
+    <div class="card center" id="tm-namebox">
+      <h3>간판 이름 정하기</h3>
+      <p class="mute" style="font-size:14px;margin:4px 0 10px">이름만 적어요. 시대에 따라 '○○ 상단 → 주식회사 ○○ → ○○ 랩스'로 바뀌어요</p>
+      <div class="row" style="justify-content:center"><input id="tm-name" maxlength="8" placeholder="예: 한빛" style="max-width:240px;text-align:center"><button class="btn gold" id="tm-save">저장</button></div>
+    </div>
+    <div class="stats" id="tm-stats"></div>
+    <div class="card center" id="tm-credit"></div>
+    <div class="card" id="tm-vault"></div>
+  </section>
+
+  <!-- 테스트 -->
+  <section id="st-test" class="stack hide"><div id="ts-body" class="stack"></div></section>
+
+  <!-- 투자 -->
+  <section id="st-inv" class="stack hide"><div id="iv-body" class="stack"></div></section>
+
+  <!-- 결과 카드 -->
+  <section id="st-card" class="stack hide">
+    <div class="rcard" id="rc"></div>
+    <div class="card" style="display:flex;flex-direction:column;gap:10px;max-width:560px;margin:0 auto;width:100%">
+      <label class="center" style="font-weight:800">우리 앱 링크</label>
+      <input id="rc-link" maxlength="200" placeholder="Gemini Canvas 공유 링크를 붙여 넣어요" style="text-align:center">
+      <label class="center" style="font-weight:800">나의 금융 다짐 한 줄</label>
+      <input id="rc-pledge" maxlength="50" placeholder="예: 큰돈을 보내기 전에는 한 번 더 확인한다" style="text-align:center">
+      <button class="btn gold" id="rc-save">저장</button>
+      <div class="row" style="justify-content:center">
+        <button class="btn line sm" id="rc-copy">카드 글로 복사</button>
+        <button class="btn line sm" id="rc-print">인쇄 / 이미지로 저장</button>
+      </div>
+      <p class="mute center" style="font-size:13px">인쇄 창에서 'PDF로 저장'을 고르면 파일로 남길 수 있어요. 화면 캡처도 좋아요</p>
+    </div>
+  </section>
 </div>
 
 <!-- ============ 강사: 로그인 ============ -->
 <div id="v-tlogin" class="wrap hide">
-  <div class="hero"><div class="door"></div><h1>장터 거래소 · 강사</h1><p>장터 코드를 만들거나, 이미 만든 코드로 들어가요</p></div>
+  <div class="hero"><div class="door"></div><h1>시간상단 · 강사</h1><p>장터 코드를 만들거나, 이미 만든 코드로 들어가요</p></div>
   <div class="card" style="max-width:460px;margin:0 auto;display:flex;flex-direction:column;gap:12px">
     <label class="center" style="font-weight:800">강사 인증코드</label>
     <input id="t-key" type="password" style="text-align:center">
@@ -204,8 +322,8 @@
     <div class="row"><span class="pill" style="background:#fff;border:2px solid var(--line)" id="t-count"></span><button class="btn gold" id="t-board">큰 화면 띄우기</button></div>
   </div>
   <div class="banner" id="t-banner"><div><div class="t" id="t-bt"></div><div class="s" id="t-bs"></div></div><div class="timer" id="t-timer"></div></div>
-  <div class="card">
-    <h3 class="center" style="margin-bottom:10px">진행 버튼</h3>
+  <div class="card" id="t-mktctrl">
+    <h3 class="center" style="margin-bottom:10px">장터 진행 버튼</h3>
     <div class="ctrl">
       <button class="btn gold" id="c-open">첫째 장 열기</button>
       <button class="btn" id="c-close">이번 장 마감</button>
@@ -226,21 +344,36 @@
     <button class="tab" data-t="rank">수익률 순위</button>
     <button class="tab" data-t="belief">누구 말을 믿었나</button>
     <button class="tab" data-t="ppl">참가자</button>
+    <button class="tab" data-t="team">상단 관리</button>
+    <button class="tab" data-t="unlock">해금</button>
+    <button class="tab" data-t="test">테스트</button>
+    <button class="tab" data-t="inv">투자</button>
   </div>
   <div class="card" id="tt-mkt"></div>
   <div class="card hide" id="tt-rank"></div>
   <div class="card hide" id="tt-belief"></div>
   <div class="card hide" id="tt-ppl"></div>
+  <div class="card hide" id="tt-team"></div>
+  <div class="card hide" id="tt-unlock"></div>
+  <div class="card hide" id="tt-test"></div>
+  <div class="card hide" id="tt-inv"></div>
   <div class="row" style="justify-content:center">
     <button class="btn line sm" id="c-csv">CSV 내려받기</button>
     <button class="btn line sm" id="c-back">한 단계 되돌리기</button>
-    <button class="btn line sm" id="c-reset" style="color:var(--up)">처음부터 다시(기록 삭제)</button>
+    <button class="btn line sm" id="c-reset" style="color:var(--up)">장터만 처음부터(거래 기록 삭제)</button>
+    <button class="btn line sm" id="c-wipe" style="color:var(--up)">전체 초기화(모든 기록 삭제)</button>
     <button class="btn line sm" id="c-leave">강사 화면 나가기</button>
   </div>
 </div>
 
 <!-- ============ 큰 화면 ============ -->
 <div id="board" class="hide">
+  <div class="bviews" id="b-views">
+    <button class="btn sm" data-v="market">장터</button>
+    <button class="btn sm" data-v="team">상단</button>
+    <button class="btn sm" data-v="test">테스트</button>
+    <button class="btn sm" data-v="invest">투자</button>
+  </div>
   <button class="btn gold sm close" id="b-close">닫기</button>
   <h1 id="b-title"></h1>
   <p class="sub" id="b-sub"></p>
@@ -285,6 +418,47 @@ const CLOSE={
 const DAYNAME=['','첫째','둘째','셋째'];
 const TEACHER_KEY='hot2026'; // ← 강사 인증코드 (index.html과 같은 값)
 
+/* ---- 시간상단 데이터 ---- */
+const ERA={past:{n:'과거',f:b=>`${b} 상단`},now:{n:'현재',f:b=>`주식회사 ${b}`},future:{n:'미래',f:b=>`${b} 랩스`}};
+const SCORE0=600;
+const KEYS=[
+  {k:'trust', n:'믿음', s:"계산 결과 바로 아래에 '계산식 보기' 버튼을 만들어 줘. 누르면 어떤 숫자로 어떻게 계산했는지 한 줄로 보여 줘."},
+  {k:'record',n:'기록', s:'사용자가 계산할 때마다 날짜와 입력값, 결과를 아래 목록에 한 줄씩 남겨 줘. 목록은 지우기 버튼으로만 지워지게 해 줘.'},
+  {k:'share', n:'나눔', s:"결과 화면에 '한곳에 몰지 마세요: 여러 곳에 나눠 두면 덜 위험해요'라는 안내를 작은 글씨로 넣어 줘."},
+  {k:'check', n:'확인', s:"화면 맨 아래에 '돈을 보내라는 연락은 먼저 확인해요. 원금을 잃을 수 있는 상품도 있어요'라는 안내를 넣어 줘."},
+];
+const CHAL=[
+  {k:'c1',n:'도전 1 · 단리/복리 선택',s:"이자 계산에 '단리'와 '복리'를 고르는 버튼을 추가하고, 두 결과를 나란히 보여 줘."},
+  {k:'c2',n:'도전 2 · 그래프',s:'기간별로 돈이 어떻게 늘어나는지 막대그래프로 보여 줘.'},
+  {k:'c3',n:'도전 3 · 목표 달성 응원',s:'목표의 50%, 100%에 도달하면 축하 메시지를 보여 줘.'},
+  {k:'c4',n:'도전 4 · 다크 모드',s:'화면 오른쪽 위에 다크 모드 켜기/끄기 버튼을 만들어 줘.'},
+];
+const HELP=[{k:'frame',n:'앱 뼈대 받기',c:30},{k:'example',n:'막힌 상단 예시',c:20},{k:'consult',n:'강사 5분 상담',c:40},{k:'order',n:'발표 순서 고르기',c:10}];
+const SURVEY=[
+  {k:'a',q:'예금·주식·ETF의 차이를 친구에게 설명할 수 있다'},
+  {k:'b',q:'AI가 알려 준 답을 그대로 믿지 않고 확인한다'},
+  {k:'c',q:'AI로 내가 필요한 금융 앱을 만들 수 있다'},
+];
+const AX={trust:{n:'믿음',d:'사실 확인'},record:{n:'기록',d:'출처·투명'},share:{n:'나눔',d:'공정·차별'},check:{n:'확인',d:'책임·개인정보'}};
+const ETH=[
+  {q:'AI 비서가 묻는다. "다음부터 결제까지 제가 알아서 해 드릴까요?"',a:'쓸 수 있는 한도를 정하고, 결제 전에는 내가 확인한다',b:'편하니까 전부 맡긴다',ax:{check:2}},
+  {q:'친구 목소리로 전화가 왔다. "급해서 그런데 5만 원만 보내 줘."',a:'일단 끊고, 친구에게 직접 다시 연락해 본다',b:'목소리가 똑같으니 바로 보낸다',ax:{trust:2}},
+  {q:'우리 앱이 사용자 정보를 더 많이 모으면 추천이 더 정확해진다고 한다.',a:'꼭 필요한 정보만 받고, 왜 필요한지 알려 준다',b:'많이 받을수록 좋으니 최대한 받는다',ax:{check:1,record:1}},
+  {q:'AI 대출 심사가 내가 사는 동네를 이유로 점수를 낮췄다.',a:'이유를 설명해 달라고 하고, 다시 검토를 요청한다',b:'AI가 정한 거니까 그대로 따른다',ax:{share:2}},
+  {q:'AI가 써 준 투자 조언을 친구들에게 공유하려고 한다.',a:"출처와 함께 'AI가 쓴 글'이라고 밝히고 공유한다",b:'내가 쓴 것처럼 올린다',ax:{record:2}},
+  {q:'친구가 재미로 선생님 딥페이크 영상을 만들어 보자고 한다.',a:'당사자가 동의하지 않으면 만들지 않는다',b:'장난이니까 괜찮다',ax:{check:1,share:1}},
+];
+const AXMAX={trust:0,record:0,share:0,check:0};ETH.forEach(e=>{for(const k in e.ax)AXMAX[k]+=e.ax[k]});
+const ETYPE={
+  trust:{n:'꼼꼼 검증러',d:['들은 말을 바로 믿기보다 한 번 더 확인해요.','AI의 답도, 급한 연락도 사실인지 따져 보는 힘이 있어요.']},
+  record:{n:'출처 수호자',d:['어디서 온 정보인지 밝히는 일을 중요하게 여겨요.','AI가 만든 글도 투명하게 알리는 사람이에요.']},
+  share:{n:'공정 감시자',d:['누군가 억울하게 대우받지 않는지 살펴봐요.','AI의 판단에도 이유와 공정함을 요구해요.']},
+  check:{n:'선 긋는 보안관',d:['내 정보와 다른 사람의 권리를 지키는 선을 알아요.','편리함보다 책임과 동의를 먼저 생각해요.']},
+  explore:{n:'탐색 중',d:['아직 나만의 기준을 찾아가는 중이에요.','오늘 만난 상황들을 다시 떠올려 보면 나만의 기준이 보일 거예요.']},
+};
+const TESTS=[{k:'pre',n:'사전 설문'},{k:'post',n:'사후 설문'},{k:'ethics',n:'나의 AI 윤리력 테스트'}];
+const LOCK='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+
 /* ================= 저장소 (Firebase REST / 데모) ================= */
 const DEMO=/[?&]demo\b/.test(location.search);
 const FB_URL='https://geang-invest-default-rtdb.firebaseio.com';
@@ -295,7 +469,7 @@ const DB=DEMO?{
   _nav(o,p,mk){const a=p.split('/').filter(Boolean);let cur=o;for(let i=0;i<a.length-1;i++){if(cur[a[i]]==null||typeof cur[a[i]]!=='object'){if(!mk)return [null,null];cur[a[i]]={}}cur=cur[a[i]]}return [cur,a[a.length-1]]},
   async get(p){const o=this._r();const [c,k]=this._nav(o,p,false);return c?JSON.parse(JSON.stringify(c[k]??null)):null},
   async set(p,d){const o=this._r();const [c,k]=this._nav(o,p,true);if(d==null)delete c[k];else c[k]=JSON.parse(JSON.stringify(d));this._w(o)},
-  async update(p,d){const o=this._r();const [c,k]=this._nav(o,p,true);c[k]=Object.assign(c[k]||{},JSON.parse(JSON.stringify(d)));this._w(o)},
+  async update(p,d){const o=this._r();const [c,k]=this._nav(o,p,true);const cur=Object.assign(c[k]||{},JSON.parse(JSON.stringify(d)));for(const x in d)if(d[x]==null)delete cur[x];c[k]=cur;this._w(o)},
   async del(p){return this.set(p,null)}
 }:{
   async _f(p,opt){let r;
@@ -313,7 +487,7 @@ const $=id=>document.getElementById(id);
 const fmt=n=>Math.round(n).toLocaleString('ko-KR');
 const pct=r=>(r>0?'+':'')+(r*100).toFixed(1)+'%';
 const cls=r=>r>0.00001?'up':(r<-0.00001?'down':'');
-const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function netMsg(e){
   if(e&&e.kind==='denied')return `저장소가 막혀 있어요 (Firebase 규칙: ${e.message}). 강사님께 알려 주세요`;
   if(e&&e.kind==='blocked')return '이 페이지에서 저장소(firebaseio.com)로 연결할 수 없어요. 게시한 곳이나 학교·기관 네트워크가 막고 있을 수 있어요';
@@ -343,11 +517,56 @@ function replay(p,uptoDay){ // uptoDay 이전 장날 거래까지 반영한 현�
 }
 function dayReturn(p,d){const b=replay(p,d),a=replay(p,d+1);const vb=valueAt(b.cash,b.hold,d-1);return vb>0?valueAt(a.cash,a.hold,d)/vb-1:0}
 
+/* ---- 시간상단 공통 ---- */
+// Firebase는 숫자 키 객체를 배열로 돌려줄 수 있어 항상 {번호:값}으로 맞춰요
+function normIdx(o){if(!o)return {};if(Array.isArray(o)){const r={};o.forEach((v,i)=>{if(v!=null)r[i]=v});return r}return o}
+function teamOf(teams,n){const t=normIdx(teams)[n]||{};return {base:t.base||'',credit:+t.credit||0,score:t.score==null?SCORE0:+t.score,debt:+t.debt||0,log:Array.isArray(t.log)?t.log.filter(Boolean):Object.values(t.log||{})}}
+function gradeOf(s){return s>=800?1:s>=700?2:s>=600?3:s>=500?4:5}
+function gradePill(s){const g=gradeOf(s);return `<span class="grade g${g}">${g}등급</span>`}
+function eraOf(m){return ERA[m?.era]?m.era:'past'}
+function signOf(m,teams,n){const b=teamOf(teams,n).base;return b?ERA[eraOf(m)].f(b):`${n}상단`}
+function bonusOf(g){return g===1?50:g===2?30:g===3?10:0}
+function sumInv(inv){return Object.values(normIdx(inv)).reduce((a,b)=>a+(+b||0),0)}
+function ethResult(ans){
+  const axes={trust:0,record:0,share:0,check:0};
+  ans.forEach((c,i)=>{if(c==='A')for(const k in ETH[i].ax)axes[k]+=ETH[i].ax[k]});
+  const ratio={};for(const k in axes)ratio[k]=axes[k]/AXMAX[k];
+  const mx=Math.max(...Object.values(ratio));
+  const types=mx<=0?['explore']:Object.keys(ratio).filter(k=>Math.abs(ratio[k]-mx)<1e-9);
+  return {axes,types,type:types.map(t=>ETYPE[t].n).join(' · ')};
+}
+function ethTypes(p){const t=p?.ethics?.types;return Array.isArray(t)?t:(t?Object.values(t):[])}
+function axisBars(axes){return Object.keys(AX).map(k=>`<div class="axis"><div class="al">${AX[k].n}<br><span class="mute" style="font-weight:600;font-size:12px">${AX[k].d}</span></div><div class="bar"><span style="width:${Math.round((axes?.[k]||0)/AXMAX[k]*100)}%"></span></div></div>`).join('')}
+// 입력 중인 값과 커서를 지키면서 다시 그리기
+function setHTML(el,html){
+  if(el._h===html)return;
+  const saved={};el.querySelectorAll('input[id],select[id],textarea[id]').forEach(x=>{if(x.tagName==='SELECT'||x.value!==x.defaultValue)saved[x.id]=x.value});
+  const a=document.activeElement,fid=a&&el.contains(a)?a.id:null;let sel=null;if(fid){try{sel=[a.selectionStart,a.selectionEnd]}catch(e){}}
+  el.innerHTML=html;el._h=html;
+  for(const id in saved){const x=$(id);if(x)x.value=saved[id]}
+  if(fid){const f=$(fid);if(f){f.focus();try{if(sel&&sel[0]!=null)f.setSelectionRange(sel[0],sel[1])}catch(e){}}}
+}
+async function copyText(t,msg){
+  try{await navigator.clipboard.writeText(t);toast(msg)}
+  catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast(msg)}catch(_){prompt('아래 글을 복사하세요',t)}ta.remove()}
+}
+function surveyAvg(players,which){
+  const arr=Object.values(players).map(p=>p.survey?.[which]).filter(Boolean);
+  const o={n:arr.length};SURVEY.forEach(s=>{const v=arr.map(x=>+x[s.k]).filter(x=>x>=1);o[s.k]=v.length?v.reduce((a,b)=>a+b,0)/v.length:null});return o;
+}
+function ethDist(players){const c={trust:0,record:0,share:0,check:0,explore:0};let n=0;Object.values(players).forEach(p=>{const t=ethTypes(p);if(!t.length)return;n++;t.forEach(k=>{if(k in c)c[k]++})});return {c,n}}
+function invTotals(players,nTeams){
+  const t={};for(let i=1;i<=nTeams;i++)t[i]={team:i,sum:0,who:0};
+  Object.values(players).forEach(p=>{const inv=normIdx(p.invest);for(const k in inv){const a=+inv[k]||0;if(a>0&&t[k]){t[k].sum+=a;t[k].who++}}});
+  return Object.values(t).sort((a,b)=>b.sum-a.sum||a.team-b.team);
+}
+
 /* ================= 학생 ================= */
 const SKEY='jangteo_session'+(DEMO?'_demo':'');
-let S={code:null,pid:null,me:null,meta:null,pick:null,busy:false,players:null};
+const S0=()=>({code:null,pid:null,me:null,meta:null,pick:null,busy:false,players:null,teams:{},tab:'mkt',sv:{pre:{},post:{}},eth:null,ethEdit:false,wbusy:false});
+let S=S0();
 function loadSess(){try{return JSON.parse(localStorage.getItem(SKEY)||'null')}catch(e){return null}}
-function saveSess(){try{localStorage.setItem(SKEY,JSON.stringify({code:S.code,pid:S.pid}))}catch(e){}}
+function saveSess(){try{localStorage.setItem(SKEY,JSON.stringify({code:S.code,pid:S.pid,tab:S.tab}))}catch(e){}}
 
 function fillTeams(n){const sel=$('j-team');const cur=sel.value;sel.innerHTML='';for(let i=1;i<=n;i++){const o=document.createElement('option');o.value=i;o.textContent=`${i}상단`;sel.appendChild(o)}if(cur&&cur<=n)sel.value=cur}
 fillTeams(7);
@@ -367,7 +586,8 @@ $('j-go').onclick=async()=>{
     S.code=code;S.pid=pid;saveSess();startPlay();
   }catch(e){console.error(e);toast(netMsg(e))}
 };
-$('p-out').onclick=()=>{if(!confirm('이 기기에서 나갈까요? 같은 코드·상단·이름으로 다시 들어오면 이어져요'))return;localStorage.removeItem(SKEY);S={code:null,pid:null,me:null,meta:null,pick:null,busy:false,players:null};show('v-join')};
+$('p-out').onclick=()=>{if(!confirm('이 기기에서 나갈까요? 같은 코드·상단·이름으로 다시 들어오면 이어져요'))return;localStorage.removeItem(SKEY);clearInterval(pollT);clearInterval(tickT);S=S0();['tm-name','rc-link','rc-pledge'].forEach(id=>{$(id).value='';delete $(id).dataset.dirty});show('v-join')};
+$('p-tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;S.tab=b.dataset.s;saveSess();renderPlay();window.scrollTo(0,0)};
 
 let pollT=null,tickT=null;
 async function startPlay(){
@@ -379,19 +599,32 @@ async function startPlay(){
 }
 async function pullPlay(){
   try{
-    const [meta,me]=await Promise.all([DB.get(ROOT(S.code)+'/meta'),DB.get(ROOT(S.code)+'/players/'+S.pid)]);
+    const [meta,me,teams]=await Promise.all([DB.get(ROOT(S.code)+'/meta'),DB.get(ROOT(S.code)+'/players/'+S.pid),DB.get(ROOT(S.code)+'/teams')]);
     if(!meta||!me){toast('장터가 초기화되었어요. 다시 입장해 주세요');localStorage.removeItem(SKEY);clearInterval(pollT);show('v-join');return}
     const changed=JSON.stringify(meta)!==JSON.stringify(S.meta);
-    S.meta=meta;if(!S.busy)S.me=me;
-    if(meta.status==='final'&&(!S.players||changed||Math.random()<0.15))S.players=await DB.get(ROOT(S.code)+'/players')||{};
+    S.meta=meta;if(!S.busy&&!S.wbusy)S.me=me;S.teams=normIdx(teams);
+    const needAll=meta.status==='final'||meta.invest?.status==='closed';
+    if(needAll&&(!S.players||changed||Math.random()<0.15))S.players=await DB.get(ROOT(S.code)+'/players')||{};
     renderPlay();
   }catch(e){}
 }
 function canTrade(){const m=S.meta;if(!m||m.status!=='open')return false;if(timeLeft(m)===0)return false;return !!S.me?.beliefs?.[m.day]}
+function visibleTabs(){const iv=S.meta?.invest?.status;return ['mkt','team','test',...(iv==='open'||iv==='closed'?['inv']:[]),'card']}
 function renderPlay(){
   const m=S.meta,me=S.me;if(!m||!me)return;
+  const vis=visibleTabs();if(!vis.includes(S.tab))S.tab='mkt';
+  document.querySelectorAll('#p-tabs .tab').forEach(b=>{b.classList.toggle('hide',!vis.includes(b.dataset.s));b.classList.toggle('on',b.dataset.s===S.tab)});
+  ['mkt','team','test','inv','card'].forEach(t=>$('st-'+t).classList.toggle('hide',t!==S.tab));
+  $('p-who').textContent=`${signOf(m,S.teams,me.team)} · ${me.name}`;$('p-code').textContent=`장터 ${S.code}`;
+  renderMarket();
+  if(S.tab==='team')renderTeam();
+  if(S.tab==='test')renderTest();
+  if(S.tab==='inv')renderInv();
+  if(S.tab==='card')renderCard();
+}
+function renderMarket(){
+  const m=S.meta,me=S.me;if(!m||!me)return;
   const i=pIdx(m);
-  $('p-who').textContent=`${me.team}상단 · ${me.name}`;$('p-code').textContent=`장터 ${S.code}`;
   const [bt,bs]=bannerText(m);$('p-bt').textContent=bt;$('p-bs').textContent=bs;
   $('p-banner').className='banner'+(m.status==='open'?' open':'')+(m.status==='final'?' final':'');
   const l=timeLeft(m);$('p-timer').textContent=l==null?'':mmss(l);
@@ -461,7 +694,7 @@ async function trade(k,q){
   me.cash-=q*p;me.hold[k]=(me.hold[k]||0)+q;if(!me.hold[k])delete me.hold[k];
   me.log.push({d:m.day,k,q,p,t:Date.now()});
   S.busy=true;S.me=me;renderPlay();
-  try{await DB.set(ROOT(S.code)+'/players/'+S.pid,me);toast(`${priceName(k)} ${Math.abs(q)}주 ${q>0?'샀어요':'팔았어요'}`)}
+  try{await DB.update(ROOT(S.code)+'/players/'+S.pid,{cash:me.cash,hold:me.hold,log:me.log});toast(`${priceName(k)} ${Math.abs(q)}주 ${q>0?'샀어요':'팔았어요'}`)}
   catch(e){toast('저장이 안 됐어요. 다시 눌러 주세요');S.me=await DB.get(ROOT(S.code)+'/players/'+S.pid)}
   S.busy=false;renderPlay();
 }
@@ -488,12 +721,185 @@ $('p-copy').onclick=async()=>{
   const held=ITEMS.filter(it=>me.hold?.[it.k]).map(it=>`${it.n} ${me.hold[it.k]}주`);
   t+=`\n지금 내 재산: ${fmt(v)}냥 (${pct(v/START-1)})\n가진 것: 현금 ${fmt(me.cash)}냥${held.length?', '+held.join(', '):''}\n`;
   t+=`\n돌아보기: 나는 누구 말을 믿었고, 그 선택은 맞았나? → `;
-  try{await navigator.clipboard.writeText(t);toast('복사했어요! 기록장에 붙여 넣으세요')}
-  catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('복사했어요! 기록장에 붙여 넣으세요')}catch(_){prompt('아래 글을 복사하세요',t)}ta.remove()}
+  copyText(t,'복사했어요! 기록장에 붙여 넣으세요');
+};
+// 학생 자기 노드의 일부만 저장
+async function saveMine(path,val,okMsg){
+  S.wbusy=true;
+  try{await DB.set(ROOT(S.code)+'/players/'+S.pid+'/'+path,val);S.me[path]=val;if(okMsg)toast(okMsg);return true}
+  catch(e){toast(netMsg(e));return false}
+  finally{S.wbusy=false}
+}
+
+/* ---- 학생: 우리 상단 ---- */
+function renderTeam(){
+  const m=S.meta,me=S.me,t=teamOf(S.teams,me.team),g=gradeOf(t.score),era=eraOf(m);
+  setHTML($('tm-sign'),`<div class="sign-era">${ERA[era].n}의 간판 · ${me.team}번 상단</div><div class="sign-big">${esc(signOf(m,S.teams,me.team))}</div>
+    <p class="mute" style="font-size:13px;margin-top:10px">과거 '○○ 상단' → 현재 '주식회사 ○○' → 미래 '○○ 랩스'</p>`);
+  $('tm-namebox').classList.toggle('hide',!!m.namesLocked);
+  const ni=$('tm-name');if(document.activeElement!==ni&&!ni.dataset.dirty)ni.value=t.base;
+  setHTML($('tm-stats'),`<div class="stat"><div class="v">${fmt(t.credit)}</div><div class="l">크레딧(냥)</div></div>
+    <div class="stat"><div class="v">${t.score}</div><div class="l">신용점수 · ${g}등급</div></div>
+    <div class="stat"><div class="v ${t.debt?'up':''}">${fmt(t.debt)}</div><div class="l">갚을 금액(냥)</div></div>`);
+  const pos=Math.max(0,Math.min(1000,t.score))/10;
+  const hist=t.log.slice(-10).reverse().map(e=>{const a=+e.amt||0;const isS=e.kind==='score';
+    return `<li>${esc(e.reason||'')} · <b class="${a>0?(isS?'':'up'):(a<0?'down':'')}" style="${isS?'color:var(--ok)':''}">${isS?'신용 ':''}${a>0?'+':''}${fmt(a)}${isS?'점':'냥'}</b></li>`}).join('');
+  setHTML($('tm-credit'),`<h3>신용점수 ${t.score}점 ${gradePill(t.score)}</h3>
+    <p class="mute" style="font-size:14px;margin-top:4px">약속을 지킨 기록이 쌓이면 올라가요</p>
+    <div class="meter"><i style="left:${pos}%"></i></div>
+    <div class="meter-l"><span style="left:25%">5등급 (~499)</span><span style="left:55%">4</span><span style="left:65%">3</span><span style="left:75%">2</span><span style="left:90%">1등급</span></div>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #EADBC2">
+      <h3>대출</h3>
+      ${g<=2?`<p style="margin-top:6px"><b style="color:var(--ok)">${g}등급이라 대출을 받을 수 있어요</b> · 50냥 또는 100냥 · 강사님께 신청해요</p>`
+        :`<p class="mute" style="margin-top:6px">2등급(700점) 이상이면 대출을 받을 수 있어요</p>`}
+      <p style="margin-top:6px;font-weight:800">갚을 금액 = 빌린 금액 × 1.1</p>
+      ${t.debt?`<p class="up" style="margin-top:4px;font-weight:800">지금 갚을 금액: ${fmt(t.debt)}냥</p>`:''}
+    </div>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px dashed #EADBC2">
+      <h3>상단 기록 <span class="mute" style="font-size:13px;font-weight:600">(최근 10개)</span></h3>
+      <ul class="hist" style="margin-top:6px">${hist||'<li class="mute">아직 기록이 없어요</li>'}</ul>
+    </div>`);
+  const keys=m.keys||{},ch=m.challenges||{};
+  const item=(o,on,isCh)=>on?`<div class="vi ${isCh?'ch':''}"><div class="vh">${isCh?esc(o.n):`${o.n}의 열쇠`}</div><div class="snip">${esc(o.s)}</div><button class="btn gold sm" onclick="copySnip('${o.k}')">복사</button></div>`
+    :`<div class="vi locked">${LOCK}<div class="vh">${isCh?esc(o.n):`${o.n}의 열쇠`}</div><div style="font-size:13px">아직 잠겨 있어요</div></div>`;
+  setHTML($('tm-vault'),`<h3 class="center">해금 보관함</h3><p class="mute center" style="font-size:14px;margin:4px 0 12px">열린 주문문을 복사해 Gemini Canvas에 붙여 넣어요</p>
+    <div class="vault">${KEYS.map(o=>item(o,!!keys[o.k],false)).join('')}</div>
+    <h3 class="center" style="margin:18px 0 10px">도전 과제</h3>
+    <div class="vault">${CHAL.map(o=>item(o,!!ch[o.k],true)).join('')}</div>`);
+}
+function copySnip(k){const o=[...KEYS,...CHAL].find(x=>x.k===k);if(!o)return;const m=S.meta;const on=(m.keys||{})[k]||(m.challenges||{})[k];if(!on)return;copyText(o.s,'주문문을 복사했어요')}
+$('tm-name').addEventListener('input',()=>{$('tm-name').dataset.dirty='1'});
+$('tm-save').onclick=async()=>{
+  if(S.meta?.namesLocked)return toast('간판 이름이 확정되어 바꿀 수 없어요');
+  const v=$('tm-name').value.trim().slice(0,8);if(!v)return toast('이름을 넣어 주세요');
+  try{await DB.update(ROOT(S.code)+'/teams/'+S.me.team,{base:v});S.teams[S.me.team]={...(S.teams[S.me.team]||{}),base:v};delete $('tm-name').dataset.dirty;toast('간판 이름을 저장했어요');renderPlay()}
+  catch(e){toast(netMsg(e))}
 };
 
+/* ---- 학생: 테스트 ---- */
+function renderTest(){
+  const m=S.meta,me=S.me,ts=m.tests||{};
+  const list=TESTS.filter(x=>ts[x.k]==='open'||ts[x.k]==='closed');
+  if(!list.length)return setHTML($('ts-body'),'<div class="card center"><h3>아직 열린 테스트가 없어요</h3><p class="mute" style="margin-top:6px">강사님이 열면 여기에 나타나요</p></div>');
+  setHTML($('ts-body'),list.map(x=>x.k==='ethics'?ethHTML(ts.ethics,me):surveyHTML(x,ts[x.k],me)).join(''));
+}
+function surveyHTML(x,st,me){
+  const done=me.survey?.[x.k],d=S.sv[x.k]=S.sv[x.k]||{};
+  if(done&&!Object.keys(d).length)Object.assign(d,{a:done.a,b:done.b,c:done.c});
+  const open=st==='open';
+  return `<div class="card center"><h2>${x.n}</h2><p class="mute" style="font-size:14px;margin:4px 0 12px">${open?'지금의 나에게 가까운 숫자를 골라요 · 1 전혀 아니다 · 3 보통 · 5 매우 그렇다':'마감되었어요'}</p>
+    <div class="stack">${SURVEY.map((s,i)=>`<div class="scn"><div class="q">${i+1}. ${s.q}</div>
+      <div class="sc">${[1,2,3,4,5].map(v=>`<button class="${+d[s.k]===v?'on':''}" ${open?'':'disabled'} onclick="svPick('${x.k}','${s.k}',${v})">${v}</button>`).join('')}</div></div>`).join('')}</div>
+    ${open?`<button class="btn gold" style="margin-top:14px" onclick="svSubmit('${x.k}')">${done?'다시 제출':'제출'}</button>`:''}
+    ${done?`<p style="margin-top:10px;font-weight:800;color:var(--ok)">제출했어요${open?' · 마감 전까지 고칠 수 있어요':''}</p>`:''}</div>`;
+}
+function svPick(w,k,v){if(S.meta?.tests?.[w]!=='open')return;S.sv[w][k]=v;renderTest()}
+async function svSubmit(w){
+  if(S.meta?.tests?.[w]!=='open')return toast('마감되었어요');
+  const d=S.sv[w];if(!SURVEY.every(s=>d[s.k]>=1))return toast('세 문항 모두 골라 주세요');
+  S.me.survey=S.me.survey||{};
+  const val={a:d.a,b:d.b,c:d.c,t:Date.now()};
+  S.wbusy=true;
+  try{await DB.set(ROOT(S.code)+'/players/'+S.pid+'/survey/'+w,val);S.me.survey[w]=val;toast('제출했어요')}catch(e){toast(netMsg(e))}
+  S.wbusy=false;renderTest();
+}
+function ethHTML(st,me){
+  const open=st==='open',done=me.ethics;
+  if(!S.eth)S.eth=done?.answers?[...(Array.isArray(done.answers)?done.answers:Object.values(done.answers))]:Array(ETH.length).fill(null);
+  if(done&&!S.ethEdit){
+    const types=ethTypes(me);
+    return `<div class="card center"><h2>나의 AI 윤리력</h2><p class="mute" style="font-size:14px;margin:4px 0 14px">맞고 틀림이 없어요. 내가 무엇을 먼저 챙기는지 보여 줄 뿐이에요</p>
+      ${types.length<=2?types.map(k=>`<div style="margin-bottom:12px"><div class="sign-big" style="font-size:26px">${ETYPE[k].n}</div><p style="margin-top:10px;line-height:1.7">${ETYPE[k].d.join('<br>')}</p></div>`).join('')
+        :`<div class="tchips">${types.map(k=>`<span>${ETYPE[k].n}</span>`).join('')}</div><p style="margin-top:12px;line-height:1.7">${types.map(k=>ETYPE[k].d[0]).join('<br>')}</p>`}
+      ${types.length>1?`<p class="mute" style="font-size:13px;margin-top:6px">${types.length===2?'두':types.length===3?'세':'네'} 모습이 똑같이 강하게 나왔어요</p>`:''}
+      <div style="margin-top:14px">${axisBars(done.axes)}</div>
+      ${open?'<button class="btn line sm" style="margin-top:14px" onclick="S.ethEdit=true;renderTest()">답 바꾸기</button>':''}</div>`;
+  }
+  if(!open)return `<div class="card center"><h2>나의 AI 윤리력 테스트</h2><p class="mute" style="margin-top:6px">마감되었어요</p></div>`;
+  return `<div class="card center"><h2>나의 AI 윤리력 테스트</h2><p class="mute" style="font-size:14px;margin:4px 0 12px">여섯 가지 상황에서 나라면 어떻게 할지 골라요</p>
+    <div class="stack">${ETH.map((e,i)=>`<div class="scn"><div class="q">${i+1}. ${esc(e.q)}</div><div class="ab">
+      <button class="${S.eth[i]==='A'?'on':''}" onclick="ethPick(${i},'A')">${esc(e.a)}</button>
+      <button class="${S.eth[i]==='B'?'on':''}" onclick="ethPick(${i},'B')">${esc(e.b)}</button></div></div>`).join('')}</div>
+    <button class="btn gold" style="margin-top:14px" onclick="ethSubmit()">결과 보기</button></div>`;
+}
+function ethPick(i,c){if(S.meta?.tests?.ethics!=='open')return;S.eth[i]=c;renderTest()}
+async function ethSubmit(){
+  if(S.meta?.tests?.ethics!=='open')return toast('마감되었어요');
+  if(S.eth.some(x=>!x))return toast('여섯 상황 모두 골라 주세요');
+  const r=ethResult(S.eth);const val={answers:[...S.eth],axes:r.axes,types:r.types,type:r.type,t:Date.now()};
+  if(await saveMine('ethics',val,'결과가 나왔어요')){S.ethEdit=false}
+  renderTest();window.scrollTo(0,$('st-test').offsetTop);
+}
+
+/* ---- 학생: 투자 ---- */
+function myBudget(){const t=teamOf(S.teams,S.me.team),g=gradeOf(t.score);return {g,bonus:bonusOf(g),total:100+bonusOf(g)}}
+function renderInv(){
+  const m=S.meta,me=S.me,st=m.invest?.status,n=m.teams||7;const inv=normIdx(me.invest);const used=sumInv(inv);const b=myBudget();
+  if(st==='open'){
+    const others=[];for(let i=1;i<=n;i++)if(i!==me.team)others.push(i);
+    setHTML($('iv-body'),`<div class="banner open"><div><div class="t">투자 라운드 · 진행 중</div><div class="s">발표를 듣고 응원하고 싶은 상단의 앱에 투자해요. 우리 상단에는 투자할 수 없어요</div></div></div>
+      <div class="stats"><div class="stat"><div class="v">${b.total}</div><div class="l">내 투자금 (기본 100 + ${b.g}등급 ${b.bonus})</div></div>
+        <div class="stat"><div class="v">${used}</div><div class="l">투자한 냥</div></div>
+        <div class="stat"><div class="v ${b.total-used<0?'up':''}">${b.total-used}</div><div class="l">남은 냥</div></div></div>
+      ${used>b.total?'<p class="center up" style="font-weight:800">투자금이 줄었어요. 남은 냥이 0 이상이 되도록 줄여 주세요</p>':''}
+      <div class="card"><table><thead><tr><th>상단</th><th>내 투자</th><th>조정 (10냥씩)</th></tr></thead><tbody>
+      ${others.map(i=>{const a=+inv[i]||0;return `<tr><td style="font-weight:800">${esc(signOf(m,S.teams,i))}</td><td class="num" style="font-weight:900">${a}냥</td>
+        <td><div class="qtybtn"><button class="btn blue sm" ${a>=10?'':'disabled'} onclick="invest(${i},-10)">−10</button><button class="btn red sm" ${used+10<=b.total?'':'disabled'} onclick="invest(${i},10)">+10</button></div></td></tr>`}).join('')}
+      </tbody></table><p class="mute center" style="font-size:13px;margin-top:8px">마감 전까지 몇 번이든 바꿀 수 있어요</p></div>`);
+  }else{
+    const tot=S.players?invTotals(S.players,n):[];const mine=Object.entries(inv).filter(([k,a])=>+a>0);
+    setHTML($('iv-body'),`<div class="banner final"><div><div class="t">투자 라운드 마감</div><div class="s">어느 상단이 가장 많은 투자를 받았을까요?</div></div></div>
+      <div class="card"><h3 class="center" style="margin-bottom:8px">투자 유치 순위</h3>
+      <table><thead><tr><th>순위</th><th>상단</th><th>받은 투자</th><th>투자한 사람</th></tr></thead><tbody>
+      ${tot.map(x=>`<tr style="${x.team===me.team?'background:#FBF0DC':''}"><td>${1+tot.filter(y=>y.sum>x.sum).length}</td><td style="font-weight:800">${esc(signOf(m,S.teams,x.team))}</td><td class="num" style="font-weight:900">${fmt(x.sum)}냥</td><td>${x.who}명</td></tr>`).join('')||'<tr><td colspan="4" class="mute">결과를 불러오는 중이에요</td></tr>'}
+      </tbody></table></div>
+      <div class="card center"><h3>나의 투자</h3><ul class="hist" style="margin-top:6px">${mine.map(([k,a])=>`<li>${esc(signOf(m,S.teams,+k))} · <b>${fmt(a)}냥</b></li>`).join('')||'<li class="mute">투자하지 않았어요</li>'}</ul></div>`);
+  }
+}
+async function invest(team,d){
+  const m=S.meta;if(m?.invest?.status!=='open')return toast('투자 라운드가 열려 있지 않아요');
+  if(team===S.me.team)return toast('우리 상단에는 투자할 수 없어요');
+  if(S.wbusy)return;
+  const inv={...normIdx(S.me.invest)};const cur=+inv[team]||0,nx=cur+d;if(nx<0)return;
+  const b=myBudget();if(d>0&&sumInv(inv)+d>b.total)return toast(`투자금 ${b.total}냥을 넘을 수 없어요`);
+  if(nx)inv[team]=nx;else delete inv[team];
+  S.wbusy=true;S.me.invest=inv;renderInv();
+  try{await DB.set(ROOT(S.code)+'/players/'+S.pid+'/invest',Object.keys(inv).length?inv:null)}catch(e){toast(netMsg(e))}
+  S.wbusy=false;
+}
+
+/* ---- 학생: 결과 카드 ---- */
+function cardData(){
+  const m=S.meta,me=S.me,t=teamOf(S.teams,me.team);
+  const fin=m.status==='final';const r=fin?valueAt(me.cash,me.hold,3)/START-1:null;
+  return {name:me.name,sign:signOf(m,S.teams,me.team),team:me.team,ret:r,eth:me.ethics?.type||'',score:t.score,grade:gradeOf(t.score),link:me.card?.link||'',pledge:me.card?.pledge||''};
+}
+function renderCard(){
+  const c=cardData();
+  ['rc-link','rc-pledge'].forEach(id=>{const el=$(id);const v=id==='rc-link'?c.link:c.pledge;if(document.activeElement!==el&&!el.dataset.dirty)el.value=v});
+  setHTML($('rc'),`<div class="rk">시간상단 결과 카드</div><div class="rn">${esc(c.name)}</div>
+    <div class="sign-big" style="font-size:22px">${esc(c.sign)}</div>
+    <div class="rg">
+      <div><span>장터 최종 수익률</span><b class="${c.ret==null?'':cls(c.ret)}">${c.ret==null?'공개 전':pct(c.ret)}</b></div>
+      <div><span>AI 윤리 유형</span><b style="${c.eth.length>12?'font-size:15px':''}">${c.eth?esc(c.eth):'아직 안 했어요'}</b></div>
+      <div><span>우리 상단 신용등급</span><b>${c.grade}등급 <span style="font-size:13px">(${c.score}점)</span></b></div>
+      <div><span>우리 앱</span><b style="font-size:15px">${c.link?'링크 있음':'아직 없음'}</b></div>
+    </div>
+    ${c.link?`<p class="rl">${esc(c.link)}</p>`:''}
+    <p class="rp">${c.pledge?'“'+esc(c.pledge)+'”':'<span class="mute" style="font-size:15px;font-weight:600">나의 금융 다짐을 아래에 적어 주세요</span>'}</p>`);
+}
+['rc-link','rc-pledge'].forEach(id=>$(id).addEventListener('input',()=>{$(id).dataset.dirty='1'}));
+$('rc-save').onclick=async()=>{
+  const link=$('rc-link').value.trim().slice(0,200),pledge=$('rc-pledge').value.trim().slice(0,50);
+  if(await saveMine('card',{link,pledge},'저장했어요')){delete $('rc-link').dataset.dirty;delete $('rc-pledge').dataset.dirty}
+  renderCard();
+};
+$('rc-copy').onclick=()=>{const c=cardData();
+  copyText(`[시간상단 결과 카드]\n닉네임: ${c.name}\n상단: ${c.sign} (${c.team}번 상단)\n장터 최종 수익률: ${c.ret==null?'공개 전':pct(c.ret)}\nAI 윤리 유형: ${c.eth||'-'}\n우리 상단 신용등급: ${c.grade}등급 (${c.score}점)\n우리 앱: ${c.link||'-'}\n나의 금융 다짐: ${c.pledge||'-'}\n`,'카드를 글로 복사했어요')};
+$('rc-print').onclick=()=>{renderCard();window.print()};
+
 /* ================= 강사 ================= */
-let T={code:null,meta:null,players:{},tab:'mkt',min:6,boardOn:false};
+let T={code:null,meta:null,players:{},teams:{},tab:'mkt',min:6,boardOn:false,bview:'market'};
 const TKEY='jangteo_teacher'+(DEMO?'_demo':'');
 $('t-go').onclick=async()=>{
   if(($('t-key').value||'').trim()!==TEACHER_KEY)return toast('강사 인증코드가 올바르지 않아요');
@@ -505,15 +911,17 @@ $('t-go').onclick=async()=>{
     startTeacher();
   }catch(e){console.error(e);toast(netMsg(e))}
 };
-async function newMarket(code){await DB.set(ROOT(code),{meta:{status:'waiting',day:0,endsAt:null,teams:+$('t-teams').value,created:Date.now()}})}
+function freshMeta(teams){return {status:'waiting',day:0,endsAt:null,teams,created:Date.now(),era:'past',namesLocked:false,
+  keys:{trust:false,record:false,share:false,check:false},challenges:{c1:false,c2:false,c3:false,c4:false}}}
+async function newMarket(code){await DB.set(ROOT(code),{meta:freshMeta(+$('t-teams').value)})}
 let tpoll=null,ttick=null;
 async function startTeacher(){
   show('v-teacher');$('t-codeview').textContent=T.code;
   await pullT();clearInterval(tpoll);clearInterval(ttick);
   tpoll=setInterval(pullT,2000);
-  ttick=setInterval(()=>{const l=timeLeft(T.meta);const s=l==null?'':mmss(l);$('t-timer').textContent=s;$('b-timer').textContent=l==null?'':(l===0?'시간 끝!':s)},500);
+  ttick=setInterval(()=>{const l=timeLeft(T.meta);const s=l==null?'':mmss(l);$('t-timer').textContent=s;$('b-timer').textContent=(l==null||T.bview!=='market')?'':(l===0?'시간 끝!':s)},500);
 }
-async function pullT(){try{const d=await DB.get(ROOT(T.code))||{};T.meta=d.meta;T.players=d.players||{};renderT()}catch(e){}}
+async function pullT(){try{const d=await DB.get(ROOT(T.code))||{};T.meta=d.meta;T.players=d.players||{};T.teams=normIdx(d.teams);renderT()}catch(e){}}
 async function setMeta(o){await DB.update(ROOT(T.code)+'/meta',o);await pullT()}
 $('c-open').onclick=async()=>{const m=T.meta;if(!m)return;
   const next=m.status==='waiting'?1:(m.status==='closed'&&m.day<3?m.day+1:null);
@@ -528,12 +936,18 @@ $('c-back').onclick=async()=>{const m=T.meta;if(!m)return;let o=null;
   else if(m.status==='closed')o={status:'open',endsAt:Date.now()+60000};
   else if(m.status==='open')o=m.day===1?{status:'waiting',day:0,endsAt:null}:{status:'closed',day:m.day-1,endsAt:null};
   if(!o)return;if(!confirm('한 단계 되돌릴까요? (학생 거래 기록은 그대로 남아요)'))return;await setMeta(o)};
-$('c-reset').onclick=async()=>{if(!confirm('모든 학생의 장부를 지우고 처음(대기)으로 돌릴까요?'))return;if(!confirm('정말 지울까요? 되돌릴 수 없어요'))return;
-  await DB.set(ROOT(T.code),{meta:{status:'waiting',day:0,endsAt:null,teams:T.meta?.teams||7,created:Date.now()}});await pullT();toast('처음으로 돌렸어요')};
+$('c-reset').onclick=async()=>{if(!confirm('장터만 처음(대기)으로 돌릴까요? 학생들의 거래·믿음 기록과 냥이 처음으로 돌아가요. 상단 크레딧·테스트·투자·결과 카드는 그대로예요'))return;
+  await DB.update(ROOT(T.code)+'/meta',{status:'waiting',day:0,endsAt:null});
+  for(const id of Object.keys(T.players))await DB.update(ROOT(T.code)+'/players/'+id,{cash:START,hold:null,beliefs:null,log:null});
+  await pullT();toast('장터를 처음으로 돌렸어요')};
+$('c-wipe').onclick=async()=>{if(!confirm('모든 학생과 상단 기록(크레딧·테스트·투자 포함)을 지우고 처음으로 돌릴까요?'))return;if(!confirm('정말 지울까요? 되돌릴 수 없어요'))return;
+  await DB.set(ROOT(T.code),{meta:freshMeta(T.meta?.teams||7)});await pullT();toast('전체를 처음으로 돌렸어요')};
 $('c-leave').onclick=()=>{clearInterval(tpoll);clearInterval(ttick);try{localStorage.removeItem(TKEY)}catch(e){}location.hash='';location.reload()};
 $('t-tabs').onclick=e=>{const b=e.target.closest('.tab');if(!b)return;T.tab=b.dataset.t;renderT()};
-$('t-board').onclick=()=>{T.boardOn=true;$('board').classList.remove('hide');renderBoard()};
+const TAB2VIEW={team:'team',unlock:'team',test:'test',inv:'invest'};
+$('t-board').onclick=()=>{T.boardOn=true;T.bview=TAB2VIEW[T.tab]||'market';$('board').classList.remove('hide');renderBoard()};
 $('b-close').onclick=()=>{T.boardOn=false;$('board').classList.add('hide')};
+$('b-views').onclick=e=>{const b=e.target.closest('button');if(!b)return;T.bview=b.dataset.v;renderBoard()};
 
 function rows(){const i=pIdx(T.meta);return Object.entries(T.players).map(([id,p])=>{const v=valueAt(p.cash,p.hold,i);return {id,...p,v,r:v/START-1}})}
 function teamRows(arr){const t={};arr.forEach(p=>{(t[p.team]=t[p.team]||[]).push(p)});return Object.entries(t).map(([k,ps])=>({team:+k,n:ps.length,r:ps.reduce((a,b)=>a+b.r,0)/ps.length})).sort((a,b)=>b.r-a.r)}
@@ -575,6 +989,7 @@ function rankHTML(big,limit){
     <div><h3 class="center" style="margin-bottom:8px">상단별 평균 수익률</h3><table><thead><tr><th>순위</th><th>상단</th><th>인원</th><th>평균</th></tr></thead><tbody>${tm}</tbody></table></div>
     <div><h3 class="center" style="margin-bottom:8px">개인 수익률${limit?` (상위 ${limit}명)`:''}</h3><table><thead><tr><th>순위</th><th>상단</th><th>이름</th><th>재산</th><th>수익률</th></tr></thead><tbody>${ind}</tbody></table></div></div>`;
 }
+const TABS=['mkt','rank','belief','ppl','team','unlock','test','inv'];
 function renderT(){
   const m=T.meta;if(!m)return;
   const [bt,bs]=bannerText(m);$('t-bt').textContent=bt;$('t-bs').textContent=bs;
@@ -587,7 +1002,7 @@ function renderT(){
   $('t-tmset').textContent=`다음 장: ${T.min}분`;
   document.querySelectorAll('.tm').forEach(b=>b.classList.toggle('gold',+b.dataset.m===T.min));
   document.querySelectorAll('#t-tabs .tab').forEach(b=>b.classList.toggle('on',b.dataset.t===T.tab));
-  ['mkt','rank','belief','ppl'].forEach(t=>$('tt-'+t).classList.toggle('hide',t!==T.tab));
+  TABS.forEach(t=>$('tt-'+t).classList.toggle('hide',t!==T.tab));
   if(T.tab==='mkt')$('tt-mkt').innerHTML=((m.status==='closed'||m.status==='final')&&m.day?`<div class="event" style="margin-bottom:12px">${CLOSE[m.day]}</div>`:'')+marketTable(false)
     +(m.status==='open'?`<div style="margin-top:14px"><h3 class="center">${NEWS[m.day].t}</h3><p class="lead">${NEWS[m.day].lead}</p><div class="news">${['gov','letter','rumor'].map(s=>`<div class="src ${s}"><div class="h">${SRC[s].n}</div><div class="b">${NEWS[m.day][s]}</div></div>`).join('')}</div></div>`:'');
   if(T.tab==='rank')$('tt-rank').innerHTML=rankHTML(false);
@@ -596,32 +1011,154 @@ function renderT(){
     const arr=rows().sort((a,b)=>a.team-b.team||a.name.localeCompare(b.name));
     $('tt-ppl').innerHTML=arr.length?`<table><thead><tr><th>상단</th><th>이름</th><th>거래 수</th>${[1,2,3].map(d=>`<th>${DAYNAME[d]} 장 믿음</th>`).join('')}<th>수익률</th><th></th></tr></thead><tbody>${arr.map(p=>`<tr><td>${p.team}상단</td><td style="font-weight:800">${esc(p.name)}</td><td>${(p.log||[]).length}</td>${[1,2,3].map(d=>{const b=p.beliefs?.[d];return `<td title="${esc(b?.why||'')}">${b?`<b style="color:${SRC[b.src].c}">${SRC[b.src].n}</b><br><span class="mute" style="font-size:13px">${esc(b.why)}</span>`:'<span class="mute">-</span>'}</td>`}).join('')}<td class="${cls(p.r)}" style="font-weight:800">${pct(p.r)}</td><td><button class="btn line sm" onclick="kick('${p.id}')">빼기</button></td></tr>`).join('')}</tbody></table>`:'<p class="mute center">아직 들어온 학생이 없어요</p>';
   }
+  if(T.tab==='team')setHTML($('tt-team'),teamAdminHTML());
+  if(T.tab==='unlock')setHTML($('tt-unlock'),unlockHTML());
+  if(T.tab==='test')setHTML($('tt-test'),testAdminHTML());
+  if(T.tab==='inv')setHTML($('tt-inv'),invAdminHTML());
   if(T.boardOn)renderBoard();
 }
 async function kick(id){const p=T.players[id];if(!p||!confirm(`${p.team}상단 ${p.name} 학생을 장터에서 뺄까요? (장부가 지워져요)`))return;await DB.del(ROOT(T.code)+'/players/'+id);await pullT()}
+
+/* ---- 강사: 상단 관리 ---- */
+function members(n){return Object.values(T.players).filter(p=>p.team===n).length}
+function teamAdminHTML(){
+  const m=T.meta,era=eraOf(m),N=m.teams||7;let cards='';
+  for(let n=1;n<=N;n++){
+    const t=teamOf(T.teams,n),g=gradeOf(t.score);
+    cards+=`<div class="tcard">
+      <div><span class="tno">${n}</span><b style="font-size:18px">${esc(signOf(m,T.teams,n))}</b> <span class="mute" style="font-size:14px">· ${members(n)}명</span></div>
+      <input id="tb-${n}" value="${esc(t.base)}" maxlength="8" placeholder="간판 이름 (예: 한빛)" onchange="tBase(${n},this.value)">
+      <div class="sep"><span class="lab">크레딧</span> <b style="font-size:22px" class="num">${fmt(t.credit)}냥</b></div>
+      <div class="qtybtn"><button class="btn red sm" onclick="tCredit(${n},10)">+10</button><button class="btn red sm" onclick="tCredit(${n},20)">+20</button><button class="btn blue sm" onclick="tCredit(${n},-10)">−10</button></div>
+      <div class="mini"><input id="ta-${n}" type="number" step="10" placeholder="금액(±)"><input id="tr-${n}" maxlength="30" placeholder="사유" title="사유를 적으면 이 상단의 모든 버튼에 그 사유로 기록돼요"><button class="btn sm" onclick="tCustom(${n})">반영</button></div>
+      <div class="sep"><span class="lab">신용점수</span> <b style="font-size:20px">${t.score}</b> ${gradePill(t.score)}
+        <div class="qtybtn" style="margin-top:6px"><button class="btn line sm" onclick="tScore(${n},10)">신용 +10</button><button class="btn line sm" onclick="tScore(${n},-10)">신용 −10</button></div></div>
+      <div class="sep"><span class="lab">대출</span> <b class="${t.debt?'up':''}">갚을 금액 ${fmt(t.debt)}냥</b>
+        <div class="qtybtn" style="margin-top:6px"><button class="btn line sm" ${g<=2?'':'disabled'} onclick="tLoan(${n},50)">대출 50</button><button class="btn line sm" ${g<=2?'':'disabled'} onclick="tLoan(${n},100)">대출 100</button><button class="btn line sm" ${t.debt?'':'disabled'} onclick="tRepay(${n})">상환</button></div>
+        ${g<=2?'':'<div class="mute" style="font-size:12px;margin-top:4px">2등급 이상만 대출 가능</div>'}</div>
+      <div class="sep mini" style="grid-template-columns:1fr auto"><select id="tk-${n}"><option value="">도움 카드 구매</option>${HELP.map(h=>`<option value="${h.k}">${h.n} · ${h.c}냥</option>`).join('')}</select><button class="btn gold sm" onclick="tHelp(${n})">구매</button></div>
+    </div>`;
+  }
+  return `<div class="row" style="justify-content:center;margin-bottom:12px">
+      <span style="font-weight:800">시대</span>${Object.keys(ERA).map(k=>`<button class="btn sm ${era===k?'gold':'line'}" onclick="setMeta({era:'${k}'})">${ERA[k].n} · ${ERA[k].f('○○')}</button>`).join('')}
+      <button class="btn sm ${m.namesLocked?'':'line'}" onclick="setMeta({namesLocked:${!m.namesLocked}})">${m.namesLocked?'간판 이름 잠김 · 풀기':'간판 이름 잠그기'}</button></div>
+    <p class="mute center" style="font-size:13px;margin-bottom:12px">사유 칸을 채우고 버튼을 누르면 그 사유로 기록돼요 · 학생은 잠그기 전까지 자기 상단 이름을 고칠 수 있어요</p>
+    <div class="tgrid">${cards}</div>`;
+}
+async function teamOp(n,fn){
+  const p=ROOT(T.code)+'/teams/'+n;
+  try{
+    const t=teamOf({[n]:await DB.get(p)},n);const why=($('tr-'+n)?.value||'').trim();
+    const res=fn(t,why);if(!res)return;
+    if(typeof res==='object')t.log.push({t:Date.now(),...res});
+    await DB.update(p,{credit:t.credit,score:t.score,debt:t.debt,log:t.log.slice(-40)});
+    if($('tr-'+n))$('tr-'+n).value='';if($('ta-'+n))$('ta-'+n).value='';
+    await pullT();
+  }catch(e){toast(netMsg(e))}
+}
+async function tBase(n,v){try{await DB.update(ROOT(T.code)+'/teams/'+n,{base:String(v).trim().slice(0,8)});await pullT();toast(`${n}번 상단 이름을 바꿨어요`)}catch(e){toast(netMsg(e))}}
+function tCredit(n,a){return teamOp(n,(t,why)=>{if(t.credit+a<0){toast('크레딧이 모자라요');return}t.credit+=a;return {amt:a,reason:why||(a>0?'활동 보상':'사용'),kind:a>0?'earn':'spend'}})}
+function tCustom(n){const a=Math.round(+($('ta-'+n)?.value||0));if(!a)return toast('금액을 넣어 주세요');return tCredit(n,a)}
+function tScore(n,a){return teamOp(n,(t,why)=>{t.score=Math.max(0,Math.min(1000,t.score+a));return {amt:a,reason:why||(a>0?'약속 지킴':'약속 지키지 못함'),kind:'score'}})}
+function tLoan(n,a){return teamOp(n,(t,why)=>{if(gradeOf(t.score)>2){toast('2등급 이상만 대출할 수 있어요');return}const owe=Math.round(a*1.1);t.credit+=a;t.debt+=owe;toast(`${n}번 상단 ${a}냥 대출 · 갚을 금액 +${owe}냥`);return {amt:a,reason:why||`대출 (갚을 금액 ${owe}냥)`,kind:'loan'}})}
+function tRepay(n){return teamOp(n,(t,why)=>{if(!t.debt){toast('갚을 대출이 없어요');return}if(t.credit<t.debt){toast(`크레딧이 모자라요 (${t.debt}냥 필요)`);return}const d=t.debt;t.credit-=d;t.debt=0;toast(`${n}번 상단 대출을 갚았어요`);return {amt:-d,reason:why||'대출 상환',kind:'repay'}})}
+function tHelp(n){const k=$('tk-'+n)?.value;const h=HELP.find(x=>x.k===k);if(!h)return toast('도움 카드를 골라 주세요');
+  return teamOp(n,t=>{if(t.credit<h.c){toast(`크레딧이 모자라요 (${h.c}냥 필요)`);return}t.credit-=h.c;toast(`${n}번 상단: ${h.n} 구매`);if($('tk-'+n))$('tk-'+n).value='';return {amt:-h.c,reason:`도움 카드: ${h.n}`,kind:'card'}})}
+
+/* ---- 강사: 해금 ---- */
+function unlockHTML(){
+  const m=T.meta,keys=m.keys||{},ch=m.challenges||{};
+  const one=(o,on,grp)=>`<div class="vi"><div class="vh">${grp==='keys'?o.n+'의 열쇠':esc(o.n)}</div><div class="snip">${esc(o.s)}</div>
+    <button class="btn sm ${on?'gold':'line'}" onclick="tToggle('${grp}','${o.k}')">${on?'열림 · 닫기':'잠김 · 열기'}</button></div>`;
+  return `<h3 class="center">열쇠 (모든 상단 공통)</h3><p class="mute center" style="font-size:13px;margin:4px 0 10px">열면 학생 화면 '우리 상단 → 해금 보관함'에 주문문이 나타나요</p>
+    <div class="vault">${KEYS.map(o=>one(o,!!keys[o.k],'keys')).join('')}</div>
+    <h3 class="center" style="margin:18px 0 10px">도전 과제</h3><div class="vault">${CHAL.map(o=>one(o,!!ch[o.k],'challenges')).join('')}</div>`;
+}
+async function tToggle(grp,k){const cur={...(T.meta[grp]||{})};cur[k]=!cur[k];await setMeta({[grp]:cur});toast(cur[k]?'열었어요':'닫았어요')}
+
+/* ---- 강사: 테스트 ---- */
+const TST={open:'진행 중',closed:'마감'};
+function testResultHTML(big){
+  const pre=surveyAvg(T.players,'pre'),post=surveyAvg(T.players,'post'),ed=ethDist(T.players);
+  const f=v=>v==null?'-':v.toFixed(2);
+  const sv=`<table><thead><tr><th>문항</th><th>사전 평균 (${pre.n}명)</th><th>사후 평균 (${post.n}명)</th><th>변화</th></tr></thead><tbody>${SURVEY.map(s=>{const a=pre[s.k],b=post[s.k],d=a!=null&&b!=null?b-a:null;
+    return `<tr><td style="font-weight:700">${s.q}</td><td class="num">${f(a)}</td><td class="num">${f(b)}</td><td class="num ${d==null?'':cls(d)}" style="font-weight:800">${d==null?'-':(d>0?'+':'')+d.toFixed(2)}</td></tr>`}).join('')}</tbody></table>`;
+  const mx=Math.max(1,...Object.values(ed.c));
+  const et=Object.keys(ETYPE).map(k=>`<div class="axis" style="grid-template-columns:${big?'260px 1fr 80px':'130px 1fr 50px'};max-width:${big?'1000px':'640px'}"><div class="al" style="${big?'font-size:24px':''}">${ETYPE[k].n}</div><div class="bar" style="${big?'height:30px;border-radius:15px':''}"><span style="width:${ed.c[k]/mx*100}%;background:var(--gold)"></span></div><div style="font-weight:900;${big?'font-size:24px':''}">${ed.c[k]}명</div></div>`).join('');
+  return `<div><h3 class="center" style="margin-bottom:8px">설문 평균 (1~5)</h3>${sv}</div>
+    <div><h3 class="center" style="margin:16px 0 8px">AI 윤리 유형 분포 (${ed.n}명)</h3>${et}<p class="mute center" style="font-size:${big?16:13}px;margin-top:6px">동점인 학생은 두 유형에 모두 셌어요 · 좋고 나쁨이 아닌 성향이에요</p></div>`;
+}
+function testAdminHTML(){
+  const ts=T.meta.tests||{},n=Object.keys(T.players).length;
+  const done=k=>Object.values(T.players).filter(p=>k==='ethics'?p.ethics:p.survey?.[k]).length;
+  return `<table><thead><tr><th>테스트</th><th>상태</th><th>제출</th><th>조작</th></tr></thead><tbody>${TESTS.map(x=>`<tr><td style="font-weight:800">${x.n}</td>
+    <td>${ts[x.k]?`<b style="color:${ts[x.k]==='open'?'var(--ok)':'var(--mute)'}">${TST[ts[x.k]]}</b>`:'<span class="mute">숨김</span>'}</td><td>${done(x.k)} / ${n}명</td>
+    <td><div class="qtybtn"><button class="btn sm ${ts[x.k]==='open'?'gold':'line'}" onclick="tTest('${x.k}','open')">열기</button><button class="btn line sm" onclick="tTest('${x.k}','closed')">마감</button><button class="btn line sm" onclick="tTest('${x.k}',null)">숨기기</button></div></td></tr>`).join('')}</tbody></table>
+    <p class="mute center" style="font-size:13px;margin:6px 0 16px">마감하면 학생은 자기 결과만 볼 수 있어요 · 큰 화면의 '테스트'에서 결과를 함께 볼 수 있어요</p>
+    ${testResultHTML(false)}`;
+}
+async function tTest(k,st){const cur={...(T.meta.tests||{})};if(st)cur[k]=st;else delete cur[k];await setMeta({tests:Object.keys(cur).length?cur:null});toast(TESTS.find(x=>x.k===k).n+(st==='open'?' 열었어요':st==='closed'?' 마감했어요':' 숨겼어요'))}
+
+/* ---- 강사: 투자 ---- */
+function invRankHTML(big){
+  const m=T.meta,tot=invTotals(T.players,m.teams||7),mx=Math.max(1,...tot.map(x=>x.sum));
+  return `<table><thead><tr><th>순위</th><th>상단</th><th>받은 투자</th>${big?'<th style="width:40%"></th>':''}<th>투자한 사람</th></tr></thead><tbody>${tot.map(x=>`<tr><td>${1+tot.filter(y=>y.sum>x.sum).length}</td><td style="font-weight:800">${esc(signOf(m,T.teams,x.team))}</td><td class="num" style="font-weight:900">${fmt(x.sum)}냥</td>${big?`<td><div class="bar" style="height:22px;border-radius:11px"><span style="width:${x.sum/mx*100}%;background:#D9A441"></span></div></td>`:''}<td>${x.who}명</td></tr>`).join('')}</tbody></table>`;
+}
+function invAdminHTML(){
+  const st=T.meta.invest?.status,n=Object.keys(T.players).length,inv=Object.values(T.players).filter(p=>sumInv(p.invest)>0).length;
+  return `<div class="row" style="justify-content:center;margin-bottom:10px">
+      <span style="font-weight:800">투자 라운드</span> ${st?`<b style="color:${st==='open'?'var(--ok)':'var(--mute)'}">${st==='open'?'진행 중':'마감'}</b>`:'<span class="mute">숨김</span>'}
+      <button class="btn sm ${st==='open'?'gold':'line'}" onclick="tInv('open')">열기</button><button class="btn line sm" onclick="tInv('closed')">마감 · 결과 공개</button><button class="btn line sm" onclick="tInv(null)">숨기기</button>
+      <button class="btn line sm" style="color:var(--up)" onclick="tInvClear()">투자 기록 지우기</button></div>
+    <p class="mute center" style="font-size:13px;margin-bottom:10px">학생 1명당 100냥 + 상단 신용등급 보너스(1등급 50, 2등급 30, 3등급 10) · 자기 상단 제외 · 10냥 단위 · 참여 ${inv} / ${n}명</p>
+    ${invRankHTML(false)}`;
+}
+async function tInv(st){await setMeta({invest:st?{status:st,at:Date.now()}:null});toast(st==='open'?'투자 라운드를 열었어요':st==='closed'?'투자를 마감했어요':'투자 탭을 숨겼어요')}
+async function tInvClear(){if(!confirm('모든 학생의 투자 기록을 지울까요?'))return;for(const id of Object.keys(T.players))await DB.update(ROOT(T.code)+'/players/'+id,{invest:null});await pullT();toast('투자 기록을 지웠어요')}
+
+/* ---- 큰 화면 ---- */
 function renderBoard(){
   const m=T.meta;if(!m)return;const [bt,bs]=bannerText(m);
-  $('b-title').textContent=m.status==='open'?NEWS[m.day].t:bt;
-  $('b-sub').textContent=m.status==='open'?`${DAYNAME[m.day]} 장 · 지금 거래 중 · 장터 코드 ${T.code}`:(m.status==='waiting'?`장터 코드 ${T.code} · 지금 ${Object.keys(T.players).length}명 입장`:bs);
+  document.querySelectorAll('#b-views button').forEach(b=>b.classList.toggle('gold',b.dataset.v===T.bview));
   let h='';
-  if(m.status==='open'){
-    const N=NEWS[m.day];
-    h+=`<p style="text-align:center;font-size:24px;opacity:.9">${N.lead}</p><div class="news">${['gov','letter','rumor'].map(s=>`<div class="src" style="background:rgba(255,246,228,.08);border-color:rgba(217,164,65,.6)"><div class="h" style="font-size:26px;color:#F7D9A0">${SRC[s].n}</div><div class="b" style="font-size:22px;color:#FFF6E4">${N[s]}</div></div>`).join('')}</div>`;
-    h+=marketTable(true);
-  }else if(m.status==='waiting'){
-    h+=`<p style="text-align:center;font-size:120px;font-weight:900;letter-spacing:16px;color:#F7D9A0">${T.code}</p>`+marketTable(true);
-  }else if(m.status==='closed'){
-    h+=`<div class="event">${CLOSE[m.day]}</div>`+marketTable(true)+`<div>${beliefHTML(true)}</div>`;
+  if(T.bview==='team'){
+    $('b-title').textContent='상단 현황';$('b-sub').textContent=`${ERA[eraOf(m)].n}의 간판 · 장터 코드 ${T.code}`;$('b-timer').textContent='';
+    let r='';for(let n=1;n<=(m.teams||7);n++){const t=teamOf(T.teams,n);r+=`<tr><td>${n}</td><td style="font-weight:800">${esc(signOf(m,T.teams,n))}</td><td class="num">${fmt(t.credit)}냥</td><td>${t.score}점 · ${gradeOf(t.score)}등급</td><td class="num">${t.debt?fmt(t.debt)+'냥':'-'}</td></tr>`}
+    h=`<table><thead><tr><th>번호</th><th>상단</th><th>크레딧</th><th>신용</th><th>갚을 금액</th></tr></thead><tbody>${r}</tbody></table>`;
+  }else if(T.bview==='test'){
+    $('b-title').textContent='테스트 결과';$('b-sub').textContent='사전 · 사후 설문과 AI 윤리 유형';$('b-timer').textContent='';
+    h=`<div style="font-size:22px">${testResultHTML(true)}</div>`;
+  }else if(T.bview==='invest'){
+    const st=m.invest?.status;
+    $('b-title').textContent=st==='closed'?'투자 유치 순위':'투자 라운드';$('b-sub').textContent=st==='open'?'지금 투자 중 · 응원하고 싶은 상단의 앱에 투자하세요':(st==='closed'?'투자가 마감되었어요':'아직 투자 라운드가 열리지 않았어요');$('b-timer').textContent='';
+    h=invRankHTML(true);
   }else{
-    h+=rankHTML(true,10)+`<div>${beliefHTML(true)}</div>`;
+    $('b-title').textContent=m.status==='open'?NEWS[m.day].t:bt;
+    $('b-sub').textContent=m.status==='open'?`${DAYNAME[m.day]} 장 · 지금 거래 중 · 장터 코드 ${T.code}`:(m.status==='waiting'?`장터 코드 ${T.code} · 지금 ${Object.keys(T.players).length}명 입장`:bs);
+    if(m.status==='open'){
+      const N=NEWS[m.day];
+      h+=`<p style="text-align:center;font-size:24px;opacity:.9">${N.lead}</p><div class="news">${['gov','letter','rumor'].map(s=>`<div class="src" style="background:rgba(255,246,228,.08);border-color:rgba(217,164,65,.6)"><div class="h" style="font-size:26px;color:#F7D9A0">${SRC[s].n}</div><div class="b" style="font-size:22px;color:#FFF6E4">${N[s]}</div></div>`).join('')}</div>`;
+      h+=marketTable(true);
+    }else if(m.status==='waiting'){
+      h+=`<p style="text-align:center;font-size:120px;font-weight:900;letter-spacing:16px;color:#F7D9A0">${T.code}</p>`+marketTable(true);
+    }else if(m.status==='closed'){
+      h+=`<div class="event">${CLOSE[m.day]}</div>`+marketTable(true)+`<div>${beliefHTML(true)}</div>`;
+    }else{
+      h+=rankHTML(true,10)+`<div>${beliefHTML(true)}</div>`;
+    }
   }
   $('b-body').innerHTML=h;
 }
 $('c-csv').onclick=()=>{
-  const arr=rows().sort((a,b)=>b.v-a.v);
-  const head=['순위','상단','이름','재산','수익률',...[1,2,3].flatMap(d=>[`${DAYNAME[d]}장 믿음`,`${DAYNAME[d]}장 이유`,`${DAYNAME[d]}장 수익률`]),'거래 수'];
-  const q=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
-  const lines=[head.map(q).join(',')].concat(arr.map((p,k)=>[k+1,p.team+'상단',p.name,Math.round(p.v),(p.r*100).toFixed(1)+'%',...[1,2,3].flatMap(d=>{const b=p.beliefs?.[d];const done=(T.meta.day>d)||(T.meta.day===d&&T.meta.status!=='open')||T.meta.status==='final';return [b?SRC[b.src].n:'',b?.why||'',done?(dayReturn(p,d)*100).toFixed(1)+'%':'']}),(p.log||[]).length].map(q).join(',')));
+  const m=T.meta,arr=rows().sort((a,b)=>b.v-a.v),q=s=>'"'+String(s??'').replace(/"/g,'""')+'"';
+  const recv={};invTotals(T.players,m.teams||7).forEach(x=>recv[x.team]=x.sum);
+  const head=['순위','상단','상단 간판','이름','재산','수익률',...[1,2,3].flatMap(d=>[`${DAYNAME[d]}장 믿음`,`${DAYNAME[d]}장 이유`,`${DAYNAME[d]}장 수익률`]),'거래 수',
+    '상단 크레딧','상단 신용점수','상단 신용등급','윤리 유형',...SURVEY.map((s,i)=>`사전${i+1}`),...SURVEY.map((s,i)=>`사후${i+1}`),'투자한 금액','투자 내역','상단이 받은 투자','앱 링크','금융 다짐'];
+  const lines=[head.map(q).join(',')].concat(arr.map((p,k)=>{
+    const t=teamOf(T.teams,p.team),inv=normIdx(p.invest);
+    return [k+1,p.team+'상단',signOf(m,T.teams,p.team),p.name,Math.round(p.v),(p.r*100).toFixed(1)+'%',...[1,2,3].flatMap(d=>{const b=p.beliefs?.[d];const done=(m.day>d)||(m.day===d&&m.status!=='open')||m.status==='final';return [b?SRC[b.src].n:'',b?.why||'',done?(dayReturn(p,d)*100).toFixed(1)+'%':'']}),(p.log||[]).length,
+      t.credit,t.score,gradeOf(t.score)+'등급',p.ethics?.type||'',...SURVEY.map(s=>p.survey?.pre?.[s.k]??''),...SURVEY.map(s=>p.survey?.post?.[s.k]??''),
+      sumInv(inv),Object.entries(inv).filter(([x,a])=>+a>0).map(([x,a])=>`${x}상단 ${a}`).join(' / '),recv[p.team]||0,p.card?.link||'',p.card?.pledge||''].map(q).join(',')}));
   const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`장터거래소_${T.code}.csv`;a.click();
 };
@@ -647,7 +1184,7 @@ function route(){
   const s=loadSess();
   const qc=(location.search.match(/[?&]code=([A-Za-z0-9]+)/)||[])[1];
   if(qc)$('j-code').value=qc.toUpperCase();
-  if(s&&s.code&&s.pid){S.code=s.code;S.pid=s.pid;startPlay()}else{show('v-join');if(qc)$('j-code').dispatchEvent(new Event('change'))}
+  if(s&&s.code&&s.pid){S.code=s.code;S.pid=s.pid;if(s.tab)S.tab=s.tab;startPlay()}else{show('v-join');if(qc)$('j-code').dispatchEvent(new Event('change'))}
 }
 window.addEventListener('hashchange',route);
 route();
