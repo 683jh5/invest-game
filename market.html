@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>상단 투자 장터</title>
+<style>
+:root{
+  --bg:#e9e0cf;--card:#fbf8f1;--card2:#f2ebdc;--border:#dccfb6;
+  --ink:#4d4536;--ink2:#7d7159;--ink3:#a99d84;
+  --accent:#8a9a76;--accent-d:#6f8060;--accent-bg:#e6ead9;
+  --pos:#4f8a4b;--neg:#c0654a;--warn:#bf9a3f;--seal:#b5442e;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;font-size:16px}
+.screen{display:none;min-height:100vh;padding:18px}
+.screen.active{display:block}
+.wrap{max-width:1080px;margin:0 auto}
+.narrow{max-width:460px;margin:6vh auto 0}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:0 6px 18px rgba(120,100,70,.08);margin-bottom:14px}
+h1{font-size:1.7rem;margin-bottom:4px}
+h2{font-size:1.15rem;margin-bottom:12px}
+h3{font-size:1rem;margin-bottom:8px}
+.sub{color:var(--ink2);font-size:.92rem}
+input,select,textarea{width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--ink);font-size:1rem;margin-bottom:9px;font-family:inherit}
+textarea{resize:vertical;min-height:64px}
+.btn{display:inline-block;padding:12px 16px;border-radius:12px;border:none;font-size:1rem;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit}
+.btn.block{display:block;width:100%;margin-top:6px}
+.btn-p{background:linear-gradient(135deg,#9aab82,#7f9269);color:#fff}
+.btn-s{background:var(--card2);color:var(--ink);border:1px solid var(--border)}
+.btn-r{background:linear-gradient(135deg,#d0866c,#b8644a);color:#fff}
+.btn-g{background:linear-gradient(135deg,#d6b25c,#bf9a3f);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:hover:not(:disabled){filter:brightness(1.05)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tab{flex:1;min-width:80px;padding:10px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--ink2);font-weight:700;cursor:pointer;font-size:.95rem;text-align:center}
+.tab.active{background:linear-gradient(135deg,#9aab82,#7f9269);color:#fff;border-color:transparent}
+.pane{display:none}.pane.active{display:block}
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px 6px;border-bottom:1px solid #ece4d4;text-align:center;font-size:.92rem;vertical-align:middle}
+th{color:var(--ink2);font-size:.82rem;font-weight:700}
+.pos{color:var(--pos);font-weight:700}.neg{color:var(--neg);font-weight:700}.zero{color:var(--ink3)}
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.78rem;font-weight:700;background:var(--card2);border:1px solid var(--border)}
+.pill.on{background:var(--accent-bg);color:var(--accent-d);border-color:var(--accent)}
+.pill.warn{background:#f6ecd2;color:#9a7a26;border-color:#e2cd93}
+.pill.red{background:#f6dfd7;color:var(--seal);border-color:#e7b9aa}
+.code-big{font-size:2.6rem;font-weight:900;letter-spacing:6px;color:var(--accent-d)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.stat b{display:block;font-size:1.35rem}
+.stat span{font-size:.78rem;color:var(--ink2)}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.scard{background:var(--card);border:1.5px solid var(--border);border-radius:13px;padding:12px;cursor:pointer;text-align:center;position:relative}
+.scard.sel{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 2px rgba(138,154,118,.35)}
+.scard.mine::after{content:'우리 상단';position:absolute;top:-9px;right:8px;background:var(--seal);color:#fff;font-size:.7rem;padding:2px 7px;border-radius:8px;transform:rotate(4deg)}
+.dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;color:#fff;font-weight:800;font-size:1.05rem}
+.sprice{font-size:1.1rem;font-weight:800}
+.omen{background:#f4eedf;border:1px dashed #c9b88f;border-radius:14px;padding:16px;margin-bottom:12px}
+.omen .big{font-size:1.25rem;font-weight:800;margin:4px 0 8px}
+.prob{display:flex;align-items:center;gap:8px;margin:4px 0;font-size:.9rem}
+.prob .bar{flex:1;height:12px;background:#ebe2cf;border-radius:6px;overflow:hidden}
+.prob .bar i{display:block;height:100%;background:var(--warn)}
+.prob .nm{width:140px;text-align:left;white-space:nowrap}
+.prob .pc{width:44px;text-align:right;color:var(--ink2)}
+.event{border-radius:18px;padding:22px;text-align:center;color:#fff;margin-bottom:12px;background:linear-gradient(135deg,#6f8190,#4f6070)}
+.event .icon{font-size:2.6rem}
+.event .nm{font-size:1.6rem;font-weight:900;margin:4px 0}
+.event .st{font-size:1rem;opacity:.95;line-height:1.5}
+.flip{animation:flip .7s ease}
+@keyframes flip{0%{transform:rotateY(90deg);opacity:0}100%{transform:rotateY(0);opacity:1}}
+.shuffle{font-size:2.4rem;text-align:center;padding:30px;animation:shk .35s infinite}
+@keyframes shk{0%{transform:translateX(-6px) rotate(-3deg)}50%{transform:translateX(6px) rotate(3deg)}100%{transform:translateX(-6px) rotate(-3deg)}}
+.trade-box{background:var(--card2);border:1px solid var(--border);border-radius:13px;padding:14px;margin-top:12px}
+.qty{display:flex;align-items:center;gap:8px;margin:8px 0}
+.qty button{white-space:nowrap;min-width:40px;padding:0 8px;height:40px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:1.2rem;cursor:pointer}
+.qty input{width:80px;flex:1;min-width:60px;text-align:center;margin:0}
+.notice{background:#f6ecd2;border:1px solid #e2cd93;border-radius:12px;padding:12px 14px;font-size:.92rem;margin-bottom:12px}
+.muted{color:var(--ink3);font-size:.88rem}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#4d4536;color:#fff;padding:11px 20px;border-radius:12px;opacity:0;transition:opacity .2s;z-index:99;pointer-events:none}
+.toast.show{opacity:1}
+.hl{background:#fff6e0}
+.left{text-align:left}
+.reason{font-size:.85rem;color:var(--ink2);text-align:left}
+.tiny{font-size:.78rem}
+@media(max-width:600px){.code-big{font-size:2rem}.prob .nm{width:120px;font-size:.82rem}.qty{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+
+<!-- 첫 화면 -->
+<div class="screen active" id="screen-home">
+  <div class="narrow">
+    <div class="card" style="text-align:center">
+      <h1>상단 투자 장터</h1>
+      <p class="sub">징조를 읽고, 근거를 적고, 사건 카드가 뒤집히면 다시 판단함</p>
+    </div>
+    <div class="card" id="form-student">
+      <h2>학생 입장</h2>
+      <input id="in-code" maxlength="6" placeholder="수업 코드 6자리" style="text-transform:uppercase">
+      <input id="in-name" maxlength="12" placeholder="이름 (예: 김하늘)">
+      <select id="in-team"><option value="">우리 상단 선택</option></select>
+      <button class="btn btn-p block" id="btn-join">입장하기</button>
+    </div>
+    <div class="card" id="form-teacher" style="display:none">
+      <h2>강사 — 새 장터 열기</h2>
+      <input id="in-tkey" type="password" placeholder="강사 인증코드">
+      <select id="in-region">
+        <option value="7">광주 · 7개 상단 (비단·곡물·도자기·약초·운송·종이·소금)</option>
+        <option value="5">울산 · 5개 상단 (비단·곡물·도자기·약초·종이)</option>
+      </select>
+      <div class="row" style="flex-wrap:nowrap">
+        <select id="in-rounds" style="flex:1"><option value="3">3라운드</option><option value="4" selected>4라운드</option><option value="5">5라운드</option><option value="6">6라운드</option></select>
+        <select id="in-seed" style="flex:1"><option value="10000000" selected>시작 자금 1,000만 원</option><option value="5000000">500만 원</option><option value="1000000">100만 원</option></select>
+      </div>
+      <input id="in-tpw" type="password" placeholder="재입장용 비밀번호 (4자리 이상)">
+      <button class="btn btn-p block" id="btn-create">장터 열기</button>
+      <hr style="border:none;border-top:1px solid var(--border);margin:14px 0">
+      <h3>기존 장터 재입장</h3>
+      <input id="in-tcode" maxlength="6" placeholder="수업 코드" style="text-transform:uppercase">
+      <input id="in-tpw2" type="password" placeholder="비밀번호">
+      <button class="btn btn-s block" id="btn-rejoin">재입장</button>
+    </div>
+    <div style="text-align:center;margin-top:6px"><button class="btn btn-s tiny" style="padding:7px 14px" id="btn-role">강사로 시작하기</button></div>
+    <p class="muted" style="text-align:center;margin-top:10px" id="demo-note"></p>
+  </div>
+</div>
+
+<!-- 강사 화면 -->
+<div class="screen" id="screen-teacher">
+  <div class="wrap">
+    <div class="card between">
+      <div>
+        <div class="sub">수업 코드</div>
+        <div class="code-big" id="t-code">------</div>
+      </div>
+      <div style="text-align:right">
+        <div id="t-status" class="pill on">대기</div>
+        <div class="sub" style="margin-top:6px" id="t-count">참여 0명</div>
+        <button class="btn btn-s tiny" style="margin-top:8px;padding:6px 12px" id="t-logout">나가기</button>
+      </div>
+    </div>
+    <div class="tabs" id="t-tabs">
+      <div class="tab active" data-p="tp-run">진행</div>
+      <div class="tab" data-p="tp-students">학생 현황</div>
+      <div class="tab" data-p="tp-deck">사건 카드</div>
+      <div class="tab" data-p="tp-result">결과·돌아보기</div>
+    </div>
+    <div class="pane active" id="tp-run">
+      <div class="card" id="t-step"></div>
+      <div class="card"><h2>현재 시세</h2><div id="t-prices"></div></div>
+      <div class="card"><h2>라운드 기록</h2><div id="t-history"></div></div>
+    </div>
+    <div class="pane" id="tp-students"><div class="card"><div class="between"><h2>학생 현황</h2><button class="btn btn-s tiny" id="t-csv" style="padding:6px 12px">거래·근거 CSV 저장</button></div><div id="t-students" style="overflow-x:auto"></div></div></div>
+    <div class="pane" id="tp-deck"><div class="card"><h2>사건 카드 목록</h2><p class="sub" style="margin-bottom:10px">숫자는 해당 상단 가격 변동률(%)임. 실제 공개 때는 상단마다 ±2% 안의 평소 흔들림이 더해짐.</p><div id="t-deck" style="overflow-x:auto"></div></div>
+      <div class="card"><h2>징조 목록</h2><div id="t-omens"></div></div></div>
+    <div class="pane" id="tp-result"><div class="card" id="t-result"></div></div>
+  </div>
+</div>
+
+<!-- 학생 화면 -->
+<div class="screen" id="screen-student">
+  <div class="wrap">
+    <div class="card between">
+      <div>
+        <div style="font-weight:800;font-size:1.15rem" id="s-name">-</div>
+        <div class="sub" id="s-team">-</div>
+      </div>
+      <div style="text-align:right">
+        <div id="s-status" class="pill on">대기</div>
+        <div class="sub" style="margin-top:4px">총자산 <b id="s-asset" style="font-size:1.15rem;color:var(--ink)">-</b></div>
+        <div id="s-ret" class="tiny"></div>
+      </div>
+    </div>
+    <div class="tabs" id="s-tabs">
+      <div class="tab active" data-p="sp-news">소식</div>
+      <div class="tab" data-p="sp-trade">투자</div>
+      <div class="tab" data-p="sp-hold">보유</div>
+      <div class="tab" data-p="sp-log">내역</div>
+      <div class="tab" data-p="sp-review" id="s-review-tab" style="display:none">돌아보기</div>
+    </div>
+    <div class="pane active" id="sp-news"></div>
+    <div class="pane" id="sp-trade"></div>
+    <div class="pane" id="sp-hold"></div>
+    <div class="pane" id="sp-log"></div>
+    <div class="pane" id="sp-review"></div>
+  </div>
+</div>
+
+<div id="net-bar" style="display:none;position:fixed;top:0;left:0;right:0;background:#c0654a;color:#fff;padding:10px 16px;text-align:center;z-index:98;font-size:.92rem">서버에 연결할 수 없음. 이 화면에서는 여러 기기 연결이 막혀 있을 수 있음 <button class="btn btn-s tiny" style="padding:4px 10px;margin-left:8px" onclick="useDemo()">이 기기에서만 체험하기</button></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ───────── 저장소 (Firebase REST · ?demo 이면 이 브라우저 안에서만) ─────────
+const FB_URL='https://geang-invest-default-rtdb.firebaseio.com';
+const TEACHER_KEY='hot2026';
+let DEMO=new URLSearchParams(location.search).has('demo');
+const ROOT=c=>`classes/MK-${c}`;
+const demoKey='mk_demo_tree';
+function dTree(){try{return JSON.parse(localStorage.getItem(demoKey)||'{}')}catch(e){return {}}}
+function dSave(t){try{localStorage.setItem(demoKey,JSON.stringify(t))}catch(e){}}
+function dWalk(t,p,create){const ks=p.split('/').filter(Boolean);let o=t;for(let i=0;i<ks.length-1;i++){if(o[ks[i]]==null||typeof o[ks[i]]!=='object'){if(!create)return [null,null];o[ks[i]]={};}o=o[ks[i]];}return [o,ks[ks.length-1]];}
+const db={
+  async get(p){if(!DEMO){try{const r=await fetch(`${FB_URL}/${p}.json`);if(!r.ok)throw 0;return await r.json()}catch(e){netFail();throw e}}if(DEMO){const [o,k]=dWalk(dTree(),p,false);return o?JSON.parse(JSON.stringify(o[k]??null)):null;}const r=await fetch(`${FB_URL}/${p}.json`);return r.json();},
+  async set(p,d){if(!DEMO){try{const r=await fetch(`${FB_URL}/${p}.json`,{method:'PUT',body:JSON.stringify(d)});if(!r.ok)throw 0;return}catch(e){netFail();throw e}}if(DEMO){const t=dTree();const [o,k]=dWalk(t,p,true);if(d==null)delete o[k];else o[k]=JSON.parse(JSON.stringify(d));dSave(t);return;}await fetch(`${FB_URL}/${p}.json`,{method:'PUT',body:JSON.stringify(d)});},
+  async update(p,d){if(!DEMO){try{const r=await fetch(`${FB_URL}/${p}.json`,{method:'PATCH',body:JSON.stringify(d)});if(!r.ok)throw 0;return}catch(e){netFail();throw e}}if(DEMO){const t=dTree();const [o,k]=dWalk(t,p,true);o[k]=Object.assign(o[k]||{},JSON.parse(JSON.stringify(d)));Object.keys(d).forEach(x=>{if(d[x]==null)delete o[k][x]});dSave(t);return;}await fetch(`${FB_URL}/${p}.json`,{method:'PATCH',body:JSON.stringify(d)});}
+};
+
+let _nf=0;
+function netFail(){if(Date.now()-_nf<5000)return;_nf=Date.now();const n=document.getElementById('net-bar');if(n)n.style.display='block'}
+function useDemo(){DEMO=true;document.getElementById('net-bar').style.display='none';document.getElementById('demo-note').textContent='체험 모드: 이 브라우저 안에서만 저장됨 (다른 기기와 연결되지 않음)';toast('체험 모드로 바뀜. 다시 시도해 주세요')}
+// ───────── 상단·사건·징조 ─────────
+const ALL_STOCKS=[
+  {id:'silk',name:'비단 상단',short:'비단',color:'#a0628a',goods:'비단·명주실'},
+  {id:'grain',name:'곡물 상단',short:'곡물',color:'#b8923c',goods:'쌀·보리'},
+  {id:'pot',name:'도자기 상단',short:'도자기',color:'#5f8aa0',goods:'그릇·항아리'},
+  {id:'herb',name:'약초 상단',short:'약초',color:'#5e8c5a',goods:'약초·탕약'},
+  {id:'ship',name:'운송 상단',short:'운송',color:'#7d6a58',goods:'수레·나룻배'},
+  {id:'paper',name:'종이 상단',short:'종이',color:'#8a7ba8',goods:'한지·지우산'},
+  {id:'salt',name:'소금 상단',short:'소금',color:'#6f8190',goods:'소금·젓갈'}
+];
+const REGION={7:['silk','grain','pot','herb','ship','paper','salt'],5:['silk','grain','pot','herb','paper']};
+// e: 상단별 변동률(%)
+const EVENTS=[
+  {id:'storm',icon:'⛈️',name:'폭풍우',story:'사흘 밤낮 비바람이 몰아침. 길이 끊기고 염전이 물에 잠겼지만, 장터마다 지우산(기름종이 우산)이 동났음.',e:{silk:-5,grain:-4,pot:-6,herb:5,ship:-14,paper:16,salt:-10}},
+  {id:'drought',icon:'☀️',name:'가뭄',story:'한 달째 비가 오지 않음. 쌀값이 뛰고 햇볕 좋은 염전은 소금을 많이 거둠. 약초밭은 말라 감.',e:{silk:-2,grain:12,pot:0,herb:-8,ship:2,paper:-1,salt:10}},
+  {id:'wedding',icon:'🎎',name:'혼례철 잔치',story:'고을마다 혼례가 줄을 이음. 비단 예복과 잔칫상 그릇 주문이 밀려듦.',e:{silk:15,grain:4,pot:9,herb:0,ship:4,paper:2,salt:3}},
+  {id:'plague',icon:'🤧',name:'돌림감기 유행',story:'이웃 고을에 감기가 번짐. 탕약 주문은 늘었지만 사람들이 장터 나들이를 줄임.',e:{silk:-6,grain:0,pot:-3,herb:16,ship:-7,paper:0,salt:-2}},
+  {id:'exam',icon:'📜',name:'과거 시험 공고',story:'나라에서 과거 시험을 연다는 방이 붙음. 선비들이 한지를 사고 한양 가는 길이 붐빔.',e:{silk:3,grain:2,pot:0,herb:0,ship:7,paper:13,salt:0}},
+  {id:'bandit',icon:'🗡️',name:'고갯길 산적',story:'고갯길에 산적이 나타나 수레 짐을 빼앗음. 먼 길 장사가 멈춤.',e:{silk:-6,grain:-2,pot:-4,herb:-2,ship:-15,paper:-2,salt:-6}},
+  {id:'road',icon:'🛤️',name:'새 길 개통',story:'두 고을을 잇는 새 길이 뚫림. 짐을 더 빨리, 더 멀리 보낼 수 있게 됨.',e:{silk:4,grain:5,pot:3,herb:2,ship:13,paper:2,salt:6}},
+  {id:'harvest',icon:'🌾',name:'대풍년',story:'들판마다 벼가 가득함. 팔 곡식이 넘치고 수레가 쉴 틈이 없음.',e:{silk:2,grain:11,pot:3,herb:0,ship:6,paper:0,salt:2}},
+  {id:'fire',icon:'🔥',name:'장터 큰불',story:'밤사이 장터에 불이 남. 한지·비단 창고가 탔고, 새 살림에 쓸 그릇을 찾는 사람이 늘었음.',e:{silk:-9,grain:-3,pot:8,herb:-2,ship:0,paper:-13,salt:0}},
+  {id:'ledger',icon:'📒',name:'관아 장부 의무화',story:'관아가 모든 상단에 거래 장부를 쓰게 함. 장부용 한지가 불티나게 팔림.',e:{silk:0,grain:0,pot:0,herb:0,ship:2,paper:12,salt:0}},
+  {id:'kiln',icon:'🧱',name:'가마 무너짐',story:'도자기 마을의 큰 가마가 무너짐. 한동안 그릇을 굽지 못함.',e:{silk:0,grain:0,pot:-15,herb:0,ship:-2,paper:0,salt:0}},
+  {id:'pirate',icon:'🏴',name:'바닷가 해적',story:'바닷가에 해적이 나타나 소금배를 노림. 뱃길 장사가 위험해짐.',e:{silk:-2,grain:0,pot:0,herb:0,ship:-8,paper:0,salt:-14}},
+  {id:'calm',icon:'🍃',name:'평온한 장날',story:'별일 없는 장날. 모두가 조금씩 벌었음.',e:{silk:2,grain:2,pot:2,herb:2,ship:2,paper:2,salt:2}}
+];
+// 징조: 특정 사건 가능성을 높임 (가중치 배수)
+const OMENS=[
+  {id:'cloud',text:'제비가 낮게 날고, 서쪽 하늘에 먹구름이 쌓임',boost:{storm:8}},
+  {id:'dry',text:'우물물이 줄고, 개울 바닥이 드러나기 시작함',boost:{drought:8}},
+  {id:'match',text:'중매쟁이들이 이 집 저 집 바쁘게 드나듦',boost:{wedding:8}},
+  {id:'cough',text:'이웃 고을에서 기침 소리가 끊이지 않는다는 말이 돎',boost:{plague:7}},
+  {id:'notice',text:'관아 앞에 곧 큰 방이 붙을 거라는 소문이 돎',boost:{exam:5,ledger:5}},
+  {id:'pass',text:'고갯길에서 수상한 사람들을 봤다는 장꾼이 늘어남',boost:{bandit:8}},
+  {id:'work',text:'고을 사람들이 산을 깎고 다리를 놓는 일에 불려 감',boost:{road:8}},
+  {id:'rice',text:'들판의 벼 이삭이 유난히 묵직하다는 이야기가 돎',boost:{harvest:8}},
+  {id:'sea',text:'바닷가 마을에서 낯선 배를 봤다는 소문이 돎',boost:{pirate:8}},
+  {id:'quiet',text:'특별한 소문 없이 조용한 한 주가 지나감',boost:{calm:6}}
+];
+
+// ───────── 공통 ─────────
+const $=id=>document.getElementById(id);
+function toast(m){const e=$('toast');e.textContent=m;e.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>e.classList.remove('show'),2300)}
+function won(n){return Math.round(n).toLocaleString('ko-KR')+'원'}
+function pct(n){return (n>0?'+':'')+(Math.round(n*10)/10)+'%'}
+function cls(n){return n>0.0001?'pos':n<-0.0001?'neg':'zero'}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function genCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let r='';for(let i=0;i<6;i++)r+=c[Math.floor(Math.random()*c.length)];return r}
+function arr(x){return Array.isArray(x)?x.filter(Boolean):(x?Object.values(x):[])}
+function stocksOf(m){return (m.stocks||REGION[7]).map(id=>ALL_STOCKS.find(s=>s.id===id))}
+function S(id){return ALL_STOCKS.find(s=>s.id===id)}
+function evById(id){return EVENTS.find(e=>e.id===id)}
+function omenById(id){return OMENS.find(o=>o.id===id)}
+function curPrices(m){return (m.prices||{})['r'+(m.revealed||0)]||{}}
+function assetOf(st,prices){let t=st.cash||0;Object.entries(st.hold||{}).forEach(([k,q])=>t+=(prices[k]||0)*q);return t}
+function probs(m,omenId){
+  const o=omenById(omenId);const ids=EVENTS.map(e=>e.id);
+  const w={};ids.forEach(i=>w[i]=1*((o&&o.boost[i])||1));
+  const sum=Object.values(w).reduce((a,b)=>a+b,0);const p={};ids.forEach(i=>p[i]=w[i]/sum);return p;
+}
+function weightedPick(p){let r=Math.random(),acc=0;for(const [k,v] of Object.entries(p)){acc+=v;if(r<=acc)return k}return Object.keys(p)[0]}
+function bindTabs(id){$(id).querySelectorAll('.tab').forEach(t=>t.onclick=()=>{$(id).querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');const host=$(id).parentElement;host.querySelectorAll(':scope > .pane').forEach(p=>p.classList.remove('active'));$(t.dataset.p).classList.add('active');if(role==='student')renderStudent(true)})}
+bindTabs('t-tabs');bindTabs('s-tabs');
+
+let role=null,code='',me='',M=null,pollIv=null,lastSig='',sel=null,qty=1,side='buy';
+function saveSess(){try{sessionStorage.setItem('mk_sess'+(DEMO?'_demo':''),JSON.stringify({role,code,me}))}catch(e){}}
+function clearSess(){try{sessionStorage.removeItem('mk_sess'+(DEMO?'_demo':''))}catch(e){}}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('screen-'+id).classList.add('active');window.scrollTo(0,0)}
+
+// ───────── 첫 화면 ─────────
+function fillTeams(n){$('in-team').innerHTML='<option value="">우리 상단 선택</option>'+REGION[n].map(id=>`<option value="${id}">${S(id).name}</option>`).join('')}
+fillTeams(7);
+$('in-code').addEventListener('input',async e=>{const c=e.target.value.trim().toUpperCase();if(c.length===6){const m=await db.get(ROOT(c));if(m&&m.stocks)$('in-team').innerHTML='<option value="">우리 상단 선택</option>'+m.stocks.map(id=>`<option value="${id}">${S(id).name}</option>`).join('')}});
+let asTeacher=location.hash.toLowerCase()==='#teacher';
+function gate(){$('form-teacher').style.display=asTeacher?'block':'none';$('form-student').style.display=asTeacher?'none':'block';$('btn-role').textContent=asTeacher?'학생으로 입장하기':'강사로 시작하기'}
+$('btn-role').onclick=()=>{asTeacher=!asTeacher;gate()};
+gate();window.addEventListener('hashchange',()=>{asTeacher=location.hash.toLowerCase()==='#teacher';gate()});
+if(DEMO)$('demo-note').textContent='체험 모드: 이 브라우저 안에서만 저장됨 (다른 기기와 연결되지 않음)';
+
+$('btn-create').onclick=async()=>{
+  if($('in-tkey').value.trim()!==TEACHER_KEY)return toast('강사 인증코드가 올바르지 않음');
+  const pw=$('in-tpw').value.trim();if(pw.length<4)return toast('비밀번호는 4자리 이상');
+  const n=+$('in-region').value;code=genCode();
+  const stocks=REGION[n];const p0={};stocks.forEach(id=>p0[id]=10000);
+  await db.set(ROOT(code),{code,pw,created:Date.now(),stocks,seed:+$('in-seed').value,rounds:+$('in-rounds').value,round:0,phase:'waiting',revealed:0,prices:{r0:p0},history:{},students:{}});
+  role='teacher';saveSess();enterTeacher();
+};
+$('btn-rejoin').onclick=async()=>{
+  const c=$('in-tcode').value.trim().toUpperCase();const m=await db.get(ROOT(c));
+  if(!m)return toast('없는 수업 코드');if(m.pw!==$('in-tpw2').value.trim())return toast('비밀번호가 다름');
+  code=c;role='teacher';saveSess();enterTeacher();
+};
+$('btn-join').onclick=async()=>{
+  const c=$('in-code').value.trim().toUpperCase(),nm=$('in-name').value.trim().replace(/[.#$\[\]\/]/g,''),tm=$('in-team').value;
+  if(c.length!==6)return toast('수업 코드 6자리를 입력');if(nm.length<2)return toast('이름은 2글자 이상');if(!tm)return toast('우리 상단을 선택');
+  const m=await db.get(ROOT(c));if(!m)return toast('없는 수업 코드');
+  const ex=await db.get(`${ROOT(c)}/students/${nm}`);
+  if(!ex)await db.set(`${ROOT(c)}/students/${nm}`,{name:nm,team:tm,cash:m.seed,hold:{},avg:{},trades:[],notes:{},joined:Date.now()});
+  else if(ex.team!==tm)await db.update(`${ROOT(c)}/students/${nm}`,{team:tm});
+  code=c;me=nm;role='student';saveSess();enterStudent();
+};
+function logout(){clearInterval(pollIv);clearSess();role=null;M=null;lastSig='';show('home')}
+$('t-logout').onclick=logout;
+
+async function poll(){let m;try{m=await db.get(ROOT(code))}catch(e){return}if(!m){return}M=m;const sig=JSON.stringify(m);if(sig===lastSig)return;lastSig=sig;if(role==='teacher')renderTeacher();else renderStudent()}
+function startPoll(){clearInterval(pollIv);poll();pollIv=setInterval(poll,DEMO?800:1500)}
+function enterTeacher(){$('t-code').textContent=code;show('teacher');lastSig='';startPoll()}
+function enterStudent(){show('student');lastSig='';startPoll()}
+
+// ───────── 강사: 진행 ─────────
+const PH={waiting:'시작 전',omen:'징조 공개 · 투자 중',locked:'투자 마감 · 사건 뽑기',revealed:'사건 공개 · 재판단',done:'모든 라운드 끝'};
+async function T(patch){await db.update(ROOT(code),patch);lastSig='';poll()}
+async function startRound(){
+  const r=(M.round||0)+1;
+  const used=arr(M.history).map(h=>h.omen);
+  let pool=OMENS.filter(o=>!used.includes(o.id));if(!pool.length)pool=OMENS;
+  const om=pool[Math.floor(Math.random()*pool.length)];
+  await T({round:r,phase:'omen',omen:om.id,event:null});
+}
+async function setOmen(id){await T({omen:id})}
+async function lockRound(){await T({phase:'locked'})}
+async function drawEvent(manualId){
+  $('t-step').innerHTML='<div class="shuffle">🂠 🂠 🂠</div><p class="sub" style="text-align:center">사건 카드를 섞는 중…</p>';
+  await new Promise(r=>setTimeout(r,1400));
+  const p=probs(M,M.omen);const evId=manualId||weightedPick(p);const ev=evById(evId);
+  const prev=curPrices(M);const next={},chg={};
+  M.stocks.forEach(id=>{const noise=Math.round((Math.random()*4-2)*10)/10;const c=Math.round(((ev.e[id]||0)+noise)*10)/10;chg[id]=c;next[id]=Math.max(100,Math.round(prev[id]*(1+c/100)/10)*10)});
+  const r=M.round;const prices=Object.assign({},M.prices,{['r'+r]:next});
+  const history=Object.assign({},M.history||{},{['r'+r]:{round:r,omen:M.omen,event:evId,chg,prob:Math.round(p[evId]*100)}});
+  await T({phase:'revealed',event:evId,revealed:r,prices,history});
+}
+async function finish(){await T({phase:'done'})}
+async function resetAll(){if(!confirmBox())return;const p0={};M.stocks.forEach(id=>p0[id]=10000);const st={};Object.entries(M.students||{}).forEach(([k,s])=>st[k]={name:s.name,team:s.team,cash:M.seed,hold:{},avg:{},trades:[],notes:{},joined:s.joined});await db.set(ROOT(code),Object.assign({},M,{round:0,phase:'waiting',revealed:0,omen:null,event:null,prices:{r0:p0},history:{},students:st}));lastSig='';poll()}
+let _cf=0;function confirmBox(){if(Date.now()-_cf<4000){_cf=0;return true}_cf=Date.now();toast('한 번 더 누르면 처음부터 다시 시작함');return false}
+
+function probHTML(omenId,top=6){
+  const p=probs(M,omenId);const list=Object.entries(p).sort((a,b)=>b[1]-a[1]).slice(0,top);
+  return list.map(([k,v])=>{const e=evById(k);return `<div class="prob"><span class="nm">${e.icon} ${e.name}</span><span class="bar"><i style="width:${Math.round(v*100/list[0][1]*100)/100}%"></i></span><span class="pc">${Math.round(v*100)}%</span></div>`}).join('')+`<p class="muted tiny" style="margin-top:6px">그 밖의 사건 ${EVENTS.length-top}가지도 뽑힐 수 있음</p>`;
+}
+function eventHTML(evId,chg,stocks){const e=evById(evId);return `<div class="event flip"><div class="icon">${e.icon}</div><div class="nm">${e.name}</div><div class="st">${e.story}</div></div>`+chgTable(chg,stocks)}
+function chgTable(chg,stocks,mine){return `<table><tr>${stocks.map(id=>`<th>${S(id).short}</th>`).join('')}</tr><tr>${stocks.map(id=>`<td class="${cls(chg[id])} ${mine===id?'hl':''}">${pct(chg[id])}</td>`).join('')}</tr></table>`}
+
+function renderTeacher(){
+  const m=M;const stocks=m.stocks;const studs=Object.values(m.students||{});
+  $('t-status').textContent=(m.round?`${m.round}/${m.rounds}라운드 · `:'')+PH[m.phase];
+  $('t-count').textContent=`참여 ${studs.length}명`;
+  const r=m.round||0;let h='';
+  if(m.phase==='waiting'){h=`<h2>준비</h2><p class="sub" style="margin-bottom:12px">학생들이 수업 코드 <b>${code}</b>로 입장하면 시작함. 시작하면 1라운드 징조가 랜덤으로 공개됨.</p><button class="btn btn-p" onclick="startRound()">1라운드 시작 (징조 공개)</button>`}
+  else if(m.phase==='omen'){const o=omenById(m.omen);const traded=studs.filter(s=>arr(s.trades).some(t=>t.r===r)).length;
+    h=`<div class="between"><h2>${r}라운드 · 징조 공개 중</h2><span class="pill warn">이번 라운드 거래한 학생 ${traded}/${studs.length}</span></div>
+    <div class="omen"><div class="sub">이번 징조</div><div class="big">“${esc(o.text)}”</div>${probHTML(m.omen)}</div>
+    <div class="row"><button class="btn btn-p" onclick="lockRound()">투자 마감</button>
+    <select style="width:auto;margin:0" onchange="if(this.value)setOmen(this.value)"><option value="">징조 바꾸기…</option>${OMENS.map(x=>`<option value="${x.id}">${esc(x.text.slice(0,22))}…</option>`).join('')}</select></div>`}
+  else if(m.phase==='locked'){h=`<h2>${r}라운드 · 사건 카드 뽑기</h2><p class="sub" style="margin-bottom:12px">징조에 따라 확률이 달라진 카드 더미에서 한 장을 뽑음. 수업 흐름상 특정 카드가 필요하면 직접 고를 수도 있음.</p>
+    <div class="row"><button class="btn btn-g" onclick="drawEvent()">사건 카드 랜덤 뽑기</button>
+    <select style="width:auto;margin:0" id="t-manual"><option value="">직접 고르기…</option>${EVENTS.map(e=>`<option value="${e.id}">${e.icon} ${e.name}</option>`).join('')}</select>
+    <button class="btn btn-s" onclick="const v=$('t-manual').value;if(v)drawEvent(v);else toast('카드를 고르세요')">고른 카드 공개</button></div>`}
+  else if(m.phase==='revealed'){const hh=m.history['r'+r];
+    h=`<h2>${r}라운드 · 사건 공개</h2>${eventHTML(m.event,hh.chg,stocks)}<p class="sub" style="margin:10px 0">뽑힐 확률 ${hh.prob}% 였던 사건임. 학생들은 지금 재판단 한 줄을 적는 중.</p>
+    ${r<m.rounds?`<button class="btn btn-p" onclick="startRound()">${r+1}라운드 시작 (새 징조)</button>`:`<button class="btn btn-g" onclick="finish()">결과·돌아보기 열기</button>`}`}
+  else {h=`<h2>모든 라운드 끝</h2><p class="sub">학생들은 돌아보기 탭에서 판단을 정리함. 결과·돌아보기 탭에서 답을 확인할 수 있음.</p>`}
+  h+=`<div style="margin-top:14px;text-align:right"><button class="btn btn-s tiny" style="padding:6px 12px" onclick="resetAll()">처음부터 다시</button></div>`;
+  $('t-step').innerHTML=h;
+  // 시세
+  const cp=curPrices(m);
+  $('t-prices').innerHTML=`<table><tr><th>상단</th><th>현재가</th><th>시작가 대비</th><th>보유 학생</th></tr>${stocks.map(id=>{const holders=studs.filter(s=>(s.hold||{})[id]>0).length;const ch=(cp[id]/10000-1)*100;return `<tr><td>${S(id).name}</td><td>${won(cp[id])}</td><td class="${cls(ch)}">${pct(ch)}</td><td>${holders}명</td></tr>`}).join('')}</table>`;
+  // 기록
+  const hist=Object.values(m.history||{}).sort((a,b)=>a.round-b.round);
+  $('t-history').innerHTML=hist.length?`<table><tr><th>R</th><th>징조</th><th>사건</th><th>확률</th>${stocks.map(id=>`<th>${S(id).short}</th>`).join('')}</tr>${hist.map(x=>{const e=evById(x.event);return `<tr><td>${x.round}</td><td class="left tiny">${esc(omenById(x.omen).text)}</td><td>${e.icon} ${e.name}</td><td>${x.prob}%</td>${stocks.map(id=>`<td class="${cls(x.chg[id])}">${pct(x.chg[id])}</td>`).join('')}</tr>`}).join('')}</table>`:'<p class="muted">아직 공개된 라운드 없음</p>';
+  // 학생
+  const rows=studs.map(s=>{const a=assetOf(s,cp);return {s,a,ret:(a/m.seed-1)*100}}).sort((x,y)=>y.a-x.a);
+  $('t-students').innerHTML=rows.length?`<table><tr><th>순위</th><th>이름</th><th>우리 상단</th><th>총자산</th><th>수익률</th><th>거래</th><th class="left">가장 최근 근거</th></tr>${rows.map((x,i)=>{const tr=arr(x.s.trades);const last=tr[tr.length-1];return `<tr><td>${i+1}</td><td>${esc(x.s.name)}</td><td>${S(x.s.team)?.short||'-'}</td><td>${won(x.a)}</td><td class="${cls(x.ret)}">${pct(x.ret)}</td><td>${tr.length}</td><td class="reason">${last?`[${last.r}R ${S(last.id).short} ${last.side==='buy'?'삼':'팖'}] ${esc(last.reason)}`:'-'}</td></tr>`}).join('')}</table>`:'<p class="muted">아직 입장한 학생 없음</p>';
+  // 사건 카드
+  $('t-deck').innerHTML=`<table><tr><th>사건</th>${stocks.map(id=>`<th>${S(id).short}</th>`).join('')}</tr>${EVENTS.map(e=>`<tr><td class="left">${e.icon} ${e.name}</td>${stocks.map(id=>`<td class="${cls(e.e[id])}">${pct(e.e[id])}</td>`).join('')}</tr>`).join('')}</table>`;
+  $('t-omens').innerHTML=`<table><tr><th class="left">징조</th><th>가능성이 커지는 사건</th></tr>${OMENS.map(o=>`<tr><td class="left">${esc(o.text)}</td><td>${Object.entries(o.boost).map(([k,v])=>`${evById(k).name} ×${v}`).join(', ')}</td></tr>`).join('')}</table><p class="muted tiny" style="margin-top:8px">징조는 확률만 바꿈. 징조가 가리킨 사건이 안 나올 수도 있음 → “근거 있는 판단”과 “운”을 나눠 보는 장치.</p>`;
+  // 결과
+  renderTeacherResult(rows);
+}
+function teamStats(rows){const t={};rows.forEach(x=>{(t[x.s.team]=t[x.s.team]||[]).push(x.ret)});return Object.entries(t).map(([k,v])=>({team:k,n:v.length,avg:v.reduce((a,b)=>a+b,0)/v.length})).sort((a,b)=>b.avg-a.avg)}
+function renderTeacherResult(rows){
+  const m=M;let h=`<h2>상단별 평균 수익률 (참고용)</h2>`;
+  const ts=teamStats(rows);
+  h+=ts.length?`<table><tr><th>상단</th><th>인원</th><th>평균 수익률</th></tr>${ts.map(t=>`<tr><td>${S(t.team)?.name||t.team}</td><td>${t.n}</td><td class="${cls(t.avg)}">${pct(t.avg)}</td></tr>`).join('')}</table>`:'<p class="muted">학생 없음</p>';
+  h+=`<h2 style="margin-top:18px">학생 돌아보기 답</h2>`;
+  const st=Object.values(m.students||{});
+  h+=st.length?st.map(s=>{const rv=s.review||{};const notes=s.notes||{};return `<div style="border-top:1px solid var(--border);padding:10px 0"><b>${esc(s.name)}</b> <span class="pill">${S(s.team)?.short||''}</span>
+  <div class="reason" style="margin-top:4px">${Object.entries(notes).map(([k,v])=>`<div>· ${k.slice(1)}R 재판단: ${esc(v)}</div>`).join('')}
+  ${rv.q1?`<div>① 근거가 잘 맞은 판단: ${esc(rv.q1)}</div>`:''}${rv.q2?`<div>② 운이 컸던 결과: ${esc(rv.q2)}</div>`:''}${rv.q3?`<div>③ 다음에 바꿀 것: ${esc(rv.q3)}</div>`:''}</div></div>`}).join(''):'<p class="muted">학생 없음</p>';
+  $('t-result').innerHTML=h;
+}
+$('t-csv').onclick=()=>{
+  const lines=[['이름','우리 상단','라운드','상단','구분','수량','가격','근거','징조']];
+  Object.values(M.students||{}).forEach(s=>arr(s.trades).forEach(t=>lines.push([s.name,S(s.team)?.short,t.r,S(t.id).short,t.side==='buy'?'삼':'팖',t.q,t.p,t.reason,omenById(t.omen)?.text||''])));
+  const csv='﻿'+lines.map(l=>l.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`상단투자장터_${code}.csv`;a.click();
+};
+
+// ───────── 학생 ─────────
+function my(){return (M.students||{})[me]}
+async function saveMe(st){await db.set(`${ROOT(code)}/students/${me}`,st);lastSig='';await poll()}
+function renderStudent(force){
+  if(!M)return;const m=M,st=my();if(!st){toast('학생 정보를 찾을 수 없음. 다시 입장해 주세요');logout();return}
+  const stocks=m.stocks,cp=curPrices(m),a=assetOf(st,cp),ret=(a/m.seed-1)*100,r=m.round||0;
+  $('s-name').textContent=st.name+' 님';$('s-team').textContent=`${S(st.team).name} 소속 · 코드 ${code}`;
+  $('s-asset').textContent=won(a);$('s-ret').innerHTML=`<span class="${cls(ret)}">시작 대비 ${pct(ret)}</span>`;
+  $('s-status').textContent=(r?`${r}/${m.rounds}라운드 · `:'')+PH[m.phase];
+  $('s-review-tab').style.display=m.phase==='done'?'block':'none';
+  const active=document.querySelector('#s-tabs .tab.active').dataset.p;
+  // 입력 중이면 덮어쓰지 않음
+  const focused=document.activeElement;if(!force&&focused&&(focused.tagName==='INPUT'||focused.tagName==='TEXTAREA')&&document.getElementById(active).contains(focused)){renderOthers(active);return}
+  renderOthers(null);
+}
+function renderOthers(skip){
+  const fns={'sp-news':sNews,'sp-trade':sTrade,'sp-hold':sHold,'sp-log':sLog,'sp-review':sReview};
+  Object.entries(fns).forEach(([k,f])=>{if(k!==skip)$(k).innerHTML=f()});
+}
+function sNews(){
+  const m=M,st=my(),r=m.round||0;let h='';
+  if(m.phase==='waiting')return `<div class="card"><h2>곧 장이 열림</h2><p class="sub">강사가 1라운드를 시작하면 징조가 공개됨. 그동안 투자 탭에서 상단들의 물건을 살펴보세요.</p></div>`;
+  if(m.phase==='omen'){const o=omenById(m.omen);h+=`<div class="card"><div class="omen"><div class="sub">${r}라운드 징조</div><div class="big">“${esc(o.text)}”</div><p class="sub" style="margin-bottom:8px">이 징조 때문에 어떤 사건이 일어날 가능성이 커졌을까? 장터의 예상 확률:</p>${probHTML(m.omen)}</div>
+    <div class="notice">징조는 “가능성”일 뿐임. 다른 사건이 뽑힐 수도 있음. 투자 탭에서 사거나 팔 때 근거를 한 줄로 남기세요.</div><button class="btn btn-p" onclick="goTab('sp-trade')">투자하러 가기</button></div>`}
+  if(m.phase==='locked')h+=`<div class="card" style="text-align:center"><div class="shuffle">🂠 🂠 🂠</div><h2>투자 마감 — 사건 카드를 뽑는 중</h2><p class="sub">어떤 일이 벌어질까?</p></div>`;
+  if(m.phase==='revealed'||m.phase==='done'){const hh=m.history['r'+r];const prevP=m.prices['r'+(r-1)],nowP=m.prices['r'+r];const before=assetOf(st,prevP),after=assetOf(st,nowP);
+    h+=`<div class="card"><h2>${r}라운드 사건 공개</h2>${eventHTML(hh.event,hh.chg,m.stocks).replace('<table>',`<table>`)}
+    <div class="stats" style="margin-top:12px"><div class="stat"><b class="${cls(after-before)}">${(after-before>=0?'+':'')+won(after-before)}</b><span>이번 사건으로 내 자산 변화</span></div><div class="stat"><b>${hh.prob}%</b><span>이 사건이 뽑힐 확률이었음</span></div><div class="stat"><b class="${cls(hh.chg[st.team])}">${pct(hh.chg[st.team])}</b><span>우리 상단(${S(st.team).short}) 변화</span></div></div>
+    ${m.phase==='revealed'?`<h3>재판단 한 줄</h3><p class="sub" style="margin-bottom:6px">내 근거는 맞았나? 운이었나? 다음 라운드엔 무엇을 바꿀까?</p><textarea id="s-note" placeholder="예: 먹구름 징조로 종이를 샀는데 맞았음. 그래도 한 곳에 너무 몰았음">${esc((st.notes||{})['r'+r]||'')}</textarea><button class="btn btn-p" onclick="saveNote()">재판단 저장</button>`:''}</div>`}
+  const hist=Object.values(M.history||{}).sort((a,b)=>a.round-b.round).filter(x=>x.round<r||M.phase==='done');
+  if(hist.length)h+=`<div class="card"><h3>지난 라운드</h3><table><tr><th>R</th><th>사건</th>${M.stocks.map(id=>`<th>${S(id).short}</th>`).join('')}</tr>${hist.map(x=>`<tr><td>${x.round}</td><td>${evById(x.event).icon} ${evById(x.event).name}</td>${M.stocks.map(id=>`<td class="${cls(x.chg[id])} ${id===st.team?'hl':''}">${pct(x.chg[id])}</td>`).join('')}</tr>`).join('')}</table></div>`;
+  return h;
+}
+function goTab(p){document.querySelectorAll('#s-tabs .tab').forEach(t=>t.classList.toggle('active',t.dataset.p===p));document.querySelectorAll('#screen-student .pane').forEach(x=>x.classList.toggle('active',x.id===p));renderStudent(true)}
+async function saveNote(){const v=$('s-note').value.trim();if(v.length<4)return toast('조금 더 적어 주세요');const st=my();st.notes=st.notes||{};st.notes['r'+M.round]=v;await saveMe(st);toast('재판단 저장됨')}
+function sTrade(){
+  const m=M,st=my(),cp=curPrices(m),open=m.phase==='omen';
+  let h=`<div class="card">${open?'':`<div class="notice">${m.phase==='waiting'?'라운드가 시작되면 사고팔 수 있음':'지금은 거래 시간이 아님 (징조 공개 중에만 거래 가능)'}</div>`}
+  <div class="between" style="margin-bottom:10px"><h2 style="margin:0">상단 고르기</h2><span class="sub">현금 <b>${won(st.cash)}</b></span></div>
+  <div class="sgrid">${m.stocks.map(id=>{const s=S(id),ch=(cp[id]/10000-1)*100,q=(st.hold||{})[id]||0;return `<div class="scard ${sel===id?'sel':''} ${st.team===id?'mine':''}" onclick="pick('${id}')"><div class="dot" style="background:${s.color}">${s.short[0]}</div><div style="font-weight:800">${s.name}</div><div class="muted tiny">${s.goods}</div><div class="sprice">${won(cp[id])}</div><div class="${cls(ch)} tiny">${pct(ch)}</div>${q?`<div class="pill on" style="margin-top:4px">${q}주 보유</div>`:''}</div>`}).join('')}</div>`;
+  if(sel){const s=S(sel),price=cp[sel],held=(st.hold||{})[sel]||0,maxBuy=Math.floor(st.cash/price);
+    h+=`<div class="trade-box"><div class="between"><h3 style="margin:0">${s.name} · 1주 ${won(price)}</h3><div class="row"><span class="pill ${side==='buy'?'on':''}" style="cursor:pointer" onclick="setSide('buy')">사기</span><span class="pill ${side==='sell'?'red':''}" style="cursor:pointer" onclick="setSide('sell')">팔기</span></div></div>
+    <div class="qty"><button onclick="chgQty(-10)">−10</button><button onclick="chgQty(-1)">−</button><input id="s-qty" type="number" min="1" value="${qty}" oninput="qty=Math.max(1,parseInt(this.value)||1);updTotal()"><button onclick="chgQty(1)">+</button><button onclick="chgQty(10)">+10</button><button style="width:auto;padding:0 10px" onclick="qty=${side==='buy'?'Math.max(1,'+maxBuy+')':'Math.max(1,'+held+')'};renderStudent(true)">최대</button></div>
+    <div class="sub" id="s-total">합계 ${won(price*qty)} · ${side==='buy'?`최대 ${maxBuy}주 살 수 있음`:`보유 ${held}주`}</div>
+    <textarea id="s-reason" placeholder="근거 한 줄 (필수) 예: 먹구름 징조 → 폭풍이면 지우산이 팔릴 것 같아서" style="margin-top:8px"></textarea>
+    <button class="btn ${side==='buy'?'btn-p':'btn-r'} block" ${open?'':'disabled'} onclick="doTrade()">${side==='buy'?'사기':'팔기'}</button></div>`}
+  return h+'</div>';
+}
+function pick(id){sel=id;qty=1;renderStudent(true)}
+function setSide(s){side=s;qty=1;renderStudent(true)}
+function chgQty(d){qty=Math.max(1,qty+d);const r=$('s-reason')?.value;renderStudent(true);if(r&&$('s-reason'))$('s-reason').value=r}
+function updTotal(){const p=curPrices(M)[sel];$('s-total').textContent=`합계 ${won(p*qty)}`}
+let busy=false;
+async function doTrade(){
+  if(busy)return;const reason=($('s-reason').value||'').trim();if(reason.length<5)return toast('근거를 한 줄(5글자 이상) 적어야 거래할 수 있음');
+  const fresh=await db.get(ROOT(code));if(fresh.phase!=='omen')return toast('거래 시간이 끝났음');M=fresh;
+  const st=my(),price=curPrices(M)[sel];st.hold=st.hold||{};st.avg=st.avg||{};
+  const held=st.hold[sel]||0;
+  if(side==='buy'){if(price*qty>st.cash)return toast('현금이 부족함');st.avg[sel]=Math.round(((st.avg[sel]||0)*held+price*qty)/(held+qty));st.hold[sel]=held+qty;st.cash-=price*qty}
+  else{if(qty>held)return toast('보유 수량보다 많이 팔 수 없음');st.hold[sel]=held-qty;st.cash+=price*qty;if(!st.hold[sel]){delete st.hold[sel];delete st.avg[sel]}}
+  const tr=arr(st.trades);tr.push({r:M.round,id:sel,side,q:qty,p:price,reason,omen:M.omen,t:Date.now()});st.trades=tr;
+  busy=true;await saveMe(st);busy=false;toast(`${S(sel).short} ${qty}주 ${side==='buy'?'삼':'팖'}`);qty=1;renderStudent(true)
+}
+function sHold(){
+  const st=my(),cp=curPrices(M);const ent=Object.entries(st.hold||{}).filter(([k,q])=>q>0);
+  if(!ent.length)return `<div class="card"><h2>보유</h2><p class="muted">아직 산 상단이 없음</p><p class="sub" style="margin-top:6px">현금 ${won(st.cash)}</p></div>`;
+  const tot=assetOf(st,cp);
+  return `<div class="card"><h2>보유</h2><table><tr><th>상단</th><th>수량</th><th>평균 산 값</th><th>현재가</th><th>평가액</th><th>손익</th><th>비중</th></tr>${ent.map(([k,q])=>{const v=cp[k]*q,pl=(cp[k]-(st.avg||{})[k])*q;return `<tr class="${k===st.team?'hl':''}"><td>${S(k).name}</td><td>${q}</td><td>${won(st.avg[k])}</td><td>${won(cp[k])}</td><td>${won(v)}</td><td class="${cls(pl)}">${(pl>=0?'+':'')+won(pl)}</td><td>${Math.round(v/tot*100)}%</td></tr>`}).join('')}<tr><td>현금</td><td colspan="3"></td><td>${won(st.cash)}</td><td></td><td>${Math.round(st.cash/tot*100)}%</td></tr></table>
+  <p class="muted tiny" style="margin-top:8px">한 상단에 비중이 너무 크면, 그 상단에 나쁜 사건이 뽑혔을 때 자산이 크게 흔들림</p></div>`;
+}
+function sLog(){
+  const st=my(),tr=arr(st.trades).slice().reverse();
+  if(!tr.length)return `<div class="card"><h2>내역</h2><p class="muted">아직 거래 없음</p></div>`;
+  return `<div class="card"><h2>내역</h2><table><tr><th>R</th><th>상단</th><th>구분</th><th>수량</th><th>가격</th><th class="left">근거</th><th>그 뒤 사건</th></tr>${tr.map(t=>{const h=(M.history||{})['r'+t.r];const ev=h?evById(h.event):null;const c=h?h.chg[t.id]:null;return `<tr><td>${t.r}</td><td>${S(t.id).short}</td><td class="${t.side==='buy'?'pos':'neg'}">${t.side==='buy'?'삼':'팖'}</td><td>${t.q}</td><td>${won(t.p)}</td><td class="reason">${esc(t.reason)}</td><td class="tiny">${ev?`${ev.name} <span class="${cls(c)}">${pct(c)}</span>`:'공개 전'}</td></tr>`}).join('')}</table></div>`;
+}
+function sReview(){
+  if(M.phase!=='done')return '';
+  const st=my(),cp=curPrices(M),a=assetOf(st,cp),ret=(a/M.seed-1)*100;const rv=st.review||{};
+  const tr=arr(st.trades);
+  // 거래별 결과: 산 뒤 마지막까지 가격 변화
+  const evals=tr.filter(t=>t.side==='buy').map(t=>({t,res:(cp[t.id]/t.p-1)*100})).sort((x,y)=>y.res-x.res);
+  const best=evals[0],worst=evals[evals.length-1];
+  const studs=Object.values(M.students||{}).map(s=>({n:s.name,a:assetOf(s,cp)})).sort((x,y)=>y.a-x.a);const rank=studs.findIndex(x=>x.n===st.name)+1;
+  const hist=Object.values(M.history||{}).sort((a,b)=>a.round-b.round);
+  const teamRet=(cp[st.team]/10000-1)*100;
+  let h=`<div class="card"><h2>돌아보기</h2>
+  <div class="stats"><div class="stat"><b>${won(a)}</b><span>최종 총자산</span></div><div class="stat"><b class="${cls(ret)}">${pct(ret)}</b><span>내 수익률</span></div><div class="stat"><b class="${cls(teamRet)}">${pct(teamRet)}</b><span>우리 상단(${S(st.team).short}) 가격 변화</span></div><div class="stat"><b>${rank} / ${studs.length}</b><span>순위 (참고용)</span></div></div>
+  <div class="notice">순위는 참고용임. 같은 판단이라도 뽑힌 카드에 따라 결과가 달라짐. 중요한 건 “근거가 무엇이었고, 확률을 어떻게 읽었는가”임.</div>
+  <h3>뽑힌 사건과 확률</h3><table style="margin-bottom:12px"><tr><th>R</th><th class="left">징조</th><th>뽑힌 사건</th><th>뽑힐 확률</th></tr>${hist.map(x=>`<tr><td>${x.round}</td><td class="left tiny">${esc(omenById(x.omen).text)}</td><td>${evById(x.event).icon} ${evById(x.event).name}</td><td>${x.prob}%</td></tr>`).join('')}</table>
+  ${best?`<h3>가장 잘 풀린 매수</h3><p class="reason" style="margin-bottom:8px">${best.t.r}R ${S(best.t.id).short} ${best.t.q}주 → 지금까지 <span class="${cls(best.res)}">${pct(best.res)}</span><br>근거: “${esc(best.t.reason)}”</p>`:''}
+  ${worst&&worst!==best?`<h3>가장 아쉬운 매수</h3><p class="reason" style="margin-bottom:12px">${worst.t.r}R ${S(worst.t.id).short} ${worst.t.q}주 → 지금까지 <span class="${cls(worst.res)}">${pct(worst.res)}</span><br>근거: “${esc(worst.t.reason)}”</p>`:''}
+  <h3>① 근거가 잘 맞은 판단은?</h3><textarea id="rv1" placeholder="어떤 징조를 어떻게 읽었고, 왜 맞았는지">${esc(rv.q1||'')}</textarea>
+  <h3>② 근거보다 운이 컸던 결과는? (좋았든 나빴든)</h3><textarea id="rv2" placeholder="확률이 낮은 사건이 뽑혀서 생긴 결과 등">${esc(rv.q2||'')}</textarea>
+  <h3>③ 다시 한다면 무엇을 바꿀까?</h3><textarea id="rv3" placeholder="나눠 담기, 우리 상단에만 몰지 않기, 징조 다시 읽기 등">${esc(rv.q3||'')}</textarea>
+  <button class="btn btn-p block" onclick="saveReview()">돌아보기 저장</button></div>
+  <div class="card"><h3>상단별 평균 수익률 (참고용)</h3>${(()=>{const rows=Object.values(M.students||{}).map(s=>{const a=assetOf(s,cp);return {s,ret:(a/M.seed-1)*100}});return `<table><tr><th>상단</th><th>인원</th><th>평균 수익률</th></tr>${teamStats(rows).map(t=>`<tr class="${t.team===st.team?'hl':''}"><td>${S(t.team).name}</td><td>${t.n}</td><td class="${cls(t.avg)}">${pct(t.avg)}</td></tr>`).join('')}</table>`})()}</div>`;
+  return h;
+}
+async function saveReview(){const st=my();st.review={q1:$('rv1').value.trim(),q2:$('rv2').value.trim(),q3:$('rv3').value.trim()};if(!st.review.q1&&!st.review.q2&&!st.review.q3)return toast('한 칸 이상 적어 주세요');await saveMe(st);toast('돌아보기 저장됨')}
+
+// ───────── 자동 복귀 ─────────
+(async()=>{try{const s=JSON.parse(sessionStorage.getItem('mk_sess'+(DEMO?'_demo':''))||'null');if(!s||!s.code)return;const m=await db.get(ROOT(s.code));if(!m)return;role=s.role;code=s.code;me=s.me;if(role==='teacher')enterTeacher();else if(role==='student'&&m.students&&m.students[me])enterStudent()}catch(e){}})();
+</script>
+</body>
+</html>
