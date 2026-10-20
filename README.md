@@ -15,3 +15,10 @@
 - `meta`: status, day, endsAt, teams, era(past/now/future), namesLocked, keys{trust,record,share,check}, challenges{c1..c4}, tests{pre,post,ethics: open|closed}, invest{status: open|closed}
 - `teams/{번호}`: base, credit, score, debt, log[{t,amt,reason,kind}] (강사만 씀, base는 잠금 전 학생도 씀)
 - `players/{id}`: 기존 장터 필드 + survey{pre,post:{a,b,c}}, ethics{answers,axes,types,type}, invest{상단번호:냥}, card{link,pledge}
+
+## 캠프용 모의투자 (camp.html)
+청소년 AI금융캠프 토 오전 '현재' 파트(70분)용. index.html을 복사해 내용만 바꾼 것이라 기존 수업(index.html)에는 영향 없음.
+- 회사·뉴스 모두 수업용 가상: 반짝메모리·번개칩·톡톡·척척검색·씽씽모터스·시장 전체 ETF·국채 ETF
+- 뉴스 꼬리표: 발표(근거) / 소문 / AI 질문
+- 4라운드 흐름: 1R 발표 뉴스 → 2R 소문 섞기 → 3R AI에게 물어보기 → 4R 반도체 급락(나눠 산 사람이 버팀)
+- 강사: `camp.html#teacher`
