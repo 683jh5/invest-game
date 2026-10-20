@@ -1,0 +1,537 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>AI금융캠프 프롬프트 카드북</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  /* 미래에셋 청소년 AI 캠프 장표 디자인 시스템: White 중심 + Navy/Orange 포인트 + 공식 보조색 */
+  --bg:#FAFBFC; --surface:#FFFFFF; --ink:#1C2430; --ink-2:#48535B; --muted:#6B7177; --line:#E1E4E8;
+  --field:#FFFFFF; --field-line:#CDCECB;
+  --sky:#ECEFF4; --mint:#E4F1F7; --sun:#FDF0E4; --peach:#F7E9E3; --lilac:#EEF1F5;
+  --navy:#043B72; --orange:#F58220;
+  --blue:#0086B8; --coral:#CB6015; --green:#00668C; --violet:#043B72;
+  --blue-ink:#00668C; --coral-ink:#9E4A10; --green-ink:#00668C; --violet-ink:#043B72;
+  --f-display:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-body:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-hand:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --r:16px; --shadow:none;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 90px}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.25;font-family:var(--f-display);font-weight:400}
+p{margin:0}
+a{color:var(--blue-ink)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.small{font-size:14px}.muted{color:var(--muted)}
+.stack{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--surface);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);min-width:0}
+.card h2{font-size:clamp(24px,3.4vw,30px)}
+.card .cap{font-size:14.5px;color:var(--muted);margin-top:4px}
+
+.mascot{display:block;overflow:visible}
+.mascot .mo{display:none}
+.mascot[data-mood="happy"] .mo-happy,.mascot[data-mood="wow"] .mo-wow,.mascot[data-mood="think"] .mo-think{display:inline}
+.mascot .m-bob{animation:bob 3.2s ease-in-out infinite;transform-box:fill-box}
+.mascot .m-eyes{animation:blink 5s infinite;transform-box:fill-box;transform-origin:center}
+.mascot .m-wave{transform-box:fill-box;transform-origin:100% 0;animation:wave 2.4s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes blink{0%,94%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes wave{0%,100%{transform:rotate(0)}50%{transform:rotate(-14deg)}}
+
+.hero{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:22px;align-items:center;background:linear-gradient(135deg,#FFF1B8 0%,#FFE2D6 45%,#DCEBFF 100%);border-radius:28px;padding:26px 28px;box-shadow:var(--shadow);overflow:hidden}
+.hero .mascot{width:136px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px;font-size:13.5px;font-weight:700;background:rgba(255,255,255,.85);border:1.5px solid rgba(30,42,71,.08);color:var(--ink-2)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.hero h1{font-size:clamp(34px,5.5vw,54px);margin-top:8px}
+.hero .lede{font-size:17px;color:var(--ink-2);margin-top:6px;max-width:34em}
+.say{position:relative;margin-top:12px;display:inline-block;background:var(--surface);border:2px solid var(--ink);border-radius:16px;padding:8px 14px;font-family:var(--f-hand);font-size:20px;line-height:1.35;box-shadow:3px 3px 0 var(--ink)}
+.hero .side{display:flex;flex-direction:column;gap:10px;align-items:stretch}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;background:var(--ink);color:#fff;border-radius:14px;padding:11px 18px;font-family:var(--f-display);font-size:17px;box-shadow:0 4px 0 #0E1630;transition:transform .1s,box-shadow .1s;text-decoration:none;white-space:nowrap}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0E1630}
+.btn.blue{background:var(--blue);box-shadow:0 4px 0 #1D4FB8}
+.btn.coral{background:var(--coral);box-shadow:0 4px 0 #B6472B}
+.btn.green{background:var(--green);box-shadow:0 4px 0 #087260}
+.btn.violet{background:var(--violet);box-shadow:0 4px 0 #3E31A5}
+.btn.light{background:var(--surface);color:var(--ink);box-shadow:0 0 0 2px var(--line) inset,0 4px 0 #D3DBEA}
+.btn.warn{background:var(--peach);color:var(--coral-ink);box-shadow:0 0 0 2px #F5C8A8 inset,0 4px 0 #E9B8A2}
+.btn.done{background:var(--green);color:#fff;box-shadow:0 4px 0 #087260}
+
+.map{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+.stop{position:relative;border-radius:16px;padding:12px;background:color-mix(in srgb,var(--c) 7%,#fff);border:2px solid color-mix(in srgb,var(--c) 28%,#fff);display:flex;flex-direction:column;gap:6px;min-width:0}
+.stop .st{font-family:var(--f-display);font-size:18px}
+.stop .tm{font-size:12.5px;color:var(--ink-2);font-weight:700}
+.stop .who{font-size:12px;font-weight:700;color:#fff;background:var(--c);border-radius:6px;padding:0 7px;align-self:flex-start}
+.stop .pbs{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.pb{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:999px;padding:4px 11px;font-weight:700;font-size:13.5px;color:#fff;background:var(--c);text-decoration:none}
+.g-satam{--c:var(--coral)} .g-satpm{--c:var(--blue)} .g-sunam{--c:var(--violet)} .g-sunpm{--c:var(--green)}
+.chain{margin-top:12px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13.5px;color:var(--ink-2)}
+.chain b{background:var(--lilac);color:var(--violet-ink);border-radius:8px;padding:1px 8px}
+
+.anat{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:18px;margin-top:14px;align-items:start}
+.parts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.part{display:flex;gap:10px;align-items:flex-start;border-radius:14px;padding:10px 12px;background:color-mix(in srgb,var(--k) 12%,#fff);border:2px solid transparent;text-align:left;min-width:0}
+.part[aria-pressed="true"]{border-color:var(--k)}
+.part .n{flex:0 0 auto;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--k);color:#fff;font-family:var(--f-display);font-size:15px}
+.part b{display:block;font-size:15px}
+.part span{font-size:13px;color:var(--ink-2);line-height:1.45}
+.k1{--k:#043B72}.k2{--k:#0086B8}.k3{--k:#CB6015}.k4{--k:#F58220}.k5{--k:#AD624E}.k6{--k:#48535B}
+.specimen{border-radius:16px;background:#FBFCFF;border:2px solid var(--line);padding:16px;font-size:14.5px;line-height:1.85;min-width:0}
+.specimen mark{background:color-mix(in srgb,var(--k) 16%,#fff);color:var(--ink);border-bottom:3px solid var(--k);padding:1px 2px;border-radius:3px;transition:background .2s}
+.specimen.focus mark{background:transparent;border-bottom-color:transparent;color:#A9B2C6}
+.specimen.focus mark.on{background:color-mix(in srgb,var(--k) 22%,#fff);border-bottom-color:var(--k);color:var(--ink)}
+.specimen .tag{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:var(--k);border-radius:5px;padding:0 5px;margin-right:3px;vertical-align:1px}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;padding:10px 0;background:rgba(243,247,255,.94);backdrop-filter:blur(6px)}
+.filters .lb{font-family:var(--f-display);font-size:16px;margin-right:2px}
+.filters button{border:2px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font-weight:700;font-size:14.5px;display:inline-flex;gap:5px;align-items:baseline}
+.filters button small{font-weight:500;font-size:11.5px;color:var(--muted)}
+.filters button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.filters button[aria-pressed="true"] small{color:#C9D2E6}
+.filters .jump{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.filters .jump a{text-decoration:none;font-weight:700;font-size:13px;border-radius:999px;padding:5px 10px;color:#fff;background:var(--c)}
+
+.pcard{scroll-margin-top:70px;background:var(--surface);border-radius:22px;box-shadow:var(--shadow);overflow:hidden;min-width:0}
+.phead{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:18px 20px;background:color-mix(in srgb,var(--c) 10%,#fff);border-bottom:2px dashed color-mix(in srgb,var(--c) 30%,#fff)}
+.pnum{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;background:var(--c);color:#fff;font-family:var(--f-display);font-size:22px;box-shadow:0 4px 0 color-mix(in srgb,var(--c) 70%,#000)}
+.phead h3{font-size:clamp(21px,2.8vw,26px)}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.meta span{font-size:12.5px;font-weight:700;border-radius:8px;padding:2px 9px;background:#fff;color:var(--ink-2);border:1.5px solid var(--line)}
+.meta .lv{background:var(--c);color:#fff;border-color:var(--c)}
+.meta .role{background:var(--lilac);border-color:#D4CCFA;color:var(--violet-ink)}
+.use{font-size:15px;color:var(--ink-2);margin-top:6px}
+.pbody{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:18px;padding:18px 20px 20px}
+.fields{display:flex;flex-direction:column;gap:12px;min-width:0}
+.fields h4,.preview h4{margin:0;font-family:var(--f-display);font-weight:400;font-size:18px}
+.field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.field label,.field .lbl{font-weight:700;font-size:14.5px}
+.field .hint{font-size:12.5px;color:var(--violet-ink)}
+textarea,input[type=text]{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--field);border:2px solid var(--field-line);border-radius:12px;padding:9px 11px;resize:vertical;line-height:1.5;min-width:0}
+textarea{min-height:64px}
+textarea:focus,input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 4px rgba(52,120,246,.15);background:#fff}
+::placeholder{color:#9AA3B8}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:2px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;font-size:13.5px;font-weight:700;color:var(--ink-2)}
+.seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:#fff}
+.preview{display:flex;flex-direction:column;gap:10px;min-width:0}
+.ptext{white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;font-size:14px;line-height:1.75;background:#F8FAFE;border:2px solid var(--line);border-radius:14px;padding:14px;max-height:440px;overflow:auto}
+.ptext .fill{background:var(--sun);border-radius:4px;padding:0 2px;font-weight:700}
+.ptext .link{background:var(--lilac);color:var(--violet-ink);border-radius:4px;padding:0 2px;font-weight:700}
+.ptext .hole{background:var(--peach);color:var(--coral-ink);border-radius:4px;padding:0 2px;font-weight:700}
+.ptext .rule{color:var(--green-ink);background:var(--mint);border-radius:4px;padding:0 2px}
+.prow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.legend{display:flex;flex-wrap:wrap;gap:6px;font-size:12px;font-weight:700}
+.legend span{border-radius:6px;padding:1px 7px}
+.status{font-size:13px;font-weight:700;color:var(--muted)}
+.status.ok{color:var(--green-ink)}
+.extra{padding:0 20px 20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.extra.one{grid-template-columns:minmax(0,1fr)}
+.note{border-radius:16px;padding:14px 16px;font-size:14.5px;background:var(--sky);min-width:0}
+.note.sun{background:var(--sun)} .note.mint{background:var(--mint)} .note.peach{background:var(--peach)} .note.lilac{background:var(--lilac)}
+.note b{font-weight:700}
+.checks{display:flex;flex-direction:column;gap:6px;margin-top:6px}
+.checks div{display:flex;gap:8px;align-items:flex-start;font-size:14px}
+.checks div::before{content:"";flex:0 0 auto;width:18px;height:18px;margin-top:2px;border-radius:6px;background:var(--green) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'%3E%3Cpath d='M4.5 9.5l3 3 6-6.5' stroke='white' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/18px no-repeat}
+.flow3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.flow3 div{border-radius:12px;background:#fff;border:2px solid var(--line);padding:8px 10px;font-size:13.5px}
+.flow3 b{display:block;font-size:12px;color:var(--muted)}
+.review{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.review div{border-radius:14px;background:#fff;border:2px solid var(--line);padding:12px 14px;font-size:15px;font-weight:500;display:flex;gap:10px;align-items:flex-start}
+.review b{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--violet);color:#fff;display:grid;place-items:center;font-family:var(--f-display);font-size:14px;font-weight:400}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:#fff;color:var(--ink);padding:8px 16px 8px 8px;border-radius:999px;font-size:15px;font-weight:700;z-index:50;max-width:calc(100% - 32px);box-shadow:0 10px 30px rgba(30,42,71,.22);border:2px solid var(--ink)}
+.toast .mascot{width:40px;height:40px;flex:0 0 auto}
+[data-hide="1"]{display:none!important}
+
+@media (max-width:920px){
+  .hero{grid-template-columns:auto minmax(0,1fr)}
+  .hero .side{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}
+  .map{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .anat{grid-template-columns:minmax(0,1fr)}
+  .pbody{grid-template-columns:minmax(0,1fr)}
+  .filters .jump{margin-left:0}
+}
+@media (max-width:620px){
+  .hero{grid-template-columns:minmax(0,1fr);padding:18px}
+  .hero .mascot{width:96px}
+  .map,.parts,.extra,.review,.flow3{grid-template-columns:minmax(0,1fr)}
+  .phead{grid-template-columns:auto minmax(0,1fr)}
+  .phead .prow{grid-column:1/-1}
+}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== 장표 디자인 맞춤: 넓은 여백 · 얇은 선 · 그림자 최소 · 강조는 네이비/오렌지 한 가지씩 ===== */
+h1,h2,h3{font-weight:800;letter-spacing:-.02em}
+.card,.pcard{border:1px solid var(--line);box-shadow:none}
+.hero{grid-template-columns:minmax(0,1fr) auto;background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:none;padding:30px 32px}
+.hero::before{content:"";position:absolute;left:32px;top:0;width:72px;height:5px;border-radius:0 0 3px 3px;background:var(--orange)}
+.hero h1{color:var(--navy);letter-spacing:-.03em}
+.chip{background:var(--surface);border:1px solid var(--line)}
+.say{font-family:var(--f-body);font-size:16px;font-weight:500;line-height:1.55;background:#F7F8FA;border:1px solid var(--line);border-left:4px solid var(--orange);border-radius:12px;box-shadow:none;padding:10px 14px}
+.btn{font-family:var(--f-body);font-weight:700;font-size:16px;border-radius:12px;box-shadow:none}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.btn.blue,.btn.coral,.btn.green,.btn.violet,.btn.done{box-shadow:none}
+.btn.light{color:var(--navy);box-shadow:inset 0 0 0 1px #CDCECB}
+.btn.light:active{box-shadow:inset 0 0 0 1px #CDCECB}
+.btn.warn{background:var(--surface);color:var(--coral-ink);box-shadow:inset 0 0 0 1px #E3C3A8}
+.btn.warn:active{box-shadow:inset 0 0 0 1px #E3C3A8}
+.stop{background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--c);border-radius:12px}
+.stop .st{font-weight:700;font-size:17px}
+.stop .who{border-radius:999px;padding:0 9px}
+.chain b{background:var(--sky);color:var(--navy)}
+.part{border:1px solid transparent;background:color-mix(in srgb,var(--k) 8%,#fff)}
+.part[aria-pressed="true"]{border:1px solid var(--k);box-shadow:inset 0 0 0 1px var(--k)}
+.part .n{font-family:var(--f-body);font-weight:700;font-size:14px}
+.specimen{background:#F7F8FA;border:1px solid var(--line)}
+.specimen mark{border-bottom-width:2px}
+.filters{background:rgba(250,251,252,.95)}
+.filters .lb{font-weight:700;color:var(--navy)}
+.filters button{border-width:1px;border-color:#CDCECB}
+.filters button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy)}
+.pcard{border-radius:18px}
+.phead{background:var(--surface);border-bottom:1px solid var(--line);border-left:5px solid var(--c)}
+.pnum{font-family:var(--f-body);font-weight:800;font-size:20px;border-radius:12px;box-shadow:none}
+.meta span{border-width:1px}
+.meta .role{background:var(--sky);border-color:var(--line);color:var(--navy)}
+.fields h4,.preview h4{font-weight:700;font-size:16px;color:var(--navy)}
+textarea,input[type=text]{border-width:1px}
+textarea:focus,input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(4,59,114,.12)}
+:focus-visible{outline-color:var(--navy)}
+.seg button{border-width:1px;border-color:#CDCECB}
+.seg button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy)}
+.ptext{background:#F7F8FA;border:1px solid var(--line)}
+.note{border-radius:12px}
+.checks div::before{background-color:var(--navy)}
+.flow3 div,.review div{border-width:1px}
+.review b{font-family:var(--f-body);font-weight:700;background:var(--navy)}
+.toast{border:1px solid var(--line);box-shadow:0 10px 30px rgba(4,59,114,.16);padding:10px 18px}
+@media (max-width:920px){.hero{grid-template-columns:minmax(0,1fr)}.hero .side{grid-column:auto}}
+</style>
+
+<div class="wrap stack">
+  <header class="hero">
+    <div>
+      <div class="chips"><span class="chip">청소년 AI금융캠프</span><span class="chip">중등 · 무박 2일</span><span class="chip">2050 금융 서비스 만들기</span></div>
+      <h1>프롬프트 카드북</h1>
+      <p class="lede">P01–P08을 언제, 누가 쓰는지 보고 빈칸만 채워서 복사하세요. 앞 카드에 쓴 앱 이름·기능은 뒤 카드에 자동으로 들어가요.</p>
+      <div class="say">내 역할 카드부터 찾아요! 쓴 내용은 이 노트북에 남아서 내일도 이어 쓸 수 있어요.</div>
+    </div>
+    <div class="side">
+      <a class="btn violet" href="#f04">P04 기획 캔버스</a>
+      <a class="btn green" href="#f06">P06 바이브코딩</a>
+      <button type="button" class="btn warn" id="wipe">모든 기록 지우기</button>
+    </div>
+  </header>
+
+  <section class="card" aria-labelledby="whenT">
+    <h2 id="whenT">언제 어떤 카드를 쓰나요?</h2>
+    <p class="cap">캠프 이틀을 네 블록으로 나눈 지도예요. 배지를 누르면 해당 카드로 이동해요.</p>
+    <div class="map">
+      <div class="stop g-satam"><span class="tm">1일차 오전</span><span class="who">한 강사</span><span class="st">모의투자 돌아보기</span><div class="pbs"><a class="pb" href="#f01">P01</a></div></div>
+      <div class="stop g-satpm"><span class="tm">1일차 오후</span><span class="who">원 강사</span><span class="st">2050 금융생활 상상</span><div class="pbs"><a class="pb" href="#f02">P02</a></div></div>
+      <div class="stop g-sunam"><span class="tm">2일차 오전</span><span class="who">한 강사</span><span class="st">문제 → 기획 → 화면</span><div class="pbs"><a class="pb" href="#f03">P03</a><a class="pb" href="#f04">P04</a><a class="pb" href="#f05">P05</a></div></div>
+      <div class="stop g-sunpm"><span class="tm">2일차 오후</span><span class="who">원 강사</span><span class="st">만들기 → 발표</span><div class="pbs"><a class="pb" href="#f06">P06</a><a class="pb" href="#f07">P07</a><a class="pb" href="#f08">P08</a></div></div>
+    </div>
+    <div class="chain"><span>자동으로 이어지는 칸:</span><b>P03 불편 → P04·P08</b><b>P04 앱 이름 → P05·P06·P08</b><b>P04 핵심 기능 → P06</b><b>P05 화면 3장·색 → P06</b></div>
+  </section>
+
+  <section class="card" aria-labelledby="anatT">
+    <h2 id="anatT">좋은 프롬프트의 6요소</h2>
+    <p class="cap">요소를 누르면 P04 원문에서 그 부분만 강조돼요. 다시 누르면 전체가 보여요.</p>
+    <div class="anat">
+      <div class="parts">
+        <button type="button" class="part k1" data-part="1" aria-pressed="false"><span class="n">1</span><span><b>역할</b>AI가 누구처럼 생각할지 정해요</span></button>
+        <button type="button" class="part k2" data-part="2" aria-pressed="false"><span class="n">2</span><span><b>맥락</b>우리가 지금 무엇을 하려는지</span></button>
+        <button type="button" class="part k3" data-part="3" aria-pressed="false"><span class="n">3</span><span><b>자료</b>우리 팀이 정한 내용을 붙여요</span></button>
+        <button type="button" class="part k4" data-part="4" aria-pressed="false"><span class="n">4</span><span><b>요청</b>무엇을 만들어 달라고 할지</span></button>
+        <button type="button" class="part k5" data-part="5" aria-pressed="false"><span class="n">5</span><span><b>형식</b>표 · 몇 줄 · 몇 개처럼 모양을 정해요</span></button>
+        <button type="button" class="part k6" data-part="6" aria-pressed="false"><span class="n">6</span><span><b>안전</b>가짜 수익·실제 종목 추천을 막아요</span></button>
+      </div>
+      <div class="specimen" id="specimen">
+        <mark class="k1" data-p="1"><span class="tag">역할</span>너는 중학생 창업팀의 서비스 기획 코치다.</mark>
+        <mark class="k2" data-p="2"><span class="tag">맥락</span>우리 팀의 2050 금융 서비스 기획 캔버스를 만든다.</mark>
+        <mark class="k6" data-p="6"><span class="tag">안전</span>실제 회사·종목을 추천하거나 실제 투자를 권하지 마라. “수익 보장” 같은 표현을 쓰지 마라. 가격·수익률은 가상 데이터라고 표시하라.</mark><br>
+        <mark class="k3" data-p="3"><span class="tag">자료</span>팀 이름=[ ] / 고른 문제=[ ] / 앱 이름 아이디어=[ ] / 핵심 기능 아이디어=[ ] / 돈 흐름 아이디어=[ ]</mark><br>
+        <mark class="k4" data-p="4"><span class="tag">요청</span>(1) 사용자 (2) 문제 (3) 앱 이름과 한 줄 소개 (4) 핵심 기능 3개 (5) 화면 3장 (6) 신뢰·안전 장치와 돈 흐름</mark>
+        <mark class="k5" data-p="5"><span class="tag">형식</span>출력은 정확히 6행 표로 작성하라. 각 행에 “팀 아이디어” 또는 “AI 제안(확인 필요)”을 표시하라.</mark>
+      </div>
+    </div>
+    <p class="note mint small" style="margin-top:12px"><b>모든 카드에 같은 금융 안전 규칙이 들어 있어요.</b> 미리보기에서 초록색으로 표시된 문장이에요. 지우지 말고 그대로 복사하세요.</p>
+  </section>
+
+  <div class="filters" role="toolbar" aria-label="역할별로 카드 보기">
+    <span class="lb">내 역할</span>
+    <button type="button" data-filter="all" aria-pressed="true">전체 8장</button>
+    <button type="button" data-filter="lead" aria-pressed="false">리더 <small>CEO</small></button>
+    <button type="button" data-filter="money" aria-pressed="false">돈 담당 <small>CFO</small></button>
+    <button type="button" data-filter="dev" aria-pressed="false">개발 담당 <small>CTO</small></button>
+    <button type="button" data-filter="promo" aria-pressed="false">홍보 담당 <small>CMO</small></button>
+    <button type="button" data-filter="design" aria-pressed="false">디자인 담당 <small>CDO</small></button>
+    <div class="jump" id="jump"></div>
+  </div>
+
+  <div class="stack" id="cards"></div>
+
+  <section class="card" aria-labelledby="revT">
+    <h2 id="revT">AI 답을 받은 뒤, 공통 검토 질문 4가지</h2>
+    <p class="cap">AI가 준 답은 초안이에요. 팀 기획서나 앱에 넣기 전에 이 네 가지를 물어보세요.</p>
+    <div class="review">
+      <div><b>1</b>이 내용은 사실인가, 우리의 상상인가, 아직 확인 안 한 생각인가?</div>
+      <div><b>2</b>이 앱이 진짜 돈을 다룬다면 누가 손해를 볼 수 있을까?</div>
+      <div><b>3</b>AI가 실제 회사·종목을 추천하거나 수익을 약속하지는 않았나?</div>
+      <div><b>4</b>우리 팀에서 누가 이 결과를 고치고 책임질까?</div>
+    </div>
+  </section>
+</div>
+<div class="toast" id="toast" hidden><span id="toastTxt"></span></div>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const SKEY = "et1-finance-camp-cards-v1";
+let F = {};
+try { F = JSON.parse(localStorage.getItem(SKEY) || "{}") || {}; } catch (e) { F = {}; }
+const save = () => { try { localStorage.setItem(SKEY, JSON.stringify(F)); } catch (e) {} };
+
+
+const RULE = "실제 회사·종목을 추천하거나 실제 투자를 권하지 마라. “수익 보장”, “무조건 오른다” 같은 표현을 쓰지 마라. 가격·수익률·사용자 수는 모두 가상 데이터라고 표시하라. 이름·연락처·학교 같은 개인정보를 묻거나 넣지 마라. 모르는 것은 “확인 필요”로 표시하라.";
+const ROLE = { all: "모두", lead: "리더", money: "돈 담당", dev: "개발 담당", promo: "홍보 담당", design: "디자인 담당" };
+const GROUP = { satam: { lab: "1일차 오전", btn: "coral" }, satpm: { lab: "1일차 오후", btn: "blue" }, sunam: { lab: "2일차 오전", btn: "violet" }, sunpm: { lab: "2일차 오후", btn: "green" } };
+
+const P = [
+  { id: "f01", no: "P01", g: "satam", roles: ["all"], title: "모의투자 돌아보기", when: ["모의투자 게임 직후", "개인"],
+    use: "게임에서 산 회사와 이유를 넣으면, 잘한 점과 다음에 확인할 질문을 정리해 줘요. 운과 판단을 나눠 보는 연습이에요.",
+    fields: [{ k: "buy", t: "산 회사", ph: "예: 하늘을 나는 자동차 (게임 속 가상 회사)" }, { k: "why", t: "산 이유", ph: "예: 뉴스 카드에서 신기술 소식을 봐서", area: 1 }, { k: "result", t: "결과", seg: ["올랐다", "내렸다", "그대로", "섞여 있다"] }, { k: "surprise", t: "놀란 점", ph: "예: 좋은 뉴스인데도 값이 내려갔다", area: 1 }],
+    tpl: `너는 중학생의 투자 결정을 돌아보게 돕는 코치다. 오늘 모의투자 게임에서 내가 한 결정을 정리하라. ${RULE} 게임 속 회사는 모두 가상 회사이며, 게임 결과로 실제 투자 조언을 하지 마라.
+
+입력: 산 회사=[{{buy| }}] / 산 이유=[{{why| }}] / 결과=[{{result|올랐다·내렸다·그대로}}] / 놀란 점=[{{surprise| }}]
+
+출력: ① 내 결정 한 줄 요약 ② 잘한 점 1개 ③ 다시 한다면 바꿀 점 1개 ④ 다음에 사기 전에 확인할 질문 2개. 운이 좋았던 것과 잘 판단한 것을 구분하라. 중학생이 이해할 수 있는 쉬운 말로 써라.`,
+    extra: `<div class="note peach"><b>게임 속 회사는 모두 가상이에요</b><br>AI가 실제 회사 이름을 꺼내거나 “이 주식을 사라”고 하면 그 부분은 지우고 검토 질문 3번을 다시 보세요.</div>
+      <div class="note sun"><b>팀 이야기로 이어가기</b><div class="checks"><div>팀원 한 명씩 ③ ‘바꿀 점’을 말하기</div><div>공통으로 나온 질문은 P03 문제 정의의 근거로 쓰기</div></div></div>` },
+  { id: "f02", no: "P02", g: "satpm", roles: ["all"], title: "2050 금융생활 상상하기", when: ["금융·디지털자산 수업 뒤", "개인 또는 팀"],
+    use: "오후 수업에서 배운 키워드로 2050년 하루를 장면으로 그려요. 지금 있는 기술과 아직 상상인 것을 나눠 줘요.",
+    fields: [{ k: "kw", t: "오늘 배운 키워드", ph: "예: 디지털자산, 토큰, 자동 투자" }, { k: "who", t: "주인공", ph: "예: 2050년의 나, 할머니가 된 엄마" }, { k: "q", t: "궁금한 점", ph: "예: 돈이 다 디지털이 되면 잃어버릴 일은 없을까?", area: 1 }],
+    tpl: `너는 2050년 금융생활을 함께 상상하는 미래 연구원이다. 오늘 오후 수업에서 배운 내용을 바탕으로 2050년의 하루 장면을 만든다. ${RULE}
+
+입력: 배운 키워드=[{{kw| }}] / 주인공=[{{who|2050년의 나 또는 가족}}] / 궁금한 점=[{{q| }}]
+
+출력: ① 2050년 하루 속 돈과 관련된 장면 3개(아침·낮·저녁) ② 각 장면에서 생길 수 있는 불편이나 위험 1개 ③ 지금 이미 있는 기술과 아직 상상인 것을 표로 구분. 미래 예측을 사실처럼 단정하지 말고 “~일 수도 있다”로 써라.`,
+    extra: `<div class="note lilac"><b>내일 아침에 다시 써요</b><br>② ‘불편이나 위험’은 2일차 P03의 재료예요. 마음에 드는 것 하나를 팀 공유 메모에 옮겨 두세요.</div>
+      <div class="note sun"><b>상상과 사실 구분하기</b><div class="checks"><div>③ 표에서 ‘지금 있는 기술’ 칸은 원 강사님께 한 번 더 확인</div><div>연도·숫자가 나오면 확인 필요로 표시</div></div></div>` },
+  { id: "f03", no: "P03", g: "sunam", roles: ["lead", "promo"], title: "문제 정의하기", when: ["기획 첫 단계", "리더가 정리"],
+    use: "누가, 언제, 무엇 때문에 곤란한지를 한 문장으로 만들어요. 문제부터 정해야 앱 기능이 흔들리지 않아요.",
+    fields: [{ k: "user", t: "사용자", ph: "예: 용돈을 처음 관리하는 2050년의 중학생" }, { k: "situ", t: "상황", ph: "예: 디지털 용돈을 여러 앱에 나눠 받을 때" }, { k: "pain", t: "불편", ph: "예: 얼마가 남았는지 한눈에 알 수 없다", area: 1 }, { k: "ev", t: "근거", ph: "어제 P02 장면, 모의투자에서 느낀 점 등", area: 1 }],
+    tpl: `너는 서비스 기획을 돕는 문제 탐정이다. 우리 팀이 2050년에 해결하고 싶은 금융 문제를 분명한 문장으로 만든다. ${RULE}
+
+입력: 사용자=[{{user| }}] / 상황=[{{situ| }}] / 불편=[{{pain| }}] / 근거=[{{ev|어제 2050 장면, 모의투자 경험 등}}]
+
+출력: ① “[누가] [언제] [무엇 때문에] 곤란하다” 형식의 문제 문장 3개 ② 그중 우리 팀이 고를 1개와 이유 ③ 팀원·친구에게 물어볼 질문 3개(답을 유도하지 않게). 문제 안에 해결책(앱 기능)을 미리 넣지 마라.`,
+    extra: `<div class="note sun"><b>좋은 문제 문장 점검</b><div class="checks"><div>‘누가’가 한 사람의 모습으로 떠오르는가?</div><div>앱 기능 이야기가 섞이지 않았는가?</div><div>팀원 모두 이 문제에 고개를 끄덕이는가?</div></div></div>
+      <div class="note lilac"><b>다음 카드로 이어져요</b><br>여기 쓴 ‘불편’은 P04 ‘고른 문제’와 P08 발표 원고에 자동으로 들어가요. AI가 다듬어 준 문장이 더 좋으면 P04에 직접 붙여 넣으세요.</div>` },
+  { id: "f04", no: "P04", g: "sunam", roles: ["lead", "money"], title: "서비스 기획 캔버스", when: ["팀 기획의 중심", "리더 + 돈 담당"],
+    use: "문제·앱 이름·기능·돈 흐름을 6행 표로 정리해요. 여기서 정한 앱 이름과 기능이 화면·코딩·발표 카드로 이어져요.",
+    fields: [{ k: "team", t: "팀 이름", ph: "예: 도전하는 주식 호랑이" }, { k: "prob", t: "고른 문제", ph: "P03에서 고른 문제 문장", area: 1, from: ["f03_pain"] }, { k: "app", t: "앱 이름 아이디어", ph: "예: 한눈 지갑" }, { k: "feat", t: "핵심 기능 아이디어", ph: "예: 모든 디지털 용돈을 한 화면에 모아 보기", area: 1 }, { k: "money", t: "돈 흐름 아이디어", ph: "수수료 · 구독 · 광고 · 무료 등", area: 1 }],
+    tpl: `너는 중학생 창업팀의 서비스 기획 코치다. 우리 팀의 2050 금융 서비스 기획 캔버스를 만든다. ${RULE}
+
+팀 이름=[{{team| }}]
+고른 문제=[{{prob| }}]
+앱 이름 아이디어=[{{app| }}]
+핵심 기능 아이디어=[{{feat| }}]
+돈 흐름 아이디어=[{{money|수수료·구독·광고·무료 등}}]
+
+출력은 정확히 6행 표로 작성하라: (1) 사용자 (2) 문제 (3) 앱 이름과 한 줄 소개 (4) 핵심 기능 3개 (5) 꼭 필요한 화면 3장 (6) 신뢰·안전 장치와 돈 흐름.
+
+각 행에 “팀 아이디어” 또는 “AI 제안(확인 필요)”을 표시하라. 기능은 하루 안에 바이브코딩으로 만들 수 있는 크기로 줄여라. 표 뒤에 팀이 가장 먼저 결정할 질문 1개만 덧붙여라.`,
+    extra: `<div class="note mint"><b>캔버스 다음 순서</b><div class="flow3"><div><b>디자인 담당</b>P05 화면 3장</div><div><b>개발 담당</b>P06 바이브코딩</div><div><b>홍보 담당</b>P08 발표 원고</div></div><p class="small" style="margin-top:8px">앱 이름과 핵심 기능은 P05·P06·P08에 자동으로 들어가요. 바뀌면 여기만 고치면 돼요.</p></div>
+      <div class="note sun"><b>역할별 확인</b><div class="checks"><div>리더: 6행이 모두 같은 문제를 말하는가?</div><div>돈 담당: (6) 돈 흐름이 사용자에게 불리하지 않은가?</div><div>모두: AI 제안 중 우리가 동의하지 않는 것은 지웠는가?</div></div></div>` },
+  { id: "f05", no: "P05", g: "sunam", roles: ["design"], title: "화면 프로토타입", when: ["바이브코딩 전에", "디자인 담당"],
+    use: "코딩 전에 화면 3장의 설계도를 먼저 그려요. 버튼 이름과 문구까지 정해 두면 P06에서 앱이 훨씬 정확하게 나와요.",
+    fields: [{ k: "app", t: "앱 이름", ph: "P04 앱 이름", from: ["f04_app"] }, { k: "s1", t: "화면 1", ph: "예: 홈 — 전체 잔액과 오늘 알림" }, { k: "s2", t: "화면 2", ph: "예: 핵심 기능 — 용돈 나눠 담기" }, { k: "s3", t: "화면 3", ph: "예: 결과 — 이번 주 소비 그래프" }, { k: "mood", t: "분위기·색", ph: "예: 밝은 민트, 둥근 카드, 큰 숫자" }],
+    tpl: `너는 모바일 앱 화면을 함께 그리는 디자이너다. 아래 설명으로 앱 화면 3장의 설계도를 만든다. ${RULE}
+
+입력: 앱 이름=[{{app| }}] / 화면 1=[{{s1|첫 화면(홈)}}] / 화면 2=[{{s2|핵심 기능 화면}}] / 화면 3=[{{s3|결과·내 정보 화면}}] / 분위기·색=[{{mood| }}]
+
+출력: 화면마다 ① 위에서 아래로 놓일 구성 요소 목록 ② 버튼 이름과 누르면 가는 화면 ③ 화면에 들어갈 실제 문구. 종이에 바로 그릴 수 있게 간단한 글자 그림(와이어프레임)으로도 보여 줘라. 숫자는 모두 가상 데이터로 표시하라.`,
+    extra: `<div class="note sun"><b>종이에 먼저 그려 보기</b><div class="checks"><div>화면 3장을 한 장씩 휴대폰 크기로 그리기</div><div>버튼마다 화살표로 어느 화면으로 가는지 표시</div><div>팀원에게 보여 주고 “첫 화면에서 뭘 누를 것 같아?” 묻기</div></div></div>
+      <div class="note lilac"><b>P06으로 이어져요</b><br>화면 1~3과 분위기·색은 P06 바이브코딩 프롬프트에 자동으로 들어가요.</div>` },
+  { id: "f06", no: "P06", g: "sunpm", roles: ["dev"], title: "바이브코딩 시작하기", when: ["결과물 만들기", "개발 담당"],
+    use: "기획 캔버스와 화면 설계를 모아 첫 번째 앱 코드를 받아요. 앞 카드를 채웠다면 거의 빈칸이 없어요.",
+    fields: [{ k: "app", t: "앱 이름", ph: "P04 앱 이름", from: ["f04_app"] }, { k: "intro", t: "한 줄 소개", ph: "P04 표 (3)행의 한 줄 소개" }, { k: "feat", t: "핵심 기능", ph: "P04 핵심 기능", area: 1, from: ["f04_feat"] }, { k: "screens", t: "화면 3장", ph: "P05 화면 1~3", area: 1, from: ["f05_s1", "f05_s2", "f05_s3"] }, { k: "color", t: "색·분위기", ph: "P05 분위기·색", from: ["f05_mood"] }],
+    tpl: `너는 중학생과 함께 모바일 웹앱을 만드는 개발 코치다. 아래 기획으로 바로 실행되는 앱을 만든다. ${RULE}
+
+앱 이름=[{{app| }}]
+한 줄 소개=[{{intro| }}]
+핵심 기능=[{{feat| }}]
+화면 3장=[{{screens| }}]
+색·분위기=[{{color| }}]
+
+만드는 조건:
+- HTML·CSS·JavaScript를 한 파일에 담는다. 외부 서버, 로그인, 실제 결제, 실제 시세 연결은 넣지 않는다.
+- 휴대폰 화면 폭(약 390px)에 맞추고, 아래쪽 탭 버튼으로 화면 3장을 오간다.
+- 가격·수익률·사용자는 가상 데이터로 만들고, 화면 아래에 “교육용 가상 데이터”라고 표시한다.
+- 핵심 기능 1개가 확실히 작동하게 먼저 만들고, 나머지는 버튼과 화면만 있어도 된다.
+
+코드 전체를 한 번에 주고, 코드 뒤에 어디를 바꾸면 색·문구·숫자가 바뀌는지 3줄로 설명하라.`,
+    extra: `<div class="note sun"><b>코드를 받은 뒤</b><div class="checks"><div>앱이 열리면 핵심 기능 1개부터 눌러 보기</div><div>화면 아래 “교육용 가상 데이터” 표시가 있는지 확인</div><div>안 열리거나 이상하면 P07로 한 번에 하나씩 고치기</div></div></div>
+      <div class="note peach"><b>이런 기능은 넣지 않아요</b><br>실제 로그인, 실제 결제, 실제 주식 시세, 친구 연락처 불러오기. AI가 넣어 주면 빼 달라고 다시 요청하세요.</div>` },
+  { id: "f07", no: "P07", g: "sunpm", roles: ["dev"], title: "고치기·기능 추가", when: ["만드는 중 계속", "개발 담당"],
+    use: "에러가 나거나 기능을 하나 더 넣고 싶을 때 써요. 한 번에 하나씩만 고치는 게 핵심이에요.",
+    fields: [{ k: "want", t: "하고 싶은 것", ph: "예: 저금 버튼을 누르면 잔액이 바로 바뀌게", area: 1 }, { k: "bug", t: "지금 보이는 문제·에러 문구", ph: "예: 버튼을 눌러도 아무 변화가 없다", area: 1 }, { k: "keep", t: "바꾸지 말아야 할 것", ph: "예: 지금 색과 화면 3장 구성" }],
+    tpl: `너는 친절한 디버깅 도우미다. 지금 만든 앱을 고친다. ${RULE}
+
+하고 싶은 것=[{{want| }}]
+지금 보이는 문제·에러 문구=[{{bug|없음}}]
+바꾸지 말아야 할 것=[{{keep| }}]
+
+순서대로 답하라: ① 원인 추정(확실하지 않으면 “추정”이라고 표시) ② 고친 코드(바뀐 곳이 많으면 전체 코드) ③ 고친 뒤 확인하는 방법 2가지. 한 번에 하나만 고쳐라. 요청하지 않은 기능은 추가하지 마라.
+
+현재 코드:`,
+    extra: `<div class="note lilac"><b>복사한 뒤 할 일</b><br>프롬프트 맨 끝 “현재 코드:” 아래에 지금 앱 코드 전체를 붙여 넣으세요. 같은 대화창에서 이어 고치는 중이면 생략해도 돼요.</div>` },
+  { id: "f08", no: "P08", g: "sunpm", roles: ["promo", "lead"], title: "발표 원고 만들기", when: ["공유·데모데이 전", "홍보 담당 + 리더"],
+    use: "문제 → 해결 → 시연 → 팀 소개 순서로 2분 원고와 30초 버전을 받아요. 갤러리워크에서 남는 팀원은 30초 버전을 써요.",
+    fields: [{ k: "app", t: "앱 이름", ph: "P04 앱 이름", from: ["f04_app"] }, { k: "prob", t: "해결하는 문제", ph: "P04 고른 문제", area: 1, from: ["f04_prob", "f03_pain"] }, { k: "sol", t: "해결 방법", ph: "예: 디지털 용돈을 한 화면에 모아 보여 준다", area: 1 }, { k: "demo", t: "시연 순서", ph: "예: 홈 → 나눠 담기 → 결과 그래프", area: 1 }, { k: "roles", t: "역할 소개", ph: "리더·돈 담당·개발 담당·홍보 담당·디자인 담당이 한 일", area: 1 }],
+    tpl: `너는 데모데이 발표 코치다. 우리 팀 앱의 발표 원고를 만든다. ${RULE}
+
+앱 이름=[{{app| }}] / 해결하는 문제=[{{prob| }}] / 해결 방법=[{{sol| }}] / 시연 순서=[{{demo| }}] / 역할 소개=[{{roles|리더·돈 담당·개발 담당·홍보 담당·디자인 담당이 한 일}}]
+
+출력: ① 2분 발표 원고(문제 → 해결 → 시연 → 팀 소개) ② 30초로 줄인 버전 ③ 예상 질문 3개와 답. 앱이 실제로 돈을 벌어 준다거나 수익을 약속하는 표현을 쓰지 마라. 아직 만들지 못한 기능은 “앞으로 만들 기능”으로 구분하라.`,
+    extra: `<div class="note mint"><b>갤러리워크에서 쓰는 법</b><div class="checks"><div>남는 팀원: 30초 버전으로 우리 앱 소개</div><div>돌아다니는 팀원: 다른 팀 방명록에 의견 남기기</div><div>돌아온 팀원: 받은 의견을 팀에 정리해서 전달</div></div></div>
+      <div class="note sun"><b>마지막 자가 점검</b><div class="checks"><div>처음 30초 안에 문제가 나오는가?</div><div>시연 순서대로 실제로 눌러 봤는가?</div><div>팀원 모두 자기 역할을 한 문장으로 말할 수 있는가?</div></div></div>` },
+];
+
+const fkey = (p, k) => `${p.id}_${k}`;
+function fieldHTML(p, f) {
+  const id = fkey(p, f.k), v = F[id] || "";
+  if (f.seg) return `<div class="field"><span class="lbl">${f.t}</span><div class="seg" data-seg="${id}">${f.seg.map((o) => `<button type="button" data-v="${esc(o)}" aria-pressed="${v === o}">${esc(o)}</button>`).join("")}</div></div>`;
+  const hint = f.from ? `<span class="hint">비워 두면 ${f.from.map((k) => k.slice(0, 3).toUpperCase().replace("F", "P")).filter((x, i, a) => a.indexOf(x) === i).join("·")}에서 쓴 내용이 자동으로 들어가요</span>` : "";
+  const ctl = f.area ? `<textarea id="f-${id}" data-f="${id}" rows="2" placeholder="${esc(f.ph || "")}">${esc(v)}</textarea>` : `<input type="text" id="f-${id}" data-f="${id}" placeholder="${esc(f.ph || "")}" value="${esc(v)}">`;
+  return `<div class="field"><label for="f-${id}">${f.t}</label>${hint}${ctl}</div>`;
+}
+$("#cards").innerHTML = P.map((p) => {
+  const g = GROUP[p.g];
+  return `<article class="pcard g-${p.g}" id="${p.id}" data-roles="${p.roles.join(" ")}">
+    <div class="phead"><span class="pnum">${p.no}</span><div><h3>${p.title}</h3><div class="meta"><span class="lv">${g.lab}</span>${p.when.map((w) => `<span>${w}</span>`).join("")}${p.roles.map((r) => `<span class="role">${ROLE[r]}</span>`).join("")}</div><p class="use">${p.use}</p></div>
+      <div class="prow"><button type="button" class="btn ${g.btn}" data-copy="${p.id}">복사하기</button></div></div>
+    <div class="pbody">
+      <div class="fields"><h4>빈칸 채우기</h4>${p.fields.map((f) => fieldHTML(p, f)).join("")}
+        <div class="prow"><button type="button" class="btn light" data-clear="${p.id}">빈칸 지우기</button><span class="status" data-status="${p.id}"></span></div></div>
+      <div class="preview"><h4>완성된 프롬프트 미리보기</h4><div class="ptext" data-prev="${p.id}" tabindex="0"></div>
+        <div class="prow"><button type="button" class="btn ${g.btn}" data-copy="${p.id}">이 프롬프트 복사</button></div>
+        <div class="legend"><span style="background:var(--sun)">내가 채운 곳</span><span style="background:var(--lilac);color:var(--violet-ink)">앞 카드에서 이어진 곳</span><span style="background:var(--peach);color:var(--coral-ink)">아직 빈칸</span><span style="background:var(--mint);color:var(--green-ink)">안전 규칙</span></div></div>
+    </div>
+    ${p.extra ? `<div class="extra">${p.extra}</div>` : ""}
+  </article>`;
+}).join("");
+$("#jump").innerHTML = P.map((p) => `<a href="#${p.id}" class="g-${p.g}">${p.no}</a>`).join("");
+
+function valueOf(p, k) {
+  const f = p.fields.find((x) => x.k === k);
+  const own = (F[fkey(p, k)] || "").trim();
+  if (own) return { v: own, kind: "fill" };
+  if (f && f.from) {
+    const v = f.from.map((key) => (F[key] || "").trim()).filter(Boolean);
+    const joined = k === "prob" ? (v[0] || "") : v.join(" / ");
+    if (joined) return { v: joined, kind: "link" };
+  }
+  return { v: "", kind: "hole" };
+}
+function build(p, html) {
+  let filled = 0, total = 0;
+  const out = p.tpl.replace(/\{\{(\w+)\|([^}]*)\}\}/g, (_, k, def) => {
+    total++;
+    const r = valueOf(p, k);
+    if (r.v) { filled++; return html ? `<span class="${r.kind}">${esc(r.v)}</span>` : r.v; }
+    return html ? `<span class="hole">${esc(def)}</span>` : def;
+  });
+  if (!html) return { text: out, filled, total };
+  const safe = out.replace(/&(?!amp;|lt;|gt;|quot;)/g, "&amp;");
+  return { text: safe.split(esc(RULE)).join(`<span class="rule">${esc(RULE)}</span>`), filled, total };
+}
+function render(p) {
+  const r = build(p, true);
+  $(`[data-prev="${p.id}"]`).innerHTML = r.text;
+  const st = $(`[data-status="${p.id}"]`);
+  st.textContent = `${r.filled} / ${r.total}칸 채움`;
+  st.className = "status" + (r.filled === r.total ? " ok" : "");
+}
+const renderAll = () => P.forEach(render);
+renderAll();
+
+document.addEventListener("input", (e) => {
+  const el = e.target.closest("[data-f]"); if (!el) return;
+  F[el.dataset.f] = el.value; save(); renderAll();
+});
+let toastT = null;
+function toast(msg) { const t = $("#toast"); $("#toastTxt").textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => (t.hidden = true), 2600); }
+async function copyText(text) {
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch (e) {
+    const ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select();
+    let ok = false; try { ok = document.execCommand("copy"); } catch (_) {} ta.remove(); return ok;
+  }
+}
+let wipeArmed = false, wipeT = null;
+document.addEventListener("click", async (e) => {
+  if (e.target.closest("#wipe")) {
+    const b = $("#wipe");
+    if (!wipeArmed) { wipeArmed = true; b.textContent = "한 번 더 누르면 모두 지워요"; clearTimeout(wipeT); wipeT = setTimeout(() => { wipeArmed = false; b.textContent = "모든 기록 지우기"; }, 3000); return; }
+    wipeArmed = false; clearTimeout(wipeT); b.textContent = "모든 기록 지우기";
+    F = {}; save();
+    $$("[data-f]").forEach((el) => (el.value = "")); $$("[data-seg] button").forEach((x) => x.setAttribute("aria-pressed", "false"));
+    renderAll(); toast("모든 카드의 기록을 지웠어요"); return;
+  }
+  const sb = e.target.closest("[data-seg] button");
+  if (sb) {
+    const g = sb.closest("[data-seg]"), k = g.dataset.seg, val = F[k] === sb.dataset.v ? "" : sb.dataset.v;
+    F[k] = val; $$("button", g).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === val)));
+    save(); renderAll(); return;
+  }
+  const cb = e.target.closest("[data-copy]");
+  if (cb) {
+    const p = P.find((x) => x.id === cb.dataset.copy), r = build(p, false);
+    const ok = await copyText(r.text);
+    if (ok) {
+      $$(`[data-copy="${p.id}"]`).forEach((b) => { const o = b.textContent; b.classList.add("done"); b.textContent = "복사됨!"; setTimeout(() => { b.classList.remove("done"); b.textContent = o; }, 1600); });
+      toast(r.filled < r.total ? `${p.no} 복사! 빈칸 ${r.total - r.filled}개는 대괄호로 남아 있어요` : `${p.no} 복사! AI 채팅창에 붙여 넣으세요`, r.filled < r.total ? "think" : "wow");
+    } else toast("복사가 막혀 있어요. 미리보기 글을 직접 선택해 복사해 주세요.", "think");
+    return;
+  }
+  const cl = e.target.closest("[data-clear]");
+  if (cl) {
+    const p = P.find((x) => x.id === cl.dataset.clear);
+    p.fields.forEach((f) => { const id = fkey(p, f.k); delete F[id]; const el = $(`#f-${id}`); if (el) el.value = ""; const g = $(`[data-seg="${id}"]`); if (g) $$("button", g).forEach((b) => b.setAttribute("aria-pressed", "false")); });
+    save(); renderAll(); toast(`${p.no} 빈칸을 지웠어요`); return;
+  }
+  const part = e.target.closest("[data-part]");
+  if (part) {
+    const on = part.getAttribute("aria-pressed") !== "true";
+    $$("[data-part]").forEach((b) => b.setAttribute("aria-pressed", "false"));
+    part.setAttribute("aria-pressed", String(on));
+    const sp = $("#specimen"); sp.classList.toggle("focus", on);
+    $$("mark", sp).forEach((m) => m.classList.toggle("on", on && m.dataset.p === part.dataset.part));
+    return;
+  }
+  const fb = e.target.closest("[data-filter]");
+  if (fb) {
+    const f = fb.dataset.filter;
+    $$("[data-filter]").forEach((b) => b.setAttribute("aria-pressed", String(b === fb)));
+    $$(".pcard").forEach((c) => { const rs = c.dataset.roles.split(" "); c.dataset.hide = f === "all" || rs.includes("all") || rs.includes(f) ? "0" : "1"; });
+    try { localStorage.setItem(SKEY + "-role", f); } catch (_) {}
+    return;
+  }
+  const a = e.target.closest('a[href^="#f0"]');
+  if (a) { const c = $(a.getAttribute("href")); if (c && c.dataset.hide === "1") { $$("[data-filter]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filter === "all"))); $$(".pcard").forEach((x) => (x.dataset.hide = "0")); } }
+});
+try { const r = localStorage.getItem(SKEY + "-role"); if (r && r !== "all") { const b = $(`[data-filter="${r}"]`); if (b) b.click(); } } catch (_) {}
+})();
+</script>
+
+</body></html>
