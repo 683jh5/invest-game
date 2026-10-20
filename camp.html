@@ -339,16 +339,17 @@ const DEFAULT_STOCKS=[
   {id:'kakao',name:'톡톡',price:30000,emoji:'💬',cap:'메신저·간편결제'},
   {id:'naver',name:'척척검색',price:60000,emoji:'🔍',cap:'검색·AI 비서'},
   {id:'hyundai',name:'씽씽모터스',price:40000,emoji:'🚗',cap:'전기차·하이브리드'},
+  {id:'uam',name:'훨훨모빌리티',price:30000,emoji:'🚁',cap:'하늘을 나는 자동차'},
   {id:'etf',name:'시장 전체 ETF',price:20000,emoji:'📊',cap:'여러 회사를 한 바구니에'},
   {id:'bond',name:'국채 ETF',price:100000,emoji:'🏦',cap:'나라에 돈 빌려주기(채권)'},
 ];
 // 모든 회사·뉴스는 수업용 가상 시나리오
 const PRICES=[
-  {samsung:50000,skhynix:80000,kakao:30000,naver:60000,hyundai:40000,etf:20000,bond:100000},
-  {samsung:58000,skhynix:90000,kakao:27000,naver:63000,hyundai:46000,etf:21000,bond:100000},
-  {samsung:60000,skhynix:76000,kakao:28500,naver:72000,hyundai:47000,etf:21500,bond:100500},
-  {samsung:63000,skhynix:80000,kakao:33000,naver:70000,hyundai:42000,etf:21800,bond:101000},
-  {samsung:44000,skhynix:56000,kakao:32000,naver:64000,hyundai:41000,etf:19500,bond:104000},
+  {samsung:50000,skhynix:80000,kakao:30000,naver:60000,hyundai:40000,uam:30000,etf:20000,bond:100000},
+  {samsung:58000,skhynix:90000,kakao:27000,naver:63000,hyundai:46000,uam:33000,etf:21000,bond:100000},
+  {samsung:60000,skhynix:76000,kakao:28500,naver:72000,hyundai:47000,uam:45000,etf:21500,bond:100500},
+  {samsung:63000,skhynix:80000,kakao:33000,naver:70000,hyundai:42000,uam:39000,etf:21800,bond:101000},
+  {samsung:44000,skhynix:56000,kakao:32000,naver:64000,hyundai:41000,uam:36000,etf:19500,bond:104000},
 ];
 // type: fact=공식 발표·실적(근거) / rumor=소문 / ai=AI에게 물어보기 활동
 const QUARTER_NEWS={
@@ -356,23 +357,27 @@ const QUARTER_NEWS={
     {stock:'반짝메모리',type:'fact',content:'[회사 발표] AI 데이터센터가 늘면서 메모리 주문이 지난해보다 30% 늘었어요'},
     {stock:'씽씽모터스',type:'fact',content:'[실적 발표] 하이브리드 차 판매가 크게 늘어 이번 분기 최고 실적'},
     {stock:'톡톡',type:'fact',content:'[회사 발표] 메신저 하루 이용자가 조금 줄었어요'},
+    {stock:'훨훨모빌리티',type:'fact',content:'[회사 발표] 하늘을 나는 자동차, 사람 태우고 10분 시험 비행 성공'},
   ],
   2:[
     {stock:'번개칩',type:'rumor',content:'단톡방에서 돌아요: "번개칩이 세계 최대 회사랑 엄청난 계약 한대! 지금 안 사면 늦음!!"'},
     {stock:'척척검색',type:'fact',content:'[회사 발표] AI 비서 유료 가입자 100만 명 돌파'},
     {stock:'톡톡',type:'rumor',content:'친구가 그러는데: "톡톡 곧 망한대"'},
+    {stock:'훨훨모빌리티',type:'rumor',content:'커뮤니티 글: "내년부터 학교 앞까지 하늘택시 타고 등교한대!!"'},
     {stock:'전체',type:'fact',content:'[정부 발표] 기준금리 그대로 유지'},
   ],
   3:[
     {stock:'반짝메모리',type:'fact',content:'[회사 발표] 공장을 새로 짓는다! 하지만 경쟁 회사들이 가격을 내리는 중'},
     {stock:'씽씽모터스',type:'fact',content:'[실적 발표] 해외 관세 부담으로 이익이 줄었어요'},
     {stock:'톡톡',type:'fact',content:'[회사 발표] 메신저 안에서 바로 쓰는 새 간편결제 서비스 출시'},
+    {stock:'훨훨모빌리티',type:'fact',content:'[정부 발표] 하늘길 안전 규칙을 만드는 중… 실제 손님 운행은 몇 년 더 걸릴 예정'},
     {stock:'AI 활동',type:'ai',content:'AI에게 물어보세요 → "이 뉴스는 이 회사 주가에 좋은 소식일까, 나쁜 소식일까? 이유를 3가지로 알려줘." AI 답을 그대로 믿지 말고, 뉴스 내용과 맞는지 꼭 확인!'},
   ],
   4:[
     {stock:'전체',type:'fact',content:'[업계 발표] AI 칩이 너무 많이 만들어져서 반도체 가격이 크게 떨어질 전망'},
     {stock:'국채 ETF',type:'fact',content:'[시장 소식] 시장이 불안해지자 안전한 채권으로 돈이 몰리는 중'},
     {stock:'척척검색',type:'fact',content:'[회사 발표] AI 비서 가입자는 계속 늘지만 서버 비용도 늘어남'},
+    {stock:'훨훨모빌리티',type:'fact',content:'[회사 발표] 첫 이착륙장 공사 시작, 하지만 비용이 예상보다 많이 듦'},
   ],
 };
 // ── 상태 ── status: waiting / trading / review / closed
