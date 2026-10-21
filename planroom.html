@@ -31,7 +31,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:3px solid var(--theory);outline-offset:2px}
 .muted{color:var(--muted)} .small{font-size:14px}
 .kicker{display:inline-flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--ink-2);letter-spacing:.02em}
-.p-ceo{--c:var(--theory);--ci:var(--theory-ink)} .p-cfo{--c:var(--gold);--ci:var(--gold-ink)} .p-cto{--c:var(--tool);--ci:var(--tool-ink)} .p-cmo{--c:var(--rust);--ci:#8A4A3A} .p-cdo{--c:var(--result);--ci:var(--result-ink)} .p-all{--c:var(--ink);--ci:var(--ink)}
+.p-ceo{--c:var(--theory);--ci:var(--theory-ink)} .p-coo{--c:var(--gold);--ci:var(--gold-ink)} .p-cto{--c:var(--tool);--ci:var(--tool-ink)} .p-cmo{--c:var(--rust);--ci:#8A4A3A} .p-cdo{--c:var(--result);--ci:var(--result-ink)} .p-all{--c:var(--ink);--ci:var(--ink)}
 
 /* mascot */
 .mascot{display:block;overflow:visible}
@@ -516,9 +516,9 @@ details.ex summary::before{background:#ECEFF4}
 
   <!-- ================= QUIZ ================= -->
   <section class="station" data-station="quiz" id="st-quiz" hidden>
-    <div class="guide"><div class="head"><span class="kicker">01 복습 퀴즈 <span class="keyholder p-cfo" data-owner="cfo"></span></span><h2>어제 배운 돈 감각, 기억나요?</h2><p class="goal">토요일 모의투자를 떠올리며 4문제를 풀어요. 틀려도 괜찮아요. 고르면 바로 설명이 나와요.</p><div class="bubble" data-say="quiz"></div></div></div>
+    <div class="guide"><div class="head"><span class="kicker">01 복습 퀴즈 <span class="keyholder p-coo" data-owner="coo"></span></span><h2>어제 배운 돈 감각, 기억나요?</h2><p class="goal">토요일 모의투자를 떠올리며 4문제를 풀어요. 틀려도 괜찮아요. 고르면 바로 설명이 나와요.</p><div class="bubble" data-say="quiz"></div></div></div>
     <div class="card">
-      <div class="qtop"><div><span class="tagp p-cfo">뱅커 도장 재료</span></div><div class="qdots" id="qdots"></div></div>
+      <div class="qtop"><div><span class="tagp p-coo">운영 디렉터 도장 재료</span></div><div class="qdots" id="qdots"></div></div>
       <div class="qcard" id="qcard"></div>
     </div>
     <div class="navfoot"><button class="btn light" data-go="start">← 팀 만들기</button><button class="btn blue" data-go="ad">02 광고 배틀로 →</button></div>
@@ -614,9 +614,9 @@ details.ex summary::before{background:#ECEFF4}
       <div class="card sprint">
         <div><div class="clock" id="clock">15:00</div><div class="small muted">15분 스프린트</div></div>
         <div class="phases">
-          <div class="phase" data-ph="0"><div class="tm">처음 5분 · 리더</div><b>고객 · 돈 고민</b><div class="fill"><i></i></div></div>
-          <div class="phase" data-ph="1"><div class="tm">다음 5분 · 메이커</div><b>해결 아이디어 · 핵심 기능</b><div class="fill"><i></i></div></div>
-          <div class="phase" data-ph="2"><div class="tm">마지막 5분 · 스토리텔러 · 뱅커</div><b>앱 이름 · 돈 버는 방법</b><div class="fill"><i></i></div></div>
+          <div class="phase" data-ph="0"><div class="tm">처음 5분 · 대표</div><b>고객 · 돈 고민</b><div class="fill"><i></i></div></div>
+          <div class="phase" data-ph="1"><div class="tm">다음 5분 · 기술 디렉터</div><b>해결 아이디어 · 핵심 기능</b><div class="fill"><i></i></div></div>
+          <div class="phase" data-ph="2"><div class="tm">마지막 5분 · 마케팅 · 운영 디렉터</div><b>앱 이름 · 돈 버는 방법</b><div class="fill"><i></i></div></div>
         </div>
         <div class="row-btns"><button class="btn green" type="button" id="tstart">시작</button><button class="btn light" type="button" id="treset">처음으로</button></div>
       </div>
@@ -632,7 +632,7 @@ details.ex summary::before{background:#ECEFF4}
     <div class="stack">
       <div class="card"><h3>앱 테마 색</h3><div class="swatches" id="swatches" style="margin-top:10px"></div></div>
       <div class="screens" id="screens"></div>
-      <div class="note lilac">화면마다 부품을 2개 이상 고르면 디자이너 도장 재료가 채워져요. 예시 숫자는 화면 모양을 보여 주는 가짜 값이에요.</div>
+      <div class="note lilac">화면마다 부품을 2개 이상 고르면 디자인 디렉터 도장 재료가 채워져요. 예시 숫자는 화면 모양을 보여 주는 가짜 값이에요.</div>
     </div>
     <div class="navfoot"><button class="btn light" data-go="canvas">← 서비스 캔버스</button><button class="btn blue" data-go="prompt">07 프롬프트로 →</button></div>
   </section>
@@ -766,16 +766,16 @@ function mood(el, m) { const s = el && el.querySelector(".mascot"); if (s) s.set
 
 /* ---------- data ---------- */
 const ROLES = [
-  { k: "ceo", n: "리더", c: "CEO", d: "팀 방향을 정하고 고객을 고르고, 최종 발표를 이끌어요.", how: "팀 · 고객 · 캔버스 1–2" },
-  { k: "cfo", n: "뱅커", c: "CFO", d: "돈 감각 담당. 우리 앱이 어떻게 돈을 벌지 정해요.", how: "퀴즈 · 캔버스 6" },
-  { k: "cto", n: "메이커", c: "CTO", d: "AI를 다루는 담당. 기능을 정하고 프롬프트를 챙겨요.", how: "AI 검증 · 캔버스 3–4" },
-  { k: "cmo", n: "스토리텔러", c: "CMO", d: "앱 이름과 광고 문구, 한 문장 소개를 맡아요.", how: "광고 배틀 · 소개" },
-  { k: "cdo", n: "디자이너", c: "CDO", d: "앱 색과 화면 세 장의 모양을 정해요.", how: "화면 설계 3장" },
+  { k: "ceo", n: "대표", c: "CEO", d: "팀 비전과 진행을 맡아요. 고객을 고르고 최종 결정을 내려요.", how: "팀 · 고객 · 캔버스 1–2" },
+  { k: "cto", n: "기술 디렉터", c: "CTO", d: "AI를 다루는 담당. 프롬프트를 쓰고 기능을 점검 · 디버깅해요.", how: "AI 검증 · 캔버스 3–4" },
+  { k: "cdo", n: "디자인 디렉터", c: "CDO", d: "앱 색과 화면 배치를 정하고 쓰기 편한지 점검해요.", how: "화면 설계 3장" },
+  { k: "cmo", n: "마케팅 디렉터", c: "CMO", d: "앱 이름과 광고 문구, 발표 메시지를 맡아요.", how: "광고 배틀 · 소개" },
+  { k: "coo", n: "운영 디렉터", c: "COO", d: "팀 일정과 숫자 검산, 발표 자료 · 시연 순서를 챙겨요.", how: "퀴즈 · 캔버스 6" },
 ];
 const RNAME = Object.fromEntries(ROLES.map((r) => [r.k, r.n]));
 const STATIONS = [
   { id: "start", no: "0", t: "팀 만들기", r: "ceo" },
-  { id: "quiz", no: "1", t: "복습 퀴즈", r: "cfo" },
+  { id: "quiz", no: "1", t: "복습 퀴즈", r: "coo" },
   { id: "ad", no: "2", t: "광고 배틀", r: "cmo" },
   { id: "cust", no: "3", t: "고객 고르기", r: "ceo" },
   { id: "ai", no: "4", t: "AI 검증", r: "cto" },
@@ -787,7 +787,7 @@ const STATIONS = [
 ];
 const SAY = {
   start: "역할이 모두 주인을 찾으면 출발! 빈 역할이 없게 나눠 봐요.",
-  quiz: "뱅커, 출동! 팀원들이랑 의논해서 골라도 돼요.",
+  quiz: "운영 디렉터, 출동! 팀원들이랑 의논해서 골라도 돼요.",
   ad: "정답보다 ‘왜’가 중요해요. 이유를 꼭 적어 줘요!",
   cust: "고객 한 명만 골라요. 한 명을 제대로 도와야 모두를 도울 수 있어요.",
   ai: "질문은 한 글자도 바꾸지 않기! 출처는 직접 열어 보기!",
@@ -816,7 +816,7 @@ const CANVAS = [
   { k: "c_idea", t: "해결 아이디어", s: "해결", r: "cto", ph: 1, nc: "#E4F1F7", rot: "-.6deg", hint: "우리 앱은 그 고민을 어떻게 풀어 주나요?", ex: "교통비를 미리 예측해서 필요한 만큼 자동으로 모아 주는 앱" },
   { k: "c_features", t: "핵심 기능 3개", s: "기능", r: "cto", ph: 1, nc: "#ECEFF4", rot: "1deg", hint: "앱에서 누를 수 있는 기능 세 가지", ex: "① 이번 달 교통비 예측 ② 남는 돈 자동 저금 ③ 하늘택시 관련 가상 회사 투자 체험" },
   { k: "c_name", t: "앱 이름 · 한 줄 소개", s: "이름", r: "cmo", ph: 2, nc: "#EEF1F5", rot: "-.9deg", hint: "고객의 고민이 바로 떠오르는 이름과 한 줄", ex: "하늘지갑 · 날아가는 출근길, 교통비는 안 날아가게" },
-  { k: "c_money", t: "돈은 어떻게 벌까", s: "수익", r: "cfo", ph: 2, nc: "#F7ECE8", rot: ".6deg", hint: "누가, 무엇에, 얼마쯤 돈을 낼까요?", ex: "기본 기능은 무료, 자동 저금 고급 기능은 월 구독" },
+  { k: "c_money", t: "돈은 어떻게 벌까", s: "수익", r: "coo", ph: 2, nc: "#F7ECE8", rot: ".6deg", hint: "누가, 무엇에, 얼마쯤 돈을 낼까요?", ex: "기본 기능은 무료, 자동 저금 고급 기능은 월 구독" },
 ];
 const PH = ["고객 · 돈 고민", "해결 아이디어 · 핵심 기능", "앱 이름 · 돈 버는 방법"];
 const TOOL_FIELDS = [
@@ -1034,7 +1034,7 @@ const caseName = () => (v("case") === "우리 팀 고객" && v("cu_other") ? `�
 function stamps() {
   return {
     ceo: !!(v("team") && members().length >= 3 && v("case") && v("c_customer") && v("c_problem")),
-    cfo: !!(QUIZ.every((q) => state[q.k] !== undefined) && v("c_money")),
+    coo: !!(QUIZ.every((q) => state[q.k] !== undefined) && v("c_money")),
     cto: !!((v("a_reco") || v("b_reco")) && v("ai_safety") && v("c_idea") && v("c_features")),
     cmo: !!(v("battle_choice") && v("battle_reason") && sortPlaced() === SORT.length && v("c_name") && TICKET.every(v)),
     cdo: !!(v("sc_theme") && SCREENS.every((s) => partsOf(s.i).length >= 2)),
@@ -1214,11 +1214,11 @@ function drawClock() {
 $("#tstart").addEventListener("click", () => {
   if (timer) { clearInterval(timer); timer = null; $("#tstart").textContent = "계속"; drawClock(); return; }
   if (left === 0) left = TOTAL;
-  $("#tstart").textContent = "잠깐 멈춤"; say("canvas", "출발! 리더가 고객과 돈 고민부터 써요.", "wow");
+  $("#tstart").textContent = "잠깐 멈춤"; say("canvas", "출발! 대표가 고객과 돈 고민부터 써요.", "wow");
   timer = setInterval(() => {
     left = Math.max(0, left - 1);
-    if (left === 600) { toast("5분! 메이커에게 키보드를 넘겨요"); say("canvas", "메이커 차례! 해결 아이디어와 기능 세 가지예요.", "happy"); }
-    if (left === 300) { toast("10분! 스토리텔러·뱅커 차례예요"); say("canvas", "마지막! 앱 이름과 돈 버는 방법이에요.", "happy"); }
+    if (left === 600) { toast("5분! 기술 디렉터에게 키보드를 넘겨요"); say("canvas", "기술 디렉터 차례! 해결 아이디어와 기능 세 가지예요.", "happy"); }
+    if (left === 300) { toast("10분! 마케팅·운영 디렉터 차례예요"); say("canvas", "마지막! 앱 이름과 돈 버는 방법이에요.", "happy"); }
     if (left === 60) toast("1분 남았어요", "wow");
     if (left === 0) { clearInterval(timer); timer = null; $("#tstart").textContent = "다시 시작"; toast("15분 끝! 화면 설계로 넘어가요", "wow"); }
     drawClock();

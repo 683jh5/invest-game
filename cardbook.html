@@ -266,11 +266,11 @@ textarea:focus,input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(4,
   <div class="filters" role="toolbar" aria-label="역할별로 카드 보기">
     <span class="lb">내 역할</span>
     <button type="button" data-filter="all" aria-pressed="true">전체 8장</button>
-    <button type="button" data-filter="lead" aria-pressed="false">리더 <small>CEO</small></button>
-    <button type="button" data-filter="money" aria-pressed="false">돈 담당 <small>CFO</small></button>
-    <button type="button" data-filter="dev" aria-pressed="false">개발 담당 <small>CTO</small></button>
-    <button type="button" data-filter="promo" aria-pressed="false">홍보 담당 <small>CMO</small></button>
-    <button type="button" data-filter="design" aria-pressed="false">디자인 담당 <small>CDO</small></button>
+    <button type="button" data-filter="lead" aria-pressed="false">대표 <small>CEO</small></button>
+    <button type="button" data-filter="money" aria-pressed="false">운영 디렉터 <small>COO</small></button>
+    <button type="button" data-filter="dev" aria-pressed="false">기술 디렉터 <small>CTO</small></button>
+    <button type="button" data-filter="promo" aria-pressed="false">마케팅 디렉터 <small>CMO</small></button>
+    <button type="button" data-filter="design" aria-pressed="false">디자인 디렉터 <small>CDO</small></button>
     <div class="jump" id="jump"></div>
   </div>
 
@@ -302,7 +302,7 @@ const save = () => { try { localStorage.setItem(SKEY, JSON.stringify(F)); } catc
 
 
 const RULE = "실제 회사·종목을 추천하거나 실제 투자를 권하지 마라. “수익 보장”, “무조건 오른다” 같은 표현을 쓰지 마라. 가격·수익률·사용자 수는 모두 가상 데이터라고 표시하라. 이름·연락처·학교 같은 개인정보를 묻거나 넣지 마라. 모르는 것은 “확인 필요”로 표시하라.";
-const ROLE = { all: "모두", lead: "리더", money: "돈 담당", dev: "개발 담당", promo: "홍보 담당", design: "디자인 담당" };
+const ROLE = { all: "모두", lead: "대표", money: "운영 디렉터", dev: "기술 디렉터", promo: "마케팅 디렉터", design: "디자인 디렉터" };
 const GROUP = { satam: { lab: "1일차 오전", btn: "coral" }, satpm: { lab: "1일차 오후", btn: "blue" }, sunam: { lab: "2일차 오전", btn: "violet" }, sunpm: { lab: "2일차 오후", btn: "green" } };
 
 const P = [
@@ -326,7 +326,7 @@ const P = [
 출력: ① 2050년 하루 속 돈과 관련된 장면 3개(아침·낮·저녁) ② 각 장면에서 생길 수 있는 불편이나 위험 1개 ③ 지금 이미 있는 기술과 아직 상상인 것을 표로 구분. 미래 예측을 사실처럼 단정하지 말고 “~일 수도 있다”로 써라.`,
     extra: `<div class="note lilac"><b>내일 아침에 다시 써요</b><br>② ‘불편이나 위험’은 2일차 P03의 재료예요. 마음에 드는 것 하나를 팀 공유 메모에 옮겨 두세요.</div>
       <div class="note sun"><b>상상과 사실 구분하기</b><div class="checks"><div>③ 표에서 ‘지금 있는 기술’ 칸은 원 강사님께 한 번 더 확인</div><div>연도·숫자가 나오면 확인 필요로 표시</div></div></div>` },
-  { id: "f03", no: "P03", g: "sunam", roles: ["lead", "promo"], title: "문제 정의하기", when: ["기획 첫 단계", "리더가 정리"],
+  { id: "f03", no: "P03", g: "sunam", roles: ["lead", "promo"], title: "문제 정의하기", when: ["기획 첫 단계", "대표가 정리"],
     use: "누가, 언제, 무엇 때문에 곤란한지를 한 문장으로 만들어요. 문제부터 정해야 앱 기능이 흔들리지 않아요.",
     fields: [{ k: "user", t: "사용자", ph: "예: 용돈을 처음 관리하는 2050년의 중학생" }, { k: "situ", t: "상황", ph: "예: 디지털 용돈을 여러 앱에 나눠 받을 때" }, { k: "pain", t: "불편", ph: "예: 얼마가 남았는지 한눈에 알 수 없다", area: 1 }, { k: "ev", t: "근거", ph: "어제 P02 장면, 모의투자에서 느낀 점 등", area: 1 }],
     tpl: `너는 서비스 기획을 돕는 문제 탐정이다. 우리 팀이 2050년에 해결하고 싶은 금융 문제를 분명한 문장으로 만든다. ${RULE}
@@ -336,7 +336,7 @@ const P = [
 출력: ① “[누가] [언제] [무엇 때문에] 곤란하다” 형식의 문제 문장 3개 ② 그중 우리 팀이 고를 1개와 이유 ③ 팀원·친구에게 물어볼 질문 3개(답을 유도하지 않게). 문제 안에 해결책(앱 기능)을 미리 넣지 마라.`,
     extra: `<div class="note sun"><b>좋은 문제 문장 점검</b><div class="checks"><div>‘누가’가 한 사람의 모습으로 떠오르는가?</div><div>앱 기능 이야기가 섞이지 않았는가?</div><div>팀원 모두 이 문제에 고개를 끄덕이는가?</div></div></div>
       <div class="note lilac"><b>다음 카드로 이어져요</b><br>여기 쓴 ‘불편’은 P04 ‘고른 문제’와 P08 발표 원고에 자동으로 들어가요. AI가 다듬어 준 문장이 더 좋으면 P04에 직접 붙여 넣으세요.</div>` },
-  { id: "f04", no: "P04", g: "sunam", roles: ["lead", "money"], title: "서비스 기획 캔버스", when: ["팀 기획의 중심", "리더 + 돈 담당"],
+  { id: "f04", no: "P04", g: "sunam", roles: ["lead", "money"], title: "서비스 기획 캔버스", when: ["팀 기획의 중심", "대표 + 운영 디렉터"],
     use: "문제·앱 이름·기능·돈 흐름을 6행 표로 정리해요. 여기서 정한 앱 이름과 기능이 화면·코딩·발표 카드로 이어져요.",
     fields: [{ k: "team", t: "팀 이름", ph: "예: 도전하는 주식 호랑이" }, { k: "prob", t: "고른 문제", ph: "P03에서 고른 문제 문장", area: 1, from: ["f03_pain"] }, { k: "app", t: "앱 이름 아이디어", ph: "예: 한눈 지갑" }, { k: "feat", t: "핵심 기능 아이디어", ph: "예: 모든 디지털 용돈을 한 화면에 모아 보기", area: 1 }, { k: "money", t: "돈 흐름 아이디어", ph: "수수료 · 구독 · 광고 · 무료 등", area: 1 }],
     tpl: `너는 중학생 창업팀의 서비스 기획 코치다. 우리 팀의 2050 금융 서비스 기획 캔버스를 만든다. ${RULE}
@@ -350,9 +350,9 @@ const P = [
 출력은 정확히 6행 표로 작성하라: (1) 사용자 (2) 문제 (3) 앱 이름과 한 줄 소개 (4) 핵심 기능 3개 (5) 꼭 필요한 화면 3장 (6) 신뢰·안전 장치와 돈 흐름.
 
 각 행에 “팀 아이디어” 또는 “AI 제안(확인 필요)”을 표시하라. 기능은 하루 안에 바이브코딩으로 만들 수 있는 크기로 줄여라. 표 뒤에 팀이 가장 먼저 결정할 질문 1개만 덧붙여라.`,
-    extra: `<div class="note mint"><b>캔버스 다음 순서</b><div class="flow3"><div><b>디자인 담당</b>P05 화면 3장</div><div><b>개발 담당</b>P06 바이브코딩</div><div><b>홍보 담당</b>P08 발표 원고</div></div><p class="small" style="margin-top:8px">앱 이름과 핵심 기능은 P05·P06·P08에 자동으로 들어가요. 바뀌면 여기만 고치면 돼요.</p></div>
-      <div class="note sun"><b>역할별 확인</b><div class="checks"><div>리더: 6행이 모두 같은 문제를 말하는가?</div><div>돈 담당: (6) 돈 흐름이 사용자에게 불리하지 않은가?</div><div>모두: AI 제안 중 우리가 동의하지 않는 것은 지웠는가?</div></div></div>` },
-  { id: "f05", no: "P05", g: "sunam", roles: ["design"], title: "화면 프로토타입", when: ["바이브코딩 전에", "디자인 담당"],
+    extra: `<div class="note mint"><b>캔버스 다음 순서</b><div class="flow3"><div><b>디자인 디렉터</b>P05 화면 3장</div><div><b>기술 디렉터</b>P06 바이브코딩</div><div><b>마케팅 디렉터</b>P08 발표 원고</div></div><p class="small" style="margin-top:8px">앱 이름과 핵심 기능은 P05·P06·P08에 자동으로 들어가요. 바뀌면 여기만 고치면 돼요.</p></div>
+      <div class="note sun"><b>역할별 확인</b><div class="checks"><div>대표: 6행이 모두 같은 문제를 말하는가?</div><div>운영 디렉터: (6) 돈 흐름이 사용자에게 불리하지 않은가?</div><div>모두: AI 제안 중 우리가 동의하지 않는 것은 지웠는가?</div></div></div>` },
+  { id: "f05", no: "P05", g: "sunam", roles: ["design"], title: "화면 프로토타입", when: ["바이브코딩 전에", "디자인 디렉터"],
     use: "코딩 전에 화면 3장의 설계도를 먼저 그려요. 버튼 이름과 문구까지 정해 두면 P06에서 앱이 훨씬 정확하게 나와요.",
     fields: [{ k: "app", t: "앱 이름", ph: "P04 앱 이름", from: ["f04_app"] }, { k: "s1", t: "화면 1", ph: "예: 홈 — 전체 잔액과 오늘 알림" }, { k: "s2", t: "화면 2", ph: "예: 핵심 기능 — 용돈 나눠 담기" }, { k: "s3", t: "화면 3", ph: "예: 결과 — 이번 주 소비 그래프" }, { k: "mood", t: "분위기·색", ph: "예: 밝은 민트, 둥근 카드, 큰 숫자" }],
     tpl: `너는 모바일 앱 화면을 함께 그리는 디자이너다. 아래 설명으로 앱 화면 3장의 설계도를 만든다. ${RULE}
@@ -362,7 +362,7 @@ const P = [
 출력: 화면마다 ① 위에서 아래로 놓일 구성 요소 목록 ② 버튼 이름과 누르면 가는 화면 ③ 화면에 들어갈 실제 문구. 종이에 바로 그릴 수 있게 간단한 글자 그림(와이어프레임)으로도 보여 줘라. 숫자는 모두 가상 데이터로 표시하라.`,
     extra: `<div class="note sun"><b>종이에 먼저 그려 보기</b><div class="checks"><div>화면 3장을 한 장씩 휴대폰 크기로 그리기</div><div>버튼마다 화살표로 어느 화면으로 가는지 표시</div><div>팀원에게 보여 주고 “첫 화면에서 뭘 누를 것 같아?” 묻기</div></div></div>
       <div class="note lilac"><b>P06으로 이어져요</b><br>화면 1~3과 분위기·색은 P06 바이브코딩 프롬프트에 자동으로 들어가요.</div>` },
-  { id: "f06", no: "P06", g: "sunpm", roles: ["dev"], title: "바이브코딩 시작하기", when: ["결과물 만들기", "개발 담당"],
+  { id: "f06", no: "P06", g: "sunpm", roles: ["dev"], title: "바이브코딩 시작하기", when: ["결과물 만들기", "기술 디렉터"],
     use: "기획 캔버스와 화면 설계를 모아 첫 번째 앱 코드를 받아요. 앞 카드를 채웠다면 거의 빈칸이 없어요.",
     fields: [{ k: "app", t: "앱 이름", ph: "P04 앱 이름", from: ["f04_app"] }, { k: "intro", t: "한 줄 소개", ph: "P04 표 (3)행의 한 줄 소개" }, { k: "feat", t: "핵심 기능", ph: "P04 핵심 기능", area: 1, from: ["f04_feat"] }, { k: "screens", t: "화면 3장", ph: "P05 화면 1~3", area: 1, from: ["f05_s1", "f05_s2", "f05_s3"] }, { k: "color", t: "색·분위기", ph: "P05 분위기·색", from: ["f05_mood"] }],
     tpl: `너는 중학생과 함께 모바일 웹앱을 만드는 개발 코치다. 아래 기획으로 바로 실행되는 앱을 만든다. ${RULE}
@@ -382,7 +382,7 @@ const P = [
 코드 전체를 한 번에 주고, 코드 뒤에 어디를 바꾸면 색·문구·숫자가 바뀌는지 3줄로 설명하라.`,
     extra: `<div class="note sun"><b>코드를 받은 뒤</b><div class="checks"><div>앱이 열리면 핵심 기능 1개부터 눌러 보기</div><div>화면 아래 “교육용 가상 데이터” 표시가 있는지 확인</div><div>안 열리거나 이상하면 P07로 한 번에 하나씩 고치기</div></div></div>
       <div class="note peach"><b>이런 기능은 넣지 않아요</b><br>실제 로그인, 실제 결제, 실제 주식 시세, 친구 연락처 불러오기. AI가 넣어 주면 빼 달라고 다시 요청하세요.</div>` },
-  { id: "f07", no: "P07", g: "sunpm", roles: ["dev"], title: "고치기·기능 추가", when: ["만드는 중 계속", "개발 담당"],
+  { id: "f07", no: "P07", g: "sunpm", roles: ["dev"], title: "고치기·기능 추가", when: ["만드는 중 계속", "기술 디렉터"],
     use: "에러가 나거나 기능을 하나 더 넣고 싶을 때 써요. 한 번에 하나씩만 고치는 게 핵심이에요.",
     fields: [{ k: "want", t: "하고 싶은 것", ph: "예: 저금 버튼을 누르면 잔액이 바로 바뀌게", area: 1 }, { k: "bug", t: "지금 보이는 문제·에러 문구", ph: "예: 버튼을 눌러도 아무 변화가 없다", area: 1 }, { k: "keep", t: "바꾸지 말아야 할 것", ph: "예: 지금 색과 화면 3장 구성" }],
     tpl: `너는 친절한 디버깅 도우미다. 지금 만든 앱을 고친다. ${RULE}
@@ -395,12 +395,12 @@ const P = [
 
 현재 코드:`,
     extra: `<div class="note lilac"><b>복사한 뒤 할 일</b><br>프롬프트 맨 끝 “현재 코드:” 아래에 지금 앱 코드 전체를 붙여 넣으세요. 같은 대화창에서 이어 고치는 중이면 생략해도 돼요.</div>` },
-  { id: "f08", no: "P08", g: "sunpm", roles: ["promo", "lead"], title: "발표 원고 만들기", when: ["공유·데모데이 전", "홍보 담당 + 리더"],
+  { id: "f08", no: "P08", g: "sunpm", roles: ["promo", "lead"], title: "발표 원고 만들기", when: ["공유·데모데이 전", "마케팅 디렉터 + 대표"],
     use: "문제 → 해결 → 시연 → 팀 소개 순서로 2분 원고와 30초 버전을 받아요. 갤러리워크에서 남는 팀원은 30초 버전을 써요.",
-    fields: [{ k: "app", t: "앱 이름", ph: "P04 앱 이름", from: ["f04_app"] }, { k: "prob", t: "해결하는 문제", ph: "P04 고른 문제", area: 1, from: ["f04_prob", "f03_pain"] }, { k: "sol", t: "해결 방법", ph: "예: 디지털 용돈을 한 화면에 모아 보여 준다", area: 1 }, { k: "demo", t: "시연 순서", ph: "예: 홈 → 나눠 담기 → 결과 그래프", area: 1 }, { k: "roles", t: "역할 소개", ph: "리더·돈 담당·개발 담당·홍보 담당·디자인 담당이 한 일", area: 1 }],
+    fields: [{ k: "app", t: "앱 이름", ph: "P04 앱 이름", from: ["f04_app"] }, { k: "prob", t: "해결하는 문제", ph: "P04 고른 문제", area: 1, from: ["f04_prob", "f03_pain"] }, { k: "sol", t: "해결 방법", ph: "예: 디지털 용돈을 한 화면에 모아 보여 준다", area: 1 }, { k: "demo", t: "시연 순서", ph: "예: 홈 → 나눠 담기 → 결과 그래프", area: 1 }, { k: "roles", t: "역할 소개", ph: "대표·운영 디렉터·기술 디렉터·마케팅 디렉터·디자인 디렉터이 한 일", area: 1 }],
     tpl: `너는 데모데이 발표 코치다. 우리 팀 앱의 발표 원고를 만든다. ${RULE}
 
-앱 이름=[{{app| }}] / 해결하는 문제=[{{prob| }}] / 해결 방법=[{{sol| }}] / 시연 순서=[{{demo| }}] / 역할 소개=[{{roles|리더·돈 담당·개발 담당·홍보 담당·디자인 담당이 한 일}}]
+앱 이름=[{{app| }}] / 해결하는 문제=[{{prob| }}] / 해결 방법=[{{sol| }}] / 시연 순서=[{{demo| }}] / 역할 소개=[{{roles|대표·운영 디렉터·기술 디렉터·마케팅 디렉터·디자인 디렉터이 한 일}}]
 
 출력: ① 2분 발표 원고(문제 → 해결 → 시연 → 팀 소개) ② 30초로 줄인 버전 ③ 예상 질문 3개와 답. 앱이 실제로 돈을 벌어 준다거나 수익을 약속하는 표현을 쓰지 마라. 아직 만들지 못한 기능은 “앞으로 만들 기능”으로 구분하라.`,
     extra: `<div class="note mint"><b>갤러리워크에서 쓰는 법</b><div class="checks"><div>남는 팀원: 30초 버전으로 우리 앱 소개</div><div>돌아다니는 팀원: 다른 팀 방명록에 의견 남기기</div><div>돌아온 팀원: 받은 의견을 팀에 정리해서 전달</div></div></div>
