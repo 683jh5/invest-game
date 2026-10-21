@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>튤립 경매</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
+<style>
+:root{
+  --bg:#F7F8FA; --card:#FFFFFF; --panel:#ECEFF4; --line:#CDCECB; --line2:#E1E4E8;
+  --ink:#1C2430; --ink2:#48535B; --ink3:#84888B;
+  --navy:#043B72; --orange:#F58220; --orange-bg:#FDF0E4; --blue:#0086B8; --rust:#AD624E; --gold:#CB6015;
+  --up:#C8463D; --down:#2F6FD0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:var(--bg);color:var(--ink);letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer}
+.app{min-height:100%;display:flex;flex-direction:column;max-width:1280px;margin:0 auto;padding:20px 24px 16px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+.brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:20px;color:var(--navy)}
+.brand i{width:6px;height:22px;border-radius:3px;background:var(--orange);display:block}
+.top small{color:var(--ink3);font-size:14px}
+.stage{flex:1;display:flex;flex-direction:column;gap:18px}
+h1{font-size:clamp(34px,5vw,60px);font-weight:800;letter-spacing:-.03em;line-height:1.2}
+h1 span,h2 span{color:var(--navy)}
+h2{font-size:clamp(26px,3.4vw,40px);font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:12px}
+h2::before{content:"";width:6px;height:1.1em;border-radius:3px;background:var(--orange)}
+.lead{font-size:clamp(17px,2vw,24px);color:var(--ink2);line-height:1.6}
+.card{background:var(--card);border:1px solid var(--line2);border-radius:18px;padding:22px}
+.cardTop{border-top:5px solid var(--navy)}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.rule{background:var(--card);border:1px solid var(--line2);border-top:5px solid var(--navy);border-radius:18px;padding:24px 18px;text-align:center;display:flex;flex-direction:column;gap:8px}
+.rule b{font-size:clamp(24px,3vw,38px);font-weight:800;color:var(--navy)}
+.rule span{font-size:clamp(15px,1.6vw,20px);color:var(--ink2);line-height:1.5}
+.rule.secret{border-top-color:var(--orange)}
+.rule.secret b{color:var(--gold)}
+.btn{border:none;border-radius:12px;padding:12px 22px;font-weight:700;font-size:17px;background:var(--navy);color:#fff}
+.btn:hover{background:#03305D}
+.btn.light{background:#fff;color:var(--navy);border:1px solid var(--line)}
+.btn.light:hover{background:var(--panel)}
+.btn.orange{background:var(--orange)}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.nav{display:flex;justify-content:space-between;gap:12px;margin-top:16px}
+label.f{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:15px}
+label.f input,label.f select{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-weight:500;width:160px}
+.note{font-size:14px;color:var(--ink3);line-height:1.6}
+/* round */
+.roundHead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.rtag{font-size:20px;font-weight:800;color:var(--navy)}
+.rtag small{font-weight:500;color:var(--ink3);margin-left:8px;font-size:15px}
+.priceBox{display:flex;align-items:baseline;gap:10px}
+.price{font-size:clamp(64px,9vw,120px);font-weight:900;color:var(--navy);line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.04em}
+.unit{font-size:26px;font-weight:800}
+.delta{font-size:18px;font-weight:800;padding:4px 12px;border-radius:999px;background:var(--panel)}
+.delta.up{color:var(--up);background:#FBE6E4}.delta.down{color:var(--down);background:#E2ECFB}
+.split{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:16px;align-items:start}
+.rumor{background:#fff;border:1px solid var(--line2);border-left:6px solid var(--blue);border-radius:14px;padding:16px 20px;font-size:clamp(20px,2.4vw,28px);font-weight:700;line-height:1.4}
+.rumor small{display:block;font-size:14px;color:var(--ink3);font-weight:700;margin-bottom:4px}
+.secretTip{background:var(--orange-bg);border-radius:14px;padding:14px 18px;font-size:17px;font-weight:700;color:var(--gold);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.timer{font:inherit;font-weight:800;border:2px solid var(--gold);background:#fff;color:var(--gold);border-radius:999px;padding:6px 16px;font-variant-numeric:tabular-nums}
+.timer.run{background:var(--gold);color:#fff}
+.chart svg{width:100%;height:auto;display:block}
+table.teams{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.teams th{font-size:13px;color:var(--ink2);font-weight:700;padding:6px 6px;border-bottom:2px solid var(--navy);text-align:center}
+.teams td{padding:6px 6px;border-bottom:1px solid var(--line2);text-align:center;font-size:16px}
+.teams td.tn{font-weight:800;color:var(--navy)}
+.step{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff}
+.step button{border:none;background:#fff;width:30px;height:32px;font-size:18px;font-weight:700;color:var(--navy)}
+.step button:hover{background:var(--panel)}
+.step b{min-width:30px;text-align:center;font-size:16px}
+.step.buy{border-color:#E9B8B3}.step.sell{border-color:#B8CBEB}
+.warn{color:var(--up);font-size:13px;font-weight:700;min-height:18px}
+/* event */
+.eventWrap{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center}
+.eventCard{width:min(560px,100%);background:#fff;border:1px solid var(--line2);border-top:8px solid var(--orange);border-radius:22px;padding:34px 28px;display:flex;flex-direction:column;gap:12px;animation:flip .7s cubic-bezier(.2,1.2,.4,1)}
+.eventCard .k{font-size:15px;font-weight:800;color:var(--gold);letter-spacing:.08em}
+.eventCard .t{font-size:clamp(30px,4vw,48px);font-weight:900;color:var(--ink)}
+.eventCard .d{font-size:20px;color:var(--ink2);line-height:1.5}
+@keyframes flip{0%{transform:rotateY(90deg) scale(.9);opacity:0}100%{transform:none;opacity:1}}
+.calcLine{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;font-size:18px;font-weight:700}
+.calcLine span{background:#fff;border:1px solid var(--line2);border-radius:999px;padding:8px 16px}
+.bigMove{display:flex;align-items:baseline;gap:16px;justify-content:center;font-variant-numeric:tabular-nums}
+.bigMove .from{font-size:40px;font-weight:800;color:var(--ink3)}
+.bigMove .to{font-size:96px;font-weight:900;color:var(--navy);line-height:1}
+/* crash */
+body.crash{background:#1C2430}
+body.crash .stage,body.crash .top{color:#fff}
+body.crash .brand{color:#fff}
+body.crash .eventCard{border-top-color:var(--up)}
+body.crash .bigMove .to{color:#FF8A7A}
+body.crash .calcLine span{color:var(--ink)}
+.shake{animation:shake .5s 2}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+/* result */
+.rank1 td{background:var(--orange-bg)}
+.rank1 .fin{color:var(--gold)}
+.qs{display:flex;flex-direction:column;gap:12px}
+.q{background:#fff;border:1px solid var(--line2);border-left:6px solid var(--navy);border-radius:14px;padding:18px 20px;font-size:clamp(19px,2.2vw,26px);font-weight:700}
+.q i{font-style:normal;color:var(--orange);margin-right:10px}
+/* print */
+.printArea{display:none}
+@media print{
+  @page{size:A4;margin:10mm}
+  body{background:#fff}
+  .app{display:none}
+  .printArea{display:block}
+  .ptitle{font-size:14pt;font-weight:800;margin:0 0 6mm}
+  .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}
+  .pcard{border:1px dashed #84888B;border-radius:3mm;padding:4mm;height:38mm;display:flex;flex-direction:column;gap:2mm;break-inside:avoid}
+  .pcard .h{font-size:9pt;font-weight:800;color:#043B72}
+  .pcard .h b{color:#CB6015}
+  .pcard .x{font-size:12pt;font-weight:700;line-height:1.4}
+  .pcard .f{margin-top:auto;font-size:7.5pt;color:#84888B}
+  .pteam{break-after:page}
+}
+@media (max-width:900px){.split,.grid3,.grid4{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><div class="brand"><i></i>튤립 경매</div><small id="topinfo">청소년 AI금융캠프 · 강사 화면</small></div>
+  <div class="stage" id="stage"></div>
+</div>
+<div class="printArea" id="printArea"></div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const KEY='tulip-auction-v2';
+const START_COIN=100, START_PRICE=10, MAX_ROUND=7;
+
+/* ---------- 시나리오(같은 코드 = 같은 사건 · 같은 비밀 소문) ---------- */
+function rng(seed){let a=seed>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function seedOf(code){let h=2166136261;for(const c of String(code).toUpperCase())h=Math.imul(h^c.charCodeAt(0),16777619);return h>>>0}
+const EVENTS=[
+  {id:'harvest',t:'흉년',d:'올해 튤립 알뿌리가 잘 안 자랐대요. 귀해졌어요!',p:.30,hintT:'올해 흉년이라 튤립이 귀해진대',hintF:'올해 풍년이라 튤립이 넘쳐난대'},
+  {id:'merchant',t:'외국 상인 도착',d:'먼 나라 상인들이 튤립을 찾고 있어요.',p:.20,hintT:'외국 상인들이 튤립을 사러 온대',hintF:'외국 상인들이 튤립을 팔러 온대'},
+  {id:'party',t:'귀족 파티',d:'파티에서 튤립 장식이 유행이에요.',p:.15,hintT:'귀족 파티에서 튤립이 유행할 거래',hintF:'귀족들이 이제 튤립에 질렸대'},
+  {id:'calm',t:'조용한 하루',d:'특별한 소식이 없어요.',p:0,hintT:'이번엔 별일 없을 거래',hintF:'왕실이 튤립을 몽땅 사들인대'},
+  {id:'newtype',t:'새 품종 등장',d:'더 예쁘고 흔한 새 튤립이 나왔어요.',p:-.20,hintT:'더 예쁜 새 품종이 곧 나온대',hintF:'새 품종은 다 실패했대'},
+  {id:'rain',t:'봄비 풍년',d:'비가 알맞게 와서 꽃이 많이 피었어요.',p:-.15,hintT:'꽃이 엄청 많이 필 거래',hintF:'꽃이 하나도 안 필 거래'}
+];
+const CRASH={id:'crash',t:'아무도 안 산대…',d:'갑자기 사겠다는 사람이 사라졌어요. 가격이 무너집니다!',hintT:'곧 아무도 안 살 거래. 조심해!',hintF:'이번에 가격이 두 배로 뛴대!'};
+const HYPE=['다들 튤립 이야기뿐이야','옆 마을에서 두 배에 팔렸대','이웃집 아저씨도 샀대','지금 안 사면 늦는대!','튤립 하나로 집을 샀대','내일은 더 오른대!','이번이 마지막 기회래'];
+function makeScenario(code){
+  const r=rng(seedOf(code));
+  const crash=4+Math.floor(r()*4); // 4~7라운드
+  const ev=[];let last=null;
+  for(let i=1;i<=MAX_ROUND;i++){let e;do{e=EVENTS[Math.floor(r()*EVENTS.length)]}while(last&&e.id===last.id);ev.push(e);last=e}
+  const hype=HYPE.slice().sort(()=>r()-.5);
+  const secrets={}; // secrets[team][round] = {text,truth}
+  for(let t=1;t<=12;t++){secrets[t]={};for(let k=1;k<=MAX_ROUND;k++){
+    const e=k===crash?CRASH:ev[k-1];const truth=r()<.55;
+    secrets[t][k]={text:truth?e.hintT:e.hintF,truth}}}
+  return {code:String(code).toUpperCase(),crash,ev,hype,secrets};
+}
+
+/* ---------- 상태 ---------- */
+let S=load()||fresh(7,'A');
+function fresh(n,code){return{scr:'setup',n,code,round:1,price:START_PRICE,hist:[START_PRICE],teams:mkTeams(n),orders:{},last:null}}
+function mkTeams(n){const o={};for(let t=1;t<=n;t++)o[t]={coin:START_COIN,tulip:0};return o}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{return JSON.parse(localStorage.getItem(KEY))}catch(e){return null}}
+let SC=makeScenario(S.code);
+let timer=null;
+function go(scr){S.scr=scr;save();render()}
+
+/* ---------- 화면 ---------- */
+function chart(){
+  const h=S.hist,W=640,H=200,pl=40,pr=16,pt=16,pb=30;
+  const max=Math.max(40,...h)*1.15,n=Math.max(h.length,4);
+  const x=i=>pl+i*((W-pl-pr)/(n-1)),y=v=>pt+(H-pt-pb)*(1-v/max);
+  let g='';
+  const step=max>200?100:max>80?40:20;
+  for(let v=0;v<=max;v+=step)g+=`<line x1="${pl}" x2="${W-pr}" y1="${y(v)}" y2="${y(v)}" stroke="#CDCECB" stroke-width="1"/><text x="${pl-6}" y="${y(v)+4}" text-anchor="end" font-size="12" fill="#84888B">${v}</text>`;
+  h.forEach((v,i)=>{g+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="12" fill="#84888B">${i===0?'시작':i+'R'}</text>`});
+  g+=`<polyline points="${h.map((v,i)=>x(i)+','+y(v)).join(' ')}" fill="none" stroke="#043B72" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>`;
+  h.forEach((v,i)=>{const L=i===h.length-1;g+=`<circle cx="${x(i)}" cy="${y(v)}" r="${L?8:5}" fill="${L?'#F58220':'#fff'}" stroke="${L?'#F58220':'#043B72'}" stroke-width="3"/>`});
+  return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="라운드별 튤립 가격">${g}</svg>`;
+}
+const scenes={
+  setup:()=>`
+    <h1>400년 전 네덜란드,<br><span>꽃 한 송이에 왜 그렇게 큰돈을?</span></h1>
+    <p class="lead">튤립 알뿌리 값이 오르고 또 올랐어요. 오늘은 우리 팀이 그 시장에 들어가 봅니다.</p>
+    <div class="card cardTop">
+      <div class="row" style="align-items:flex-end">
+        <label class="f">팀 수<input id="n" type="number" min="2" max="12" value="${S.n}"></label>
+        <label class="f">시나리오 코드<input id="code" type="text" maxlength="8" value="${S.code}"></label>
+        <button class="btn light" id="print">비밀 소문 카드 인쇄</button>
+        <button class="btn" id="startBtn">게임 준비 →</button>
+      </div>
+      <p class="note" style="margin-top:12px">시나리오 코드가 같으면 사건 카드 · 폭락 라운드 · 비밀 소문이 똑같이 나와요. 수업 전에 같은 코드로 비밀 소문 카드를 인쇄해 팀별로 나눠 두세요. 반마다 코드를 바꾸면(예: A, B, C) 매번 다른 게임이 돼요.</p>
+    </div>
+    ${S.round>1||S.hist.length>1?`<div class="row"><button class="btn light" id="resume">진행 중인 게임 이어 하기 (${S.round}라운드)</button></div>`:''}`,
+  rules:()=>`
+    <h2>게임 <span>규칙</span></h2>
+    <div class="grid4">
+      <div class="rule"><b>100코인</b><span>팀마다 받고 시작<br>튤립 값은 10코인부터</span></div>
+      <div class="rule"><b>사기 · 팔기 · 그대로</b><span>라운드마다 몇 개든<br>몰래 정해서 강사에게</span></div>
+      <div class="rule"><b>값은 우리가 정해요</b><span>사는 팀이 많으면 오르고<br>파는 팀이 많으면 내려요</span></div>
+      <div class="rule secret"><b>끝은 비밀!</b><span>몇 라운드에 끝날지<br>아무도 몰라요</span></div>
+    </div>
+    <div class="grid3">
+      <div class="rule secret"><b>비밀 소문 카드</b><span>라운드마다 팀별로 다른 쪽지<br>진짜일 수도, 가짜일 수도</span></div>
+      <div class="rule secret"><b>사건 카드</b><span>거래가 끝나면 공개<br>값이 더 오르거나 내려요</span></div>
+      <div class="rule"><b>최종 점수</b><span>남은 코인 + 튤립 수 × 마지막 값</span></div>
+    </div>`,
+  round:()=>{
+    const r=S.round,hype=SC.hype[(r-1)%SC.hype.length];
+    const prev=S.hist.length>1?S.hist[S.hist.length-2]:null;
+    const pct=prev?Math.round((S.price-prev)/prev*100):null;
+    const dcls=pct===null?'':pct>0?'up':pct<0?'down':'';
+    const dtxt=pct===null?'시작 값':pct>0?`▲ ${pct}%`:pct<0?`▼ ${Math.abs(pct)}%`:'변동 없음';
+    let rows='';
+    for(let t=1;t<=S.n;t++){const T=S.teams[t],o=S.orders[t]||{b:0,s:0};
+      rows+=`<tr><td class="tn">${t}팀</td><td>${T.coin}</td><td>${T.tulip}</td>
+      <td><span class="step buy"><button data-t="${t}" data-k="b" data-d="-1" aria-label="${t}팀 사기 줄이기">−</button><b>${o.b}</b><button data-t="${t}" data-k="b" data-d="1" aria-label="${t}팀 사기 늘리기">+</button></span></td>
+      <td><span class="step sell"><button data-t="${t}" data-k="s" data-d="-1" aria-label="${t}팀 팔기 줄이기">−</button><b>${o.s}</b><button data-t="${t}" data-k="s" data-d="1" aria-label="${t}팀 팔기 늘리기">+</button></span></td></tr>`}
+    return `
+    <div class="roundHead"><div class="rtag">${r}라운드<small>몇 라운드에 끝날지는 비밀</small></div>
+      <div class="priceBox"><span class="price">${S.price}</span><span class="unit">코인</span><span class="delta ${dcls}">${dtxt}</span></div></div>
+    <div class="split">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="rumor"><small>시장에 도는 소문</small>“${hype}”</div>
+        <div class="secretTip"><span>${r}라운드 비밀 소문 카드를 펼쳐 보세요. 믿을까, 말까?</span><button class="timer" id="timer">60초 고민</button></div>
+        <div class="card chart">${chart()}</div>
+      </div>
+      <div class="card">
+        <table class="teams"><thead><tr><th>팀</th><th>코인</th><th>튤립</th><th>사기</th><th>팔기</th></tr></thead><tbody>${rows}</tbody></table>
+        <div class="warn" id="warn"></div>
+        <div class="row" style="justify-content:flex-end;margin-top:6px"><button class="btn orange" id="deal">거래 확정 → 사건 카드</button></div>
+      </div>
+    </div>`},
+  event:()=>{
+    const L=S.last,crash=L.crash;
+    return `<div class="eventWrap ${crash?'shake':''}">
+      <div class="rtag" style="${crash?'color:#FF8A7A':''}">${L.round}라운드 사건 카드</div>
+      <div class="eventCard"><div class="k">${crash?'폭락':'사건'}</div><div class="t">${L.ev.t}</div><div class="d">${L.ev.d}</div></div>
+      <div class="calcLine">
+        <span>산 튤립 ${L.bought}개 · 판 튤립 ${L.sold}개 → 수요 ${fmtPct(L.demand)}</span>
+        ${crash?'':`<span>사건 ${fmtPct(L.ev.p)}</span>`}
+      </div>
+      <div class="bigMove"><span class="from">${L.from}</span><span style="font-size:40px">→</span><span class="to">${L.to}</span><span style="font-size:28px;font-weight:800">코인</span></div>
+      ${crash?'<p class="lead" style="color:#CDCECB">시장이 끝났어요. 지금 가진 튤립은 이 값으로만 계산돼요.</p>':''}
+    </div>`},
+  result:()=>{
+    const fin=S.price,data=[];
+    for(let t=1;t<=S.n;t++){const T=S.teams[t];data.push({t,coin:T.coin,tulip:T.tulip,f:T.coin+T.tulip*fin})}
+    const order=data.map(d=>d.f).sort((a,b)=>b-a);
+    const rows=data.map(d=>{const rk=order.indexOf(d.f)+1;return `<tr class="${rk===1?'rank1':''}"><td class="tn">${d.t}팀</td><td>${d.coin}</td><td>${d.tulip}</td><td class="fin" style="font-weight:800">${d.f}</td><td>${rk}위</td></tr>`}).join('');
+    return `<h2>최종 <span>결과</span></h2>
+    <div class="split"><div class="card"><table class="teams"><thead><tr><th>팀</th><th>남은 코인</th><th>튤립</th><th>최종</th><th>순위</th></tr></thead><tbody>${rows}</tbody></table>
+    <p class="note" style="margin-top:10px">최종 = 남은 코인 + 튤립 수 × ${fin}코인(마지막 값) · 시작은 모두 100코인</p></div>
+    <div class="card chart">${chart()}<p class="note">폭락은 ${SC.crash}라운드였어요. 시나리오 ${SC.code}</p></div></div>`},
+  review:()=>`<h2>돌아보기</h2><div class="qs">
+    <div class="q"><i>Q1</i>우리 팀은 왜 샀을까? 소문, 분위기, 근거 중 무엇이었나요?</div>
+    <div class="q"><i>Q2</i>비밀 소문 카드는 진짜였나요? 어떻게 알 수 있었을까요?</div>
+    <div class="q"><i>Q3</i>값을 올린 건 튤립일까요, 우리일까요?</div></div>
+    <p class="note">튤립 파동 이야기 자체도 실제보다 부풀려져 전해졌다는 연구가 있어요 (Anne Goldgar, 『Tulipmania』, 2007). 게임 속 값과 사건은 모두 수업용 가상 설정이에요.</p>`
+};
+const ORDER=['setup','rules','round','event','result','review'];
+function fmtPct(p){const v=Math.round(p*100);return v>0?`+${v}%`:`${v}%`}
+
+function render(){
+  stopTimer();
+  document.body.classList.toggle('crash',S.scr==='event'&&S.last&&S.last.crash);
+  const st=$('#stage');st.innerHTML=scenes[S.scr]()+navHtml();
+  $('#topinfo').textContent=`청소년 AI금융캠프 · 강사 화면 · 시나리오 ${S.code}`;
+  bind();
+}
+function navHtml(){
+  const s=S.scr;
+  if(s==='setup')return '';
+  let prev='',next='';
+  if(s==='rules'){prev='<button class="btn light" data-go="setup">← 처음</button>';next='<button class="btn" data-go="round">1라운드 시작 →</button>'}
+  if(s==='event'){next=S.last.crash?'<button class="btn" data-go="result">최종 결과 →</button>':`<button class="btn" id="nextRound">${S.round}라운드로 →</button>`}
+  if(s==='result'){next='<button class="btn" data-go="review">돌아보기 →</button>'}
+  if(s==='review'){prev='<button class="btn light" data-go="result">← 결과</button>';next='<button class="btn light" id="reset">새 게임</button>'}
+  if(s==='round'){prev='<span></span>'}
+  return `<div class="nav">${prev||'<span></span>'}${next}</div>`;
+}
+function bind(){
+  document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>go(b.dataset.go));
+  const sb=$('#startBtn');if(sb)sb.onclick=()=>{const n=Math.max(2,Math.min(12,parseInt($('#n').value)||7));const code=($('#code').value||'A').trim().toUpperCase();S=fresh(n,code);SC=makeScenario(code);go('rules')};
+  const rs=$('#resume');if(rs)rs.onclick=()=>go('round');
+  const pr=$('#print');if(pr)pr.onclick=()=>{const n=Math.max(2,Math.min(12,parseInt($('#n').value)||7));const code=($('#code').value||'A').trim().toUpperCase();printCards(n,makeScenario(code));};
+  const nr=$('#nextRound');if(nr)nr.onclick=()=>go('round');
+  const re=$('#reset');if(re)re.onclick=()=>{if(confirmReset())go('setup')};
+  document.querySelectorAll('.step button').forEach(b=>b.onclick=()=>{
+    const t=b.dataset.t,k=b.dataset.k,d=+b.dataset.d;const o=S.orders[t]=S.orders[t]||{b:0,s:0};const T=S.teams[t];
+    let v=o[k]+d;if(v<0)v=0;
+    if(k==='b'&&v>0){o.s=0;if(v*S.price>T.coin){$('#warn').textContent=`${t}팀은 코인이 부족해요 (최대 ${Math.floor(T.coin/S.price)}개)`;return}}
+    if(k==='s'&&v>0){o.b=0;if(v>T.tulip){$('#warn').textContent=`${t}팀은 튤립이 ${T.tulip}개뿐이에요`;return}}
+    o[k]=v;save();render();
+  });
+  const tb=$('#timer');if(tb)tb.onclick=()=>{
+    if(timer){stopTimer();tb.classList.remove('run');tb.textContent='60초 고민';return}
+    let s=60;tb.classList.add('run');tb.textContent=s+'초';
+    timer=setInterval(()=>{s--;tb.textContent=s>0?s+'초':'결정!';if(s<=0){stopTimer();tb.classList.remove('run')}},1000);
+  };
+  const dl=$('#deal');if(dl)dl.onclick=deal;
+}
+function confirmReset(){S=fresh(S.n,S.code);SC=makeScenario(S.code);save();return true}
+function stopTimer(){if(timer){clearInterval(timer);timer=null}}
+
+function deal(){
+  const r=S.round,p=S.price;let bought=0,sold=0;
+  for(let t=1;t<=S.n;t++){const o=S.orders[t]||{b:0,s:0},T=S.teams[t];
+    if(o.b){T.coin-=o.b*p;T.tulip+=o.b;bought+=o.b}
+    if(o.s){T.coin+=o.s*p;T.tulip-=o.s;sold+=o.s}}
+  const crash=r===SC.crash;
+  const demand=Math.max(-.5,Math.min(.8,.4*(bought-sold)/S.n));
+  let to;let ev;
+  if(crash){ev=CRASH;to=Math.max(1,Math.round(p*.08))}
+  else{ev=SC.ev[r-1];to=Math.max(1,Math.round(p*(1+demand+ev.p)))}
+  S.last={round:r,from:p,to,bought,sold,demand,crash,ev:{t:ev.t,d:ev.d,p:ev.p||0}};
+  S.price=to;S.hist.push(to);S.orders={};
+  if(!crash)S.round=r+1;
+  go('event');
+}
+
+/* ---------- 비밀 소문 카드 인쇄 ---------- */
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function printCards(n,sc){
+  let h='';
+  for(let t=1;t<=n;t++){
+    h+=`<div class="pteam"><p class="ptitle">튤립 경매 · ${t}팀 비밀 소문 카드 (시나리오 ${esc(sc.code)}) — 라운드마다 한 장씩 펼쳐요</p><div class="pgrid">`;
+    for(let k=1;k<=MAX_ROUND;k++){h+=`<div class="pcard"><div class="h">${t}팀 · <b>${k}라운드</b> 비밀 소문</div><div class="x">“${esc(sc.secrets[t][k].text)}”</div><div class="f">진짜일 수도, 가짜일 수도 있어요. 다른 팀에 알려 줄지는 우리 팀이 정해요.</div></div>`}
+    h+='</div></div>';
+  }
+  $('#printArea').innerHTML=h;window.print();
+}
+
+/* 키보드: → 다음 */
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='INPUT')return;
+  if(e.key==='ArrowRight'){const b=[...document.querySelectorAll('.nav .btn')].pop();if(b&&!b.disabled&&b.id!=='reset')b.click()}
+});
+render();
+})();
+</script>
+</body>
+</html>
