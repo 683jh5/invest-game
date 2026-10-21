@@ -456,6 +456,7 @@ details.ex summary::before{background:#ECEFF4}
 .resume{grid-template-columns:minmax(0,1fr) auto}
 .toast{padding:10px 18px}
 @media (max-width:760px){.resume{grid-template-columns:minmax(0,1fr)}}
+.rolecard .pn .hl{font-style:normal;text-decoration:underline;text-decoration-color:#F58220;text-decoration-thickness:3px;text-underline-offset:3px}
 </style>
 
 <div class="wrap">
@@ -517,7 +518,7 @@ details.ex summary::before{background:#ECEFF4}
   <section class="station" data-station="quiz" id="st-quiz" hidden>
     <div class="guide"><div class="head"><span class="kicker">01 복습 퀴즈 <span class="keyholder p-cfo" data-owner="cfo"></span></span><h2>어제 배운 돈 감각, 기억나요?</h2><p class="goal">토요일 모의투자를 떠올리며 4문제를 풀어요. 틀려도 괜찮아요. 고르면 바로 설명이 나와요.</p><div class="bubble" data-say="quiz"></div></div></div>
     <div class="card">
-      <div class="qtop"><div><span class="tagp p-cfo">살림꾼 도장 재료</span></div><div class="qdots" id="qdots"></div></div>
+      <div class="qtop"><div><span class="tagp p-cfo">뱅커 도장 재료</span></div><div class="qdots" id="qdots"></div></div>
       <div class="qcard" id="qcard"></div>
     </div>
     <div class="navfoot"><button class="btn light" data-go="start">← 팀 만들기</button><button class="btn blue" data-go="ad">02 광고 배틀로 →</button></div>
@@ -614,8 +615,8 @@ details.ex summary::before{background:#ECEFF4}
         <div><div class="clock" id="clock">15:00</div><div class="small muted">15분 스프린트</div></div>
         <div class="phases">
           <div class="phase" data-ph="0"><div class="tm">처음 5분 · 리더</div><b>고객 · 돈 고민</b><div class="fill"><i></i></div></div>
-          <div class="phase" data-ph="1"><div class="tm">다음 5분 · 개발자</div><b>해결 아이디어 · 핵심 기능</b><div class="fill"><i></i></div></div>
-          <div class="phase" data-ph="2"><div class="tm">마지막 5분 · 마케팅 · 살림꾼</div><b>앱 이름 · 돈 버는 방법</b><div class="fill"><i></i></div></div>
+          <div class="phase" data-ph="1"><div class="tm">다음 5분 · 메이커</div><b>해결 아이디어 · 핵심 기능</b><div class="fill"><i></i></div></div>
+          <div class="phase" data-ph="2"><div class="tm">마지막 5분 · 스토리텔러 · 뱅커</div><b>앱 이름 · 돈 버는 방법</b><div class="fill"><i></i></div></div>
         </div>
         <div class="row-btns"><button class="btn green" type="button" id="tstart">시작</button><button class="btn light" type="button" id="treset">처음으로</button></div>
       </div>
@@ -766,9 +767,9 @@ function mood(el, m) { const s = el && el.querySelector(".mascot"); if (s) s.set
 /* ---------- data ---------- */
 const ROLES = [
   { k: "ceo", n: "리더", c: "CEO", d: "팀 방향을 정하고 고객을 고르고, 최종 발표를 이끌어요.", how: "팀 · 고객 · 캔버스 1–2" },
-  { k: "cfo", n: "살림꾼", c: "CFO", d: "돈 감각 담당. 우리 앱이 어떻게 돈을 벌지 정해요.", how: "퀴즈 · 캔버스 6" },
-  { k: "cto", n: "개발자", c: "CTO", d: "AI를 다루는 담당. 기능을 정하고 프롬프트를 챙겨요.", how: "AI 검증 · 캔버스 3–4" },
-  { k: "cmo", n: "마케팅", c: "CMO", d: "앱 이름과 광고 문구, 한 문장 소개를 맡아요.", how: "광고 배틀 · 소개" },
+  { k: "cfo", n: "뱅커", c: "CFO", d: "돈 감각 담당. 우리 앱이 어떻게 돈을 벌지 정해요.", how: "퀴즈 · 캔버스 6" },
+  { k: "cto", n: "메이커", c: "CTO", d: "AI를 다루는 담당. 기능을 정하고 프롬프트를 챙겨요.", how: "AI 검증 · 캔버스 3–4" },
+  { k: "cmo", n: "스토리텔러", c: "CMO", d: "앱 이름과 광고 문구, 한 문장 소개를 맡아요.", how: "광고 배틀 · 소개" },
   { k: "cdo", n: "디자이너", c: "CDO", d: "앱 색과 화면 세 장의 모양을 정해요.", how: "화면 설계 3장" },
 ];
 const RNAME = Object.fromEntries(ROLES.map((r) => [r.k, r.n]));
@@ -786,7 +787,7 @@ const STATIONS = [
 ];
 const SAY = {
   start: "역할이 모두 주인을 찾으면 출발! 빈 역할이 없게 나눠 봐요.",
-  quiz: "살림꾼, 출동! 팀원들이랑 의논해서 골라도 돼요.",
+  quiz: "뱅커, 출동! 팀원들이랑 의논해서 골라도 돼요.",
   ad: "정답보다 ‘왜’가 중요해요. 이유를 꼭 적어 줘요!",
   cust: "고객 한 명만 골라요. 한 명을 제대로 도와야 모두를 도울 수 있어요.",
   ai: "질문은 한 글자도 바꾸지 않기! 출처는 직접 열어 보기!",
@@ -858,7 +859,7 @@ const TICKET = ["tk_name", "tk_customer", "tk_problem", "tk_solve"];
 const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
 $("#trail").innerHTML = STATIONS.map((s) => `<button type="button" class="node ${s.r ? "p-" + s.r : ""}" data-go="${s.id}" id="nav-${s.id}"><span class="dot">${s.no}</span><span class="lbl">${s.t}</span><span class="tm">${s.r === "all" ? "모두" : s.r ? RNAME[s.r] : "PDF · Word"}</span></button>`).join("");
 $("#stamps").innerHTML = ROLES.map((r) => `<div class="stamp p-${r.k}" data-stamp="${r.k}"><div class="seal">${r.c}</div><div class="nm">${r.n}</div><div class="how">${r.how}</div></div>`).join("");
-$("#rolecards").innerHTML = ROLES.map((r) => `<div class="rolecard p-${r.k}"><span class="pn">${r.c}</span><h3>${r.n}</h3><p>${r.d}</p><div class="who" data-rolewho="${r.k}"></div></div>`).join("");
+$("#rolecards").innerHTML = ROLES.map((r) => `<div class="rolecard p-${r.k}"><span class="pn">${r.c[0]}<em class="hl">${r.c[1]}</em>${r.c.slice(2)}</span><h3>${r.n}</h3><p>${r.d}</p><div class="who" data-rolewho="${r.k}"></div></div>`).join("");
 $("#members").innerHTML = [1, 2, 3, 4, 5].map((i) => `<div class="member"><span class="no">${i}</span><input type="text" id="f-m${i}" data-f="m${i}" placeholder="${i <= 3 ? "팀원 이름" : "팀원 이름 (있으면)"}" aria-label="팀원 ${i} 이름" autocomplete="off"><div class="rolebtns">${ROLES.map((r) => `<button type="button" class="p-${r.k}" data-m="${i}" data-role="${r.k}" aria-pressed="false">${r.n}<small>${r.c}</small></button>`).join("")}</div></div>`).join("");
 $("#cases").innerHTML = CASES.map((c) => `<button type="button" class="case" data-pick="case" data-v="${esc(c.v)}"><span class="art" style="--bgc:${c.bg}" aria-hidden="true">${ART[c.ic]}</span><b>${esc(c.v)}</b><span class="d">${esc(c.d)}</span><span class="q">${esc(c.q)}</span></button>`).join("");
 $("#board").innerHTML = CANVAS.map((c, i) => `<div class="sticky p-${c.r}" data-cv="${c.k}" data-ph="${c.ph}" style="--nc:${c.nc};--rot:${c.rot}"><div class="sn"><span class="own">${RNAME[c.r]}</span><span>0${i + 1}</span><span class="ok">붙였어요</span></div><label for="f-${c.k}">${c.t}</label><span class="small" style="color:var(--ink-2)">${c.hint}</span><textarea id="f-${c.k}" data-f="${c.k}" placeholder="우리 고객의 말로 써요"></textarea><details class="ex"><summary>하늘지갑 예시 보기</summary><div class="exbody"><span>${esc(c.ex)}</span><button type="button" class="linkbtn" data-copyex="${i}">복사</button></div></details></div>`).join("");
@@ -1216,8 +1217,8 @@ $("#tstart").addEventListener("click", () => {
   $("#tstart").textContent = "잠깐 멈춤"; say("canvas", "출발! 리더가 고객과 돈 고민부터 써요.", "wow");
   timer = setInterval(() => {
     left = Math.max(0, left - 1);
-    if (left === 600) { toast("5분! 개발자에게 키보드를 넘겨요"); say("canvas", "개발자 차례! 해결 아이디어와 기능 세 가지예요.", "happy"); }
-    if (left === 300) { toast("10분! 마케팅·살림꾼 차례예요"); say("canvas", "마지막! 앱 이름과 돈 버는 방법이에요.", "happy"); }
+    if (left === 600) { toast("5분! 메이커에게 키보드를 넘겨요"); say("canvas", "메이커 차례! 해결 아이디어와 기능 세 가지예요.", "happy"); }
+    if (left === 300) { toast("10분! 스토리텔러·뱅커 차례예요"); say("canvas", "마지막! 앱 이름과 돈 버는 방법이에요.", "happy"); }
     if (left === 60) toast("1분 남았어요", "wow");
     if (left === 0) { clearInterval(timer); timer = null; $("#tstart").textContent = "다시 시작"; toast("15분 끝! 화면 설계로 넘어가요", "wow"); }
     drawClock();
