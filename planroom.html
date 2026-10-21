@@ -1492,6 +1492,7 @@ hydrate();
 Object.assign(prevStamps, stamps());
 const startId = (location.hash || "").replace("#", "");
 show(STATIONS.some((s) => s.id === startId) ? startId : "start", false);
+window.addEventListener("hashchange", () => { const h = (location.hash || "").replace("#", ""); if (STATIONS.some((s) => s.id === h)) show(h, true); });
 drawClock();
 window.addEventListener("resize", () => $$(`[data-station="${current}"] textarea`).forEach(autosize));
 })();
