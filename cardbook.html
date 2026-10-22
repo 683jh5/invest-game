@@ -215,7 +215,7 @@ textarea:focus,input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(4,
 <div class="wrap stack">
   <header class="hero">
     <div>
-      <div class="chips"><span class="chip">청소년 AI금융캠프</span><span class="chip">중등 · 무박 2일</span><span class="chip">2050 금융 서비스 만들기</span></div>
+      <div class="chips"><span class="chip">청소년 AI금융캠프</span><span class="chip">중등 · 무박 2일</span><span class="chip">미래 금융 서비스 만들기</span></div>
       <h1>프롬프트 카드북</h1>
       <p class="lede">P01–P08을 언제, 누가 쓰는지 보고 빈칸만 채워서 복사하세요. 앞 카드에 쓴 앱 이름·기능은 뒤 카드에 자동으로 들어가요.</p>
       <div class="say">내 역할 카드부터 찾아요! 쓴 내용은 이 노트북에 남아서 내일도 이어 쓸 수 있어요.</div>
@@ -232,7 +232,7 @@ textarea:focus,input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(4,
     <p class="cap">캠프 이틀을 네 블록으로 나눈 지도예요. 배지를 누르면 해당 카드로 이동해요.</p>
     <div class="map">
       <div class="stop g-satam"><span class="tm">1일차 오전</span><span class="who">한 강사</span><span class="st">모의투자 돌아보기</span><div class="pbs"><a class="pb" href="#f01">P01</a></div></div>
-      <div class="stop g-satpm"><span class="tm">1일차 오후</span><span class="who">원 강사</span><span class="st">2050 금융생활 상상</span><div class="pbs"><a class="pb" href="#f02">P02</a></div></div>
+      <div class="stop g-satpm"><span class="tm">1일차 오후</span><span class="who">원 강사</span><span class="st">미래 금융생활 상상</span><div class="pbs"><a class="pb" href="#f02">P02</a></div></div>
       <div class="stop g-sunam"><span class="tm">2일차 오전</span><span class="who">한 강사</span><span class="st">문제 → 기획 → 화면</span><div class="pbs"><a class="pb" href="#f03">P03</a><a class="pb" href="#f04">P04</a><a class="pb" href="#f05">P05</a></div></div>
       <div class="stop g-sunpm"><span class="tm">2일차 오후</span><span class="who">원 강사</span><span class="st">만들기 → 발표</span><div class="pbs"><a class="pb" href="#f06">P06</a><a class="pb" href="#f07">P07</a><a class="pb" href="#f08">P08</a></div></div>
     </div>
@@ -253,7 +253,7 @@ textarea:focus,input:focus{border-color:var(--navy);box-shadow:0 0 0 3px rgba(4,
       </div>
       <div class="specimen" id="specimen">
         <mark class="k1" data-p="1"><span class="tag">역할</span>너는 중학생 창업팀의 서비스 기획 코치다.</mark>
-        <mark class="k2" data-p="2"><span class="tag">맥락</span>우리 팀의 2050 금융 서비스 기획 캔버스를 만든다.</mark>
+        <mark class="k2" data-p="2"><span class="tag">맥락</span>우리 팀의 미래 금융 서비스 기획 캔버스를 만든다.</mark>
         <mark class="k6" data-p="6"><span class="tag">안전</span>실제 회사·종목을 추천하거나 실제 투자를 권하지 마라. “수익 보장” 같은 표현을 쓰지 마라. 가격·수익률은 가상 데이터라고 표시하라.</mark><br>
         <mark class="k3" data-p="3"><span class="tag">자료</span>팀 이름=[ ] / 고른 문제=[ ] / 앱 이름 아이디어=[ ] / 핵심 기능 아이디어=[ ] / 돈 흐름 아이디어=[ ]</mark><br>
         <mark class="k4" data-p="4"><span class="tag">요청</span>(1) 사용자 (2) 문제 (3) 앱 이름과 한 줄 소개 (4) 핵심 기능 3개 (5) 화면 3장 (6) 신뢰·안전 장치와 돈 흐름</mark>
@@ -316,22 +316,22 @@ const P = [
 출력: ① 내 결정 한 줄 요약 ② 잘한 점 1개 ③ 다시 한다면 바꿀 점 1개 ④ 다음에 사기 전에 확인할 질문 2개. 운이 좋았던 것과 잘 판단한 것을 구분하라. 중학생이 이해할 수 있는 쉬운 말로 써라.`,
     extra: `<div class="note peach"><b>게임 속 회사는 모두 가상이에요</b><br>AI가 실제 회사 이름을 꺼내거나 “이 주식을 사라”고 하면 그 부분은 지우고 검토 질문 3번을 다시 보세요.</div>
       <div class="note sun"><b>팀 이야기로 이어가기</b><div class="checks"><div>팀원 한 명씩 ③ ‘바꿀 점’을 말하기</div><div>공통으로 나온 질문은 P03 문제 정의의 근거로 쓰기</div></div></div>` },
-  { id: "f02", no: "P02", g: "satpm", roles: ["all"], title: "2050 금융생활 상상하기", when: ["금융·디지털자산 수업 뒤", "개인 또는 팀"],
-    use: "오후 수업에서 배운 키워드로 2050년 하루를 장면으로 그려요. 지금 있는 기술과 아직 상상인 것을 나눠 줘요.",
-    fields: [{ k: "kw", t: "오늘 배운 키워드", ph: "예: 디지털자산, 토큰, 자동 투자" }, { k: "who", t: "주인공", ph: "예: 2050년의 나, 할머니가 된 엄마" }, { k: "q", t: "궁금한 점", ph: "예: 돈이 다 디지털이 되면 잃어버릴 일은 없을까?", area: 1 }],
-    tpl: `너는 2050년 금융생활을 함께 상상하는 미래 연구원이다. 오늘 오후 수업에서 배운 내용을 바탕으로 2050년의 하루 장면을 만든다. ${RULE}
+  { id: "f02", no: "P02", g: "satpm", roles: ["all"], title: "미래 금융생활 상상하기", when: ["금융·디지털자산 수업 뒤", "개인 또는 팀"],
+    use: "오후 수업에서 배운 키워드로 미래의 하루를 장면으로 그려요. 지금 있는 기술과 아직 상상인 것을 나눠 줘요.",
+    fields: [{ k: "kw", t: "오늘 배운 키워드", ph: "예: 디지털자산, 토큰, 자동 투자" }, { k: "who", t: "주인공", ph: "예: 미래의 나, 할머니가 된 엄마" }, { k: "q", t: "궁금한 점", ph: "예: 돈이 다 디지털이 되면 잃어버릴 일은 없을까?", area: 1 }],
+    tpl: `너는 미래 금융생활을 함께 상상하는 미래 연구원이다. 오늘 오후 수업에서 배운 내용을 바탕으로 미래의 하루 장면을 만든다. ${RULE}
 
-입력: 배운 키워드=[{{kw| }}] / 주인공=[{{who|2050년의 나 또는 가족}}] / 궁금한 점=[{{q| }}]
+입력: 배운 키워드=[{{kw| }}] / 주인공=[{{who|미래의 나 또는 가족}}] / 궁금한 점=[{{q| }}]
 
-출력: ① 2050년 하루 속 돈과 관련된 장면 3개(아침·낮·저녁) ② 각 장면에서 생길 수 있는 불편이나 위험 1개 ③ 지금 이미 있는 기술과 아직 상상인 것을 표로 구분. 미래 예측을 사실처럼 단정하지 말고 “~일 수도 있다”로 써라.`,
+출력: ① 미래의 하루 속 돈과 관련된 장면 3개(아침·낮·저녁) ② 각 장면에서 생길 수 있는 불편이나 위험 1개 ③ 지금 이미 있는 기술과 아직 상상인 것을 표로 구분. 미래 예측을 사실처럼 단정하지 말고 “~일 수도 있다”로 써라.`,
     extra: `<div class="note lilac"><b>내일 아침에 다시 써요</b><br>② ‘불편이나 위험’은 2일차 P03의 재료예요. 마음에 드는 것 하나를 팀 공유 메모에 옮겨 두세요.</div>
       <div class="note sun"><b>상상과 사실 구분하기</b><div class="checks"><div>③ 표에서 ‘지금 있는 기술’ 칸은 원 강사님께 한 번 더 확인</div><div>연도·숫자가 나오면 확인 필요로 표시</div></div></div>` },
   { id: "f03", no: "P03", g: "sunam", roles: ["lead", "promo"], title: "문제 정의하기", when: ["기획 첫 단계", "대표가 정리"],
     use: "누가, 언제, 무엇 때문에 곤란한지를 한 문장으로 만들어요. 문제부터 정해야 앱 기능이 흔들리지 않아요.",
-    fields: [{ k: "user", t: "사용자", ph: "예: 용돈을 처음 관리하는 2050년의 중학생" }, { k: "situ", t: "상황", ph: "예: 디지털 용돈을 여러 앱에 나눠 받을 때" }, { k: "pain", t: "불편", ph: "예: 얼마가 남았는지 한눈에 알 수 없다", area: 1 }, { k: "ev", t: "근거", ph: "어제 P02 장면, 모의투자에서 느낀 점 등", area: 1 }],
-    tpl: `너는 서비스 기획을 돕는 문제 탐정이다. 우리 팀이 2050년에 해결하고 싶은 금융 문제를 분명한 문장으로 만든다. ${RULE}
+    fields: [{ k: "user", t: "사용자", ph: "예: 용돈을 처음 관리하는 미래의 중학생" }, { k: "situ", t: "상황", ph: "예: 디지털 용돈을 여러 앱에 나눠 받을 때" }, { k: "pain", t: "불편", ph: "예: 얼마가 남았는지 한눈에 알 수 없다", area: 1 }, { k: "ev", t: "근거", ph: "어제 P02 장면, 모의투자에서 느낀 점 등", area: 1 }],
+    tpl: `너는 서비스 기획을 돕는 문제 탐정이다. 우리 팀이 미래에 해결하고 싶은 금융 문제를 분명한 문장으로 만든다. ${RULE}
 
-입력: 사용자=[{{user| }}] / 상황=[{{situ| }}] / 불편=[{{pain| }}] / 근거=[{{ev|어제 2050 장면, 모의투자 경험 등}}]
+입력: 사용자=[{{user| }}] / 상황=[{{situ| }}] / 불편=[{{pain| }}] / 근거=[{{ev|어제 미래 장면, 모의투자 경험 등}}]
 
 출력: ① “[누가] [언제] [무엇 때문에] 곤란하다” 형식의 문제 문장 3개 ② 그중 우리 팀이 고를 1개와 이유 ③ 팀원·친구에게 물어볼 질문 3개(답을 유도하지 않게). 문제 안에 해결책(앱 기능)을 미리 넣지 마라.`,
     extra: `<div class="note sun"><b>좋은 문제 문장 점검</b><div class="checks"><div>‘누가’가 한 사람의 모습으로 떠오르는가?</div><div>앱 기능 이야기가 섞이지 않았는가?</div><div>팀원 모두 이 문제에 고개를 끄덕이는가?</div></div></div>
@@ -339,7 +339,7 @@ const P = [
   { id: "f04", no: "P04", g: "sunam", roles: ["lead", "money"], title: "서비스 기획 캔버스", when: ["팀 기획의 중심", "대표 + 운영 디렉터"],
     use: "문제·앱 이름·기능·돈 흐름을 6행 표로 정리해요. 여기서 정한 앱 이름과 기능이 화면·코딩·발표 카드로 이어져요.",
     fields: [{ k: "team", t: "팀 이름", ph: "예: 도전하는 주식 호랑이" }, { k: "prob", t: "고른 문제", ph: "P03에서 고른 문제 문장", area: 1, from: ["f03_pain"] }, { k: "app", t: "앱 이름 아이디어", ph: "예: 한눈 지갑" }, { k: "feat", t: "핵심 기능 아이디어", ph: "예: 모든 디지털 용돈을 한 화면에 모아 보기", area: 1 }, { k: "money", t: "돈 흐름 아이디어", ph: "수수료 · 구독 · 광고 · 무료 등", area: 1 }],
-    tpl: `너는 중학생 창업팀의 서비스 기획 코치다. 우리 팀의 2050 금융 서비스 기획 캔버스를 만든다. ${RULE}
+    tpl: `너는 중학생 창업팀의 서비스 기획 코치다. 우리 팀의 미래 금융 서비스 기획 캔버스를 만든다. ${RULE}
 
 팀 이름=[{{team| }}]
 고른 문제=[{{prob| }}]

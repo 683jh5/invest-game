@@ -470,7 +470,7 @@ details.ex summary::before{background:#ECEFF4}
             <div class="hero-copy">
         <div class="badge-row"><span class="chip">청소년 AI금융캠프</span><span class="chip">DAY 2 · 기획 만들기</span></div>
         <h1>미래 금융앱 기획실</h1>
-        <p class="lede">2050년 고객의 돈 고민을 찾아서, 우리 팀 앱의 기획서와 화면 3장, 바이브코딩 프롬프트까지 완성해요.</p>
+        <p class="lede">미래 고객의 돈 고민을 찾아서, 우리 팀 앱의 기획서와 화면 3장, 바이브코딩 프롬프트까지 완성해요.</p>
         <div class="hello" id="heroSay">다섯 역할 도장을 모두 모으면 앱 만들 준비 끝!</div>
       </div>
     </div>
@@ -555,13 +555,13 @@ details.ex summary::before{background:#ECEFF4}
 
   <!-- ================= CUSTOMER ================= -->
   <section class="station" data-station="cust" id="st-cust" hidden>
-    <div class="guide"><div class="head"><span class="kicker">03 고객 고르기 <span class="keyholder p-ceo" data-owner="ceo"></span></span><h2>2050년, 우리는 누구를 도울까?</h2><p class="goal">어제 오후에 상상한 2050년을 떠올리며 고객 한 명을 골라요. 그 고객의 돈 고민이 우리 앱의 출발점이에요.</p><div class="bubble" data-say="cust"></div></div></div>
+    <div class="guide"><div class="head"><span class="kicker">03 고객 고르기 <span class="keyholder p-ceo" data-owner="ceo"></span></span><h2>미래에 우리는 누구를 도울까?</h2><p class="goal">어제 오후에 상상한 미래을 떠올리며 고객 한 명을 골라요. 그 고객의 돈 고민이 우리 앱의 출발점이에요.</p><div class="bubble" data-say="cust"></div></div></div>
     <div class="stack">
       <div class="cases" id="cases"></div>
       <div class="card field" id="otherwrap" hidden>
         <label for="f-cu_other">우리 팀이 만든 고객</label>
         <span class="hint">언제, 어디서, 어떤 생활을 하는 사람인지 한 줄로 써요.</span>
-        <input type="text" id="f-cu_other" data-f="cu_other" placeholder="예: 2050년 바다 위 도시로 이사 간 가족">
+        <input type="text" id="f-cu_other" data-f="cu_other" placeholder="예: 미래 바다 위 도시로 이사 간 가족">
       </div>
       <div class="grid2">
         <div class="card field"><label for="f-cu_problem">이 고객의 돈 고민</label><span class="hint">언제, 무엇을 하려다 막히나요? 한 가지만 적어요.</span><textarea id="f-cu_problem" data-f="cu_problem" placeholder="예: 날씨마다 하늘택시 요금이 달라서 한 달 교통비가 얼마나 들지 몰라요."></textarea></div>
@@ -804,14 +804,14 @@ const ART = {
   mine: `<svg viewBox="0 0 120 80"><rect x="30" y="14" width="50" height="58" rx="6" fill="#fff" stroke="#1C2430" stroke-width="3"/><path d="M40 30h30M40 42h30M40 54h18" stroke="#AEB8CC" stroke-width="3" stroke-linecap="round"/><path d="M96 14l8 8-34 34-11 3 3-11z" fill="#F0B26B" stroke="#1C2430" stroke-width="3" stroke-linejoin="round"/></svg>`,
 };
 const CASES = [
-  { v: "하늘길 출퇴근러", ic: "taxi", bg: "var(--sky)", d: "2050년, 하늘을 나는 택시로 출퇴근하는 직장인.", q: "날씨·시간마다 바뀌는 요금, 교통비 관리는?", say: "하늘길 출퇴근러! 매일 쓰는 돈이라 고민이 많을 거예요." },
+  { v: "하늘길 출퇴근러", ic: "taxi", bg: "var(--sky)", d: "미래에 하늘을 나는 택시로 출퇴근하는 직장인.", q: "날씨·시간마다 바뀌는 요금, 교통비 관리는?", say: "하늘길 출퇴근러! 매일 쓰는 돈이라 고민이 많을 거예요." },
   { v: "로봇 반려 가족", ic: "robot", bg: "var(--mint)", d: "가사 로봇과 함께 사는 다섯 식구.", q: "로봇 구독료와 가족 공동 저금은 어떻게 나눌까?", say: "로봇 반려 가족! 다섯 명의 돈을 함께 관리해야 해요." },
-  { v: "첫 용돈 투자자", ic: "piggy", bg: "var(--rose)", d: "2050년에 처음 투자를 시작하는 초등학교 6학년.", q: "어려운 말과 무서운 손실, 어떻게 덜어 줄까?", say: "첫 용돈 투자자! 처음 시작하는 사람의 마음을 생각해 봐요." },
+  { v: "첫 용돈 투자자", ic: "piggy", bg: "var(--rose)", d: "미래에 처음 투자를 시작하는 초등학교 6학년.", q: "어려운 말과 무서운 손실, 어떻게 덜어 줄까?", say: "첫 용돈 투자자! 처음 시작하는 사람의 마음을 생각해 봐요." },
   { v: "우주여행 저축러", ic: "rocket", bg: "var(--lilac)", d: "졸업 여행으로 우주정거장에 가고 싶은 대학생.", q: "아주 큰 목표를 끝까지 모으게 하려면?", say: "우주여행 저축러! 큰 목표를 작게 나누는 게 열쇠예요." },
-  { v: "우리 팀 고객", ic: "mine", bg: "var(--sun)", d: "우리 팀이 직접 상상한 2050년의 고객.", q: "어제 오후에 그린 미래에서 데려와도 좋아요", say: "우리 팀이 만든 고객이라니 멋져요! 한 줄로 소개해 줘요." },
+  { v: "우리 팀 고객", ic: "mine", bg: "var(--sun)", d: "우리 팀이 직접 상상한 미래의 고객.", q: "어제 오후에 그린 미래에서 데려와도 좋아요", say: "우리 팀이 만든 고객이라니 멋져요! 한 줄로 소개해 줘요." },
 ];
 const CANVAS = [
-  { k: "c_customer", t: "고객", s: "고객", r: "ceo", ph: 0, nc: "#FDF0E4", rot: "-1.2deg", hint: "2050년의 누구를, 어떤 상황에서 도울까요?", ex: "2050년 하늘택시로 출퇴근하는 직장인" },
+  { k: "c_customer", t: "고객", s: "고객", r: "ceo", ph: 0, nc: "#FDF0E4", rot: "-1.2deg", hint: "미래의 누구를, 어떤 상황에서 도울까요?", ex: "미래 하늘택시로 출퇴근하는 직장인" },
   { k: "c_problem", t: "돈 고민", s: "고민", r: "ceo", ph: 0, nc: "#F7E9E3", rot: ".8deg", hint: "그 고객이 돈 때문에 막히는 순간", ex: "날씨·시간마다 요금이 달라서 한 달 교통비를 예상할 수 없다" },
   { k: "c_idea", t: "해결 아이디어", s: "해결", r: "cto", ph: 1, nc: "#E4F1F7", rot: "-.6deg", hint: "우리 앱은 그 고민을 어떻게 풀어 주나요?", ex: "교통비를 미리 예측해서 필요한 만큼 자동으로 모아 주는 앱" },
   { k: "c_features", t: "핵심 기능 3개", s: "기능", r: "cto", ph: 1, nc: "#ECEFF4", rot: "1deg", hint: "앱에서 누를 수 있는 기능 세 가지", ex: "① 이번 달 교통비 예측 ② 남는 돈 자동 저금 ③ 하늘택시 관련 가상 회사 투자 체험" },
