@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
 <style>
-/* Layout: 밝은 '미래 금융앱 기획실' 보드. 상단 기획 지도(단계 트레일, 단계마다 담당 역할) + 가이드 핀이의 말풍선 + 포스트잇·폰 화면 미리보기. 의도적으로 밝은 단일 테마. */
+/* Layout: 밝은 '미래 금융앱 기획실' 보드. 상단 기획 지도(단계 트레일, 단계마다 맡을 역할) + 가이드 핀이의 말풍선 + 포스트잇·폰 화면 미리보기. 의도적으로 밝은 단일 테마. */
 :root{
   color-scheme:light;
   /* 미래에셋 청소년 AI 캠프 장표 디자인 시스템: White 중심 + Navy/Orange 포인트 + 공식 보조색 */
@@ -500,13 +500,13 @@ details.ex summary::before{background:#ECEFF4}
       </div>
       <div class="roles" id="rolecards"></div>
       <div class="grid2">
-        <div class="note mint"><b>오늘 완성할 것</b><br>서비스 기획서 한 장 · 앱 화면 설계 3장 · 바이브코딩 프롬프트 · 갤러리워크에서 쓸 한 문장 소개. 단계마다 위쪽 띠에 <b>키보드 담당</b>이 나와요. 그 역할을 맡은 친구가 입력하고, 나머지는 옆에서 같이 생각해요.</div>
+        <div class="note mint"><b>오늘 완성할 것</b><br>서비스 기획서 한 장 · 앱 화면 설계 3장 · 바이브코딩 프롬프트 · 갤러리워크에서 쓸 한 문장 소개. 단계마다 위쪽 띠에 <b>키보드를 잡을 역할</b>이 나와요. 그 역할을 맡은 친구가 입력하고, 나머지는 옆에서 같이 생각해요.</div>
         <details class="card">
           <summary style="cursor:pointer;font-weight:700">선생님용 진행 메모</summary>
           <div class="stack small" style="gap:8px;margin-top:10px;color:var(--ink-2)">
             <p>팀 대표 노트북 한 대로 써요. 저장은 그 브라우저에만 되니, 끝나면 PDF와 백업 파일(.json)을 꼭 받아 두세요.</p>
             <p>04 AI 검증은 학생이 쓸 수 있는 AI 도구와 연령 조건을 캠프 전에 확인해 주세요. 쓸 수 없으면 선생님 화면 시연이나 ‘예시 답변’으로 진행해요.</p>
-            <p>고객 카드와 예시는 모두 교육용 가상 설정이에요. 토요일 모의투자의 가상 회사와 이어서 써도 좋아요.</p>
+            <p>고객 카드와 예시는 모두 교육용 가상 설정이에요. 오전 모의투자의 가상 회사와 이어서 써도 좋아요.</p>
           </div>
         </details>
       </div>
@@ -516,7 +516,7 @@ details.ex summary::before{background:#ECEFF4}
 
   <!-- ================= QUIZ ================= -->
   <section class="station" data-station="quiz" id="st-quiz" hidden>
-    <div class="guide"><div class="head"><span class="kicker">01 복습 퀴즈 <span class="keyholder p-coo" data-owner="coo"></span></span><h2>어제 배운 돈 감각, 기억나요?</h2><p class="goal">토요일 모의투자를 떠올리며 4문제를 풀어요. 틀려도 괜찮아요. 고르면 바로 설명이 나와요.</p><div class="bubble" data-say="quiz"></div></div></div>
+    <div class="guide"><div class="head"><span class="kicker">01 복습 퀴즈 <span class="keyholder p-coo" data-owner="coo"></span></span><h2>오전에 배운 돈 감각, 기억나요?</h2><p class="goal">오전 모의투자를 떠올리며 4문제를 풀어요. 틀려도 괜찮아요. 고르면 바로 설명이 나와요.</p><div class="bubble" data-say="quiz"></div></div></div>
     <div class="card">
       <div class="qtop"><div><span class="tagp p-coo">운영 디렉터 도장 재료</span></div><div class="qdots" id="qdots"></div></div>
       <div class="qcard" id="qcard"></div>
@@ -555,7 +555,7 @@ details.ex summary::before{background:#ECEFF4}
 
   <!-- ================= CUSTOMER ================= -->
   <section class="station" data-station="cust" id="st-cust" hidden>
-    <div class="guide"><div class="head"><span class="kicker">03 고객 고르기 <span class="keyholder p-ceo" data-owner="ceo"></span></span><h2>미래에 우리는 누구를 도울까?</h2><p class="goal">어제 오후에 상상한 미래을 떠올리며 고객 한 명을 골라요. 그 고객의 돈 고민이 우리 앱의 출발점이에요.</p><div class="bubble" data-say="cust"></div></div></div>
+    <div class="guide"><div class="head"><span class="kicker">03 고객 고르기 <span class="keyholder p-ceo" data-owner="ceo"></span></span><h2>미래에 우리는 누구를 도울까?</h2><p class="goal">앞 시간에 상상한 미래를 떠올리며 고객 한 명을 골라요. 그 고객의 돈 고민이 우리 앱의 출발점이에요.</p><div class="bubble" data-say="cust"></div></div></div>
     <div class="stack">
       <div class="cases" id="cases"></div>
       <div class="card field" id="otherwrap" hidden>
@@ -603,7 +603,7 @@ details.ex summary::before{background:#ECEFF4}
 
   <!-- ================= CANVAS ================= -->
   <section class="station" data-station="canvas" id="st-canvas" hidden>
-    <div class="guide"><div class="head"><span class="kicker">05 서비스 캔버스 <span class="keyholder p-all" data-owner="all"></span></span><h2>포스트잇 여섯 장으로 앱을 설계해요</h2><p class="goal">고객 → 돈 고민 → 해결 아이디어 → 핵심 기능 → 앱 이름 → 돈 버는 방법이 한 줄로 이어지게 써요. 포스트잇마다 담당 역할이 있어요.</p><div class="bubble" data-say="canvas"></div></div></div>
+    <div class="guide"><div class="head"><span class="kicker">05 서비스 캔버스 <span class="keyholder p-all" data-owner="all"></span></span><h2>포스트잇 여섯 장으로 앱을 설계해요</h2><p class="goal">고객 → 돈 고민 → 해결 아이디어 → 핵심 기능 → 앱 이름 → 돈 버는 방법이 한 줄로 이어지게 써요. 포스트잇마다 맡을 역할이 있어요.</p><div class="bubble" data-say="canvas"></div></div></div>
     <div class="stack">
       <div class="card">
         <div class="row-btns" style="justify-content:space-between">
@@ -639,7 +639,7 @@ details.ex summary::before{background:#ECEFF4}
 
   <!-- ================= PROMPT ================= -->
   <section class="station" data-station="prompt" id="st-prompt" hidden>
-    <div class="guide"><div class="head"><span class="kicker">07 바이브코딩 프롬프트 <span class="keyholder p-cto" data-owner="cto"></span></span><h2>기획서가 프롬프트로 바뀌어요</h2><p class="goal">지금까지 쓴 내용이 프롬프트 한 장으로 자동으로 모였어요. 빈칸이 없는지 점검하고 복사해 둬요. 오후 앱 만들기에 그대로 써요.</p><div class="bubble" data-say="prompt"></div></div></div>
+    <div class="guide"><div class="head"><span class="kicker">07 바이브코딩 프롬프트 <span class="keyholder p-cto" data-owner="cto"></span></span><h2>기획서가 프롬프트로 바뀌어요</h2><p class="goal">지금까지 쓴 내용이 프롬프트 한 장으로 자동으로 모였어요. 빈칸이 없는지 점검하고 복사해 둬요. 2일차 앱 만들기에 그대로 써요.</p><div class="bubble" data-say="prompt"></div></div></div>
     <div class="grid2">
       <div class="card stack" style="gap:12px">
         <h3>우리 팀 프롬프트</h3>
@@ -767,7 +767,7 @@ function mood(el, m) { const s = el && el.querySelector(".mascot"); if (s) s.set
 /* ---------- data ---------- */
 const ROLES = [
   { k: "ceo", n: "대표", c: "CEO", d: "팀 비전과 진행을 맡아요. 고객을 고르고 최종 결정을 내려요.", how: "팀 · 고객 · 캔버스 1–2" },
-  { k: "cto", n: "기술 디렉터", c: "CTO", d: "AI를 다루는 담당. 프롬프트를 쓰고 기능을 점검 · 디버깅해요.", how: "AI 검증 · 캔버스 3–4" },
+  { k: "cto", n: "기술 디렉터", c: "CTO", d: "AI를 다루는 역할. 프롬프트를 쓰고 기능을 점검 · 디버깅해요.", how: "AI 검증 · 캔버스 3–4" },
   { k: "cdo", n: "디자인 디렉터", c: "CDO", d: "앱 색과 화면 배치를 정하고 쓰기 편한지 점검해요.", how: "화면 설계 3장" },
   { k: "cmo", n: "마케팅 디렉터", c: "CMO", d: "앱 이름과 광고 문구, 발표 메시지를 맡아요.", how: "광고 배틀 · 소개" },
   { k: "coo", n: "운영 디렉터", c: "COO", d: "팀 일정과 숫자 검산, 발표 자료 · 시연 순서를 챙겨요.", how: "퀴즈 · 캔버스 6" },
@@ -808,7 +808,7 @@ const CASES = [
   { v: "로봇 반려 가족", ic: "robot", bg: "var(--mint)", d: "가사 로봇과 함께 사는 다섯 식구.", q: "로봇 구독료와 가족 공동 저금은 어떻게 나눌까?", say: "로봇 반려 가족! 다섯 명의 돈을 함께 관리해야 해요." },
   { v: "첫 용돈 투자자", ic: "piggy", bg: "var(--rose)", d: "미래에 처음 투자를 시작하는 초등학교 6학년.", q: "어려운 말과 무서운 손실, 어떻게 덜어 줄까?", say: "첫 용돈 투자자! 처음 시작하는 사람의 마음을 생각해 봐요." },
   { v: "우주여행 저축러", ic: "rocket", bg: "var(--lilac)", d: "졸업 여행으로 우주정거장에 가고 싶은 대학생.", q: "아주 큰 목표를 끝까지 모으게 하려면?", say: "우주여행 저축러! 큰 목표를 작게 나누는 게 열쇠예요." },
-  { v: "우리 팀 고객", ic: "mine", bg: "var(--sun)", d: "우리 팀이 직접 상상한 미래의 고객.", q: "어제 오후에 그린 미래에서 데려와도 좋아요", say: "우리 팀이 만든 고객이라니 멋져요! 한 줄로 소개해 줘요." },
+  { v: "우리 팀 고객", ic: "mine", bg: "var(--sun)", d: "우리 팀이 직접 상상한 미래의 고객.", q: "앞 시간에 그린 미래에서 데려와도 좋아요", say: "우리 팀이 만든 고객이라니 멋져요! 한 줄로 소개해 줘요." },
 ];
 const CANVAS = [
   { k: "c_customer", t: "고객", s: "고객", r: "ceo", ph: 0, nc: "#FDF0E4", rot: "-1.2deg", hint: "미래의 누구를, 어떤 상황에서 도울까요?", ex: "미래 하늘택시로 출퇴근하는 직장인" },
@@ -1198,7 +1198,7 @@ ${SCREENS.map(screenLine).join("\n")}
 
 다 만든 뒤, 우리가 다음에 고쳐 볼 만한 점 3가지를 짧게 알려 줘.`;
 }
-$("#copyprompt").addEventListener("click", async () => { const missing = (promptText().match(/\(아직 안 정함\)|\(부품 미선택\)/g) || []).length; if (await copyText(promptText(), missing ? `복사했어요. 빈칸 ${missing}곳은 채우면 더 좋아요` : "프롬프트를 복사했어요. 오후에 그대로 써요!")) { state.prompt_copied = true; persist(); refresh(); } });
+$("#copyprompt").addEventListener("click", async () => { const missing = (promptText().match(/\(아직 안 정함\)|\(부품 미선택\)/g) || []).length; if (await copyText(promptText(), missing ? `복사했어요. 빈칸 ${missing}곳은 채우면 더 좋아요` : "프롬프트를 복사했어요. 2일차에 그대로 써요!")) { state.prompt_copied = true; persist(); refresh(); } });
 
 /* ---------- sprint timer ---------- */
 const TOTAL = 15 * 60; let left = TOTAL, timer = null;
