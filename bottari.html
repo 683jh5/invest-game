@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>상단 뽑기 · 보따리 거래</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+:root{
+  --navy:#043B72;--navy2:#0A2A52;--orange:#F58220;--orange2:#CB6015;--sand:#F0B26B;--ink:#1C2430;--gray:#48535B;
+  --muted:#84888B;--paper:#FBF6EC;--paper2:#F3E9D6;--line:#E3D5BC;--light:#F7F8FA;--blue:#0086B8;--ok:#2F7D4F;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;background:#1B1612;color:var(--paper);overflow:hidden}
+button{font:inherit;cursor:pointer;border:none}
+.app{position:fixed;inset:0;display:flex;flex-direction:column}
+.bg{position:fixed;inset:0;background:#1B1612 url(img/bottari/dark.jpg) center/cover;z-index:-2}
+.bg.door{background-image:linear-gradient(180deg,rgba(4,20,45,.45),rgba(4,20,45,.88)),url(img/bottari/door.jpg)}
+/* top bar */
+.top{display:flex;align-items:center;gap:12px;padding:18px 32px}
+.brand{font-weight:900;font-size:22px;color:var(--sand);letter-spacing:.5px;margin-right:12px;white-space:nowrap}
+.steps{display:flex;gap:8px;flex:1;min-width:0}
+.steps button{display:flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:rgba(255,255,255,.08);color:#D9CDB8;font-weight:700;font-size:17px;white-space:nowrap}
+.steps button .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.14);font-size:14px}
+.steps button[aria-current="step"]{background:var(--orange);color:#1C2430}
+.steps button[aria-current="step"] .n{background:#1C2430;color:var(--orange)}
+.steps button:disabled{opacity:.35;cursor:default}
+.tool{padding:10px 16px;border-radius:10px;background:rgba(255,255,255,.08);color:#D9CDB8;font-weight:700;font-size:15px}
+/* stage */
+.stage{flex:1;min-height:0;padding:8px 48px 36px;display:flex;flex-direction:column;gap:22px}
+.stage[hidden]{display:none}
+h1{font-size:clamp(40px,4.4vw,72px);font-weight:900;letter-spacing:-1.5px;line-height:1.15}
+h1 em{font-style:normal;color:var(--sand)}
+.lead{font-size:clamp(20px,1.7vw,28px);color:#E9DECB;font-weight:500}
+.row{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.big{padding:18px 34px;border-radius:16px;background:var(--orange);color:#1C2430;font-weight:900;font-size:clamp(20px,1.7vw,28px);box-shadow:0 6px 0 var(--orange2)}
+.big:active{transform:translateY(3px);box-shadow:0 3px 0 var(--orange2)}
+.big.ghost{background:rgba(255,255,255,.12);color:var(--paper);box-shadow:none}
+.big:disabled{opacity:.4;cursor:default}
+/* setup */
+.setup{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap}
+.cnt{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:16px;padding:10px 14px}
+.cnt b{font-size:24px;min-width:72px;text-align:center}
+.cnt button{width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,.14);color:var(--paper);font-size:28px;font-weight:800}
+.names{display:flex;gap:10px;flex-wrap:wrap;flex:1}
+.names input{width:150px;padding:12px 14px;border-radius:12px;border:2px solid rgba(255,255,255,.18);background:rgba(0,0,0,.25);color:var(--paper);font:inherit;font-size:20px;font-weight:700}
+.names input:focus{outline:none;border-color:var(--sand)}
+/* draw grid */
+.grid{display:grid;gap:18px;flex:1;min-height:0;align-content:start}
+.slot{position:relative;background:var(--paper);color:var(--ink);border-radius:22px;padding:22px 24px;display:flex;flex-direction:column;gap:8px;min-height:150px;border:3px solid var(--line);box-shadow:0 10px 0 rgba(0,0,0,.25);overflow:hidden}
+.slot .tm{font-size:20px;font-weight:800;color:var(--gray)}
+.slot .sd{font-size:clamp(34px,3.3vw,56px);font-weight:900;color:var(--navy);letter-spacing:-1px;line-height:1.1}
+.slot .sd.wait{color:#C8BBA3}
+.slot.spin .sd{color:var(--orange2)}
+.slot.done{border-color:var(--orange);animation:pop .45s ease}
+.slot .goal{font-size:19px;font-weight:600;color:var(--gray);line-height:1.45}
+.slot .goal b{color:var(--ink)}
+.slot .clue{margin-top:auto;font-size:18px;font-weight:600;color:var(--orange2);background:#FDF0E4;border-radius:10px;padding:8px 12px}
+.slot.mini{min-height:0;padding:16px 20px}.slot.mini .sd{font-size:clamp(28px,2.4vw,40px)}
+.slot .stamp{position:absolute;right:16px;top:14px;display:flex;gap:6px}
+.slot .stamp button{padding:6px 12px;border-radius:999px;font-size:16px;font-weight:800;background:#ECE3D2;color:#9A8C74}
+.slot .stamp button[aria-pressed="true"]{background:var(--ok);color:#fff}
+@keyframes pop{0%{transform:scale(.92)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+/* ware */
+.ware{display:flex;gap:28px;align-items:center;background:rgba(0,0,0,.28);border-radius:20px;padding:16px 22px}
+.ware img{height:clamp(120px,15vh,190px);border-radius:12px}
+.ware p{font-size:clamp(20px,1.6vw,26px);font-weight:700;line-height:1.5}
+.ware p span{color:var(--sand)}
+/* market */
+.market{display:grid;grid-template-columns:1fr 1fr;gap:22px;flex:1;min-height:0}
+table{width:100%;border-collapse:separate;border-spacing:0;background:var(--paper);color:var(--ink);border-radius:18px;overflow:hidden;font-size:clamp(18px,1.5vw,26px)}
+th{background:var(--navy);color:#fff;text-align:left;padding:10px 18px;font-weight:800}
+td{padding:9px 18px;border-top:1px solid var(--line);font-weight:600}
+tr:nth-child(odd) td{background:#F6EEDF}
+td.m{font-weight:900;color:var(--navy)}
+.rules{display:flex;gap:14px;flex-wrap:wrap}
+.rules p{background:rgba(255,255,255,.1);border-radius:14px;padding:12px 18px;font-size:clamp(18px,1.4vw,23px);font-weight:700}
+.rules p b{color:var(--sand)}
+.hid{position:relative}
+.cover{position:absolute;inset:0;display:grid;place-items:center;background:#2A221C;border-radius:18px;border:3px dashed #6B5A48;color:#D9CDB8;font-size:30px;font-weight:800;text-align:center;line-height:1.5}
+/* result */
+.res td,.res th{text-align:center}
+.res td:first-child,.res th:first-child{text-align:left}
+.yes{color:var(--ok);font-weight:900}
+.no{color:#B0473B;font-weight:900}
+.pill{display:inline-block;padding:4px 12px;border-radius:999px;background:#FDF0E4;color:var(--orange2);font-size:.8em;font-weight:800}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:14px 22px;border-radius:12px;font-weight:700;font-size:18px}
+.toast[hidden]{display:none}
+@media (max-width:900px){body{overflow:auto}.app{position:static}.stage{padding:8px 16px 24px}.top{flex-wrap:wrap;padding:12px 16px}.steps{flex-wrap:wrap}.market{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="bg door" id="bg"></div>
+<div class="app">
+  <header class="top">
+    <span class="brand">과거의 문 · 보따리 거래</span>
+    <nav class="steps" id="steps" aria-label="진행 단계"></nav>
+    <button class="tool" id="full" type="button">전체 화면</button>
+    <button class="tool" id="reset" type="button">처음부터</button>
+  </header>
+
+  <!-- 1. 뽑기 -->
+  <section class="stage" data-s="draw">
+    <h1>우리 팀은 <em>어느 상단?</em></h1>
+    <p class="lead" id="drawLead">팀 수와 이름을 정하고 뽑기 시작. 상단이 하나씩 공개됨.</p>
+    <div class="setup" id="setup">
+      <div class="cnt"><button type="button" id="minus" aria-label="팀 줄이기">−</button><b id="cntv">5팀</b><button type="button" id="plus" aria-label="팀 늘리기">+</button></div>
+      <div class="names" id="names"></div>
+    </div>
+    <div class="row"><button class="big" id="go" type="button">상단 뽑기 시작</button><button class="big ghost" id="redo" type="button" hidden>다시 뽑기</button><button class="big ghost" id="next1" type="button" hidden>주문 보기 →</button></div>
+    <div class="grid" id="drawGrid"></div>
+  </section>
+
+  <!-- 2. 주문 -->
+  <section class="stage" data-s="order" hidden>
+    <h1>R1 · <em>우리 상단의 주문</em></h1>
+    <div class="ware"><img src="img/bottari/ware.jpg" alt="상단의 창고: 기름, 쌀, 숯, 소금, 짚신, 부채"><p>창고에서 <span>서로 다른 3개</span>를 골라 기록지에 쓰기<br>단서는 <span>목표 ①</span>을 주는 상인이 원하는 것<br>모든 상단이 다 쓰면 장터 공개</p></div>
+    <div class="grid" id="orderGrid"></div>
+    <div class="row"><button class="big" id="openMarket" type="button">모든 상단 보따리 완료 → 장터 공개</button></div>
+  </section>
+
+  <!-- 3. 장터 -->
+  <section class="stage" data-s="market" hidden>
+    <h1>R1 · <em>장터 상인표</em></h1>
+    <div class="rules"><p><b>1</b> 받는 물건 1개 → 주는 물건 1개</p><p><b>2</b> 다른 상단과 거래하지 않음</p><p><b>3</b> 막히면 보따리 1개만 교체</p><p><b>4</b> 목표를 주는 상인부터 거꾸로 찾기</p></div>
+    <div class="market" id="market"></div>
+  </section>
+
+  <!-- 4. R1 결과 -->
+  <section class="stage" data-s="r1" hidden>
+    <h1>R1 결과 · <em>원하는 물건을 바로 구했나?</em></h1>
+    <p class="lead">상단별로 확보한 목표를 눌러 표시</p>
+    <div class="grid" id="r1Grid"></div>
+  </section>
+
+  <!-- 5. 조개 장터 -->
+  <section class="stage" data-s="r2" hidden>
+    <h1>R2 · <em>조개 장터</em></h1>
+    <div class="rules"><p><b>출발</b> 처음 고른 3개, 조개 0개</p><p><b>팔기</b> 창고 물건은 모두 조개 1개</p><p><b>규칙</b> 물건과 조개를 한 거래에 섞지 않음</p></div>
+    <div id="buy"></div>
+    <div class="grid" id="r2Grid"></div>
+  </section>
+
+  <!-- 6. 비교 -->
+  <section class="stage" data-s="cmp" hidden>
+    <h1>두 라운드 <em>비교</em></h1>
+    <div id="cmp"></div>
+    <div class="rules"><p><b>질문</b> 어떤 거래가 더 빨랐나?</p><p><b>질문</b> 받아 줄 상인을 찾아야 했나?</p><p><b>질문</b> 막힌 순간이 있었나?</p><p><b>질문</b> 달라지지 않은 점은?</p></div>
+  </section>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(() => {
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+const SANGDAN = [
+  { n: "비단", t1: "명주실 1타래", t2: "쪽물감 1통", clue: "누에 농가는 겨우내 먹을 곡식이 모자람" },
+  { n: "곡물", t1: "곡식 자루 1개", t2: "새끼줄 1묶음", clue: "자루 장수는 김장에 쓸 간이 필요함" },
+  { n: "도자기", t1: "포장용 짚 1묶음", t2: "나무 상자 1개", clue: "짚단 농가는 군불 땔거리가 필요함" },
+  { n: "약초", t1: "포장용 종이 1묶음", t2: "끈 1묶음", clue: "종이 가게는 밤에 켤 등잔불이 필요함" },
+  { n: "종이", t1: "닥나무 껍질 1묶음", t2: "종이 뜨는 발 1개", clue: "닥나무 농가는 나물 절일 것이 필요함" },
+];
+const MARKET = [
+  ["누에 농가", "쌀", "명주실 1타래"], ["자루 장수", "소금", "곡식 자루 1개"], ["짚단 농가", "숯", "포장용 짚 1묶음"],
+  ["종이 가게", "기름", "포장용 종이 1묶음"], ["닥나무 농가", "소금", "닥나무 껍질 1묶음"], ["베 짜는 집", "짚신", "천 1개"],
+  ["염색 장인", "천", "쪽물감 1통"], ["목수", "천", "나무 상자 1개"], ["발 장인", "천", "종이 뜨는 발 1개"],
+  ["새끼 꼬는 집", "바가지", "새끼줄 1묶음"], ["끈 공방", "바가지", "끈 1묶음"], ["바가지 장수", "부채", "바가지 1개"],
+];
+const STEPS = [["draw", "상단 뽑기"], ["order", "주문"], ["market", "장터"], ["r1", "R1 결과"], ["r2", "조개 장터"], ["cmp", "비교"]];
+const KEY = "bottari-teacher-v1";
+
+let S = { n: 5, names: [], picks: [], step: "draw", market: false, r1: {}, r2: {} };
+try { const x = JSON.parse(localStorage.getItem(KEY) || "null"); if (x && typeof x === "object") S = Object.assign(S, x); } catch (_) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (_) {} };
+const nameOf = (i) => (S.names[i] || "").trim() || `${i + 1}팀`;
+const drawn = () => S.picks.length === S.n && S.picks.every((p) => p !== null && p !== undefined);
+let busy = false;
+
+function toast(m) { const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), 2400); }
+function cols(n) { return n <= 3 ? n : n <= 4 ? 4 : n <= 6 ? 3 : 4; }
+function setCols(el) { el.style.gridTemplateColumns = `repeat(${cols(S.n)}, minmax(0, 1fr))`; }
+
+/* steps */
+function renderSteps() {
+  $("#steps").innerHTML = STEPS.map(([k, t], i) => {
+    const off = k !== "draw" && !drawn();
+    return `<button type="button" data-go="${k}" ${S.step === k ? 'aria-current="step"' : ""} ${off ? "disabled" : ""}><span class="n">${i + 1}</span>${t}</button>`;
+  }).join("");
+}
+function go(k) {
+  if (k !== "draw" && !drawn()) return;
+  S.step = k; save();
+  $$(".stage").forEach((s) => (s.hidden = s.dataset.s !== k));
+  $("#bg").className = "bg" + (k === "draw" ? " door" : "");
+  renderSteps(); renderStage(k);
+}
+
+/* draw */
+function renderNames() {
+  $("#cntv").textContent = `${S.n}팀`;
+  $("#names").innerHTML = Array.from({ length: S.n }, (_, i) => `<input type="text" data-i="${i}" maxlength="10" aria-label="${i + 1}번 팀 이름" placeholder="${i + 1}팀" value="${esc(S.names[i] || "")}">`).join("");
+}
+function slotHTML(i, p, cls = "") {
+  const sd = p === null || p === undefined ? null : SANGDAN[p];
+  return `<div class="slot ${cls}" data-i="${i}"><span class="tm">${esc(nameOf(i))}</span><span class="sd ${sd ? "" : "wait"}">${sd ? sd.n + " 상단" : "?"}</span></div>`;
+}
+function renderDraw() {
+  const g = $("#drawGrid"); setCols(g);
+  const has = drawn();
+  g.innerHTML = Array.from({ length: S.n }, (_, i) => slotHTML(i, S.picks[i], has ? "done" : "")).join("");
+  $("#setup").hidden = has; $("#go").hidden = has; $("#redo").hidden = !has; $("#next1").hidden = !has;
+  $("#drawLead").textContent = has ? "상단 배정 완료. 팀 이름 뒤에 ‘상단’을 붙여 부르기." : "팀 수와 이름을 정하고 뽑기 시작. 상단이 하나씩 공개됨.";
+  if (!has) renderNames();
+}
+function plan(n) {
+  // 5개 상단을 고르게 섞어 배정 (6팀 이상이면 상단이 두 번째로 돌아옴)
+  const out = [];
+  while (out.length < n) {
+    const bag = [0, 1, 2, 3, 4];
+    for (let i = bag.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [bag[i], bag[j]] = [bag[j], bag[i]]; }
+    out.push(...bag);
+  }
+  return out.slice(0, n);
+}
+async function runDraw() {
+  if (busy) return; busy = true;
+  const target = plan(S.n);
+  S.picks = Array(S.n).fill(null); S.r1 = {}; S.r2 = {}; S.market = false; save();
+  $("#setup").hidden = true; $("#go").hidden = true; $("#redo").hidden = true; $("#next1").hidden = true;
+  const g = $("#drawGrid"); setCols(g);
+  g.innerHTML = Array.from({ length: S.n }, (_, i) => slotHTML(i, null)).join("");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  for (let i = 0; i < S.n; i++) {
+    const el = $(`.slot[data-i="${i}"]`, g); const sd = $(".sd", el);
+    el.classList.add("spin"); sd.classList.remove("wait");
+    const spins = reduce ? 1 : 14 + Math.floor(Math.random() * 6);
+    for (let k = 0; k < spins; k++) {
+      sd.textContent = SANGDAN[(target[i] + spins - k) % 5].n + " 상단";
+      await new Promise((r) => setTimeout(r, reduce ? 0 : 45 + k * k * 1.1));
+    }
+    sd.textContent = SANGDAN[target[i]].n + " 상단";
+    el.classList.remove("spin"); el.classList.add("done");
+    S.picks[i] = target[i]; save();
+    await new Promise((r) => setTimeout(r, reduce ? 0 : 420));
+  }
+  busy = false; renderDraw(); renderSteps(); toast("상단 배정 완료!");
+}
+
+/* order */
+function cardHTML(i, extra = "", mini = false) {
+  const d = SANGDAN[S.picks[i]];
+  return `<div class="slot done${mini ? " mini" : ""}" data-i="${i}"><span class="tm">${esc(nameOf(i))}</span><span class="sd">${d.n} 상단</span>
+    ${mini ? "" : `<p class="goal">① <b>${d.t1}</b><br>② <b>${d.t2}</b></p>`}${extra}</div>`;
+}
+function renderOrder() {
+  const g = $("#orderGrid"); setCols(g);
+  g.innerHTML = S.picks.map((p, i) => cardHTML(i, `<p class="clue">단서 · ${SANGDAN[p].clue}</p>`)).join("");
+}
+
+/* market */
+function renderMarket() {
+  const half = (rows) => `<table><tr><th>상인</th><th>받는 물건</th><th>주는 물건</th></tr>${rows.map(([a, b, c]) => `<tr><td class="m">${a}</td><td>${b}</td><td>${c}</td></tr>`).join("")}</table>`;
+  const body = `${half(MARKET.slice(0, 6))}${half(MARKET.slice(6))}`;
+  $("#market").innerHTML = S.market ? body
+    : `<div class="hid" style="grid-column:1/-1"><div class="cover">모든 상단이 보따리를 고른 뒤 공개<br><button class="big" id="reveal" type="button" style="margin-top:18px">장터 공개</button></div></div>`;
+}
+
+/* results */
+function stampHTML(round, i) {
+  const st = S[round][i] || {};
+  return `<div class="stamp"><button type="button" data-r="${round}" data-i="${i}" data-g="a" aria-pressed="${!!st.a}">① 확보</button><button type="button" data-r="${round}" data-i="${i}" data-g="b" aria-pressed="${!!st.b}">② 확보</button></div>`;
+}
+function renderRound(round, el, mini = false) {
+  el.style.gridTemplateColumns = `repeat(${mini ? Math.min(S.n, 6) : cols(S.n)}, minmax(0, 1fr))`;
+  el.innerHTML = S.picks.map((p, i) => cardHTML(i, stampHTML(round, i), mini)).join("");
+}
+function renderBuy() {
+  $("#buy").innerHTML = `<table><tr><th>팀 · 상단</th><th>조개 1개로 사기</th><th>조개 2개로 사기</th></tr>${S.picks.map((p, i) => `<tr><td class="m">${esc(nameOf(i))} · ${SANGDAN[p].n}</td><td>${SANGDAN[p].t1}</td><td>${SANGDAN[p].t2}</td></tr>`).join("")}</table>`;
+}
+function renderCmp() {
+  const cnt = (r, i) => ((S[r][i] || {}).a ? 1 : 0) + ((S[r][i] || {}).b ? 1 : 0);
+  const cell = (n) => `<span class="${n === 2 ? "yes" : "no"}">${n} / 2</span>`;
+  const rows = S.picks.map((p, i) => `<tr><td class="m">${esc(nameOf(i))} · ${SANGDAN[p].n} 상단</td><td>${cell(cnt("r1", i))}</td><td>${cell(cnt("r2", i))}</td></tr>`).join("");
+  const tot = (r) => S.picks.filter((_, i) => cnt(r, i) === 2).length;
+  $("#cmp").innerHTML = `<table class="res"><tr><th>상단</th><th>R1 · 물물교환</th><th>R2 · 조개 화폐</th></tr>${rows}<tr><td><b>목표 2종 모두 확보</b></td><td><span class="pill">${tot("r1")} / ${S.n} 상단</span></td><td><span class="pill">${tot("r2")} / ${S.n} 상단</span></td></tr></table>`;
+}
+function renderStage(k) {
+  if (k === "draw") renderDraw();
+  if (k === "order") renderOrder();
+  if (k === "market") renderMarket();
+  if (k === "r1") renderRound("r1", $("#r1Grid"));
+  if (k === "r2") { renderBuy(); renderRound("r2", $("#r2Grid"), true); }
+  if (k === "cmp") renderCmp();
+}
+
+/* events */
+document.addEventListener("click", (e) => {
+  const st = e.target.closest("[data-go]"); if (st && !st.disabled) { go(st.dataset.go); return; }
+  if (e.target.closest("#minus")) { if (S.n > 2) { S.n--; save(); renderNames(); renderDraw(); } return; }
+  if (e.target.closest("#plus")) { if (S.n < 12) { S.n++; save(); renderNames(); renderDraw(); } return; }
+  if (e.target.closest("#go")) { runDraw(); return; }
+  if (e.target.closest("#redo")) { if (!busy) { S.picks = []; save(); renderDraw(); renderSteps(); } return; }
+  if (e.target.closest("#next1")) { go("order"); return; }
+  if (e.target.closest("#openMarket")) { S.market = true; save(); go("market"); return; }
+  if (e.target.closest("#reveal")) { S.market = true; save(); renderMarket(); return; }
+  const sb = e.target.closest(".stamp button");
+  if (sb) { const r = sb.dataset.r, i = sb.dataset.i, g = sb.dataset.g; S[r][i] = Object.assign({}, S[r][i]); S[r][i][g] = !S[r][i][g]; save(); sb.setAttribute("aria-pressed", String(S[r][i][g])); return; }
+  if (e.target.closest("#full")) { try { const d = document.documentElement; const pr = document.fullscreenElement ? document.exitFullscreen() : (d.requestFullscreen ? d.requestFullscreen() : null); if (pr && pr.catch) pr.catch(() => {}); } catch (_) {} return; }
+  if (e.target.closest("#reset")) { if (busy) return; S = { n: S.n, names: S.names, picks: [], step: "draw", market: false, r1: {}, r2: {} }; save(); go("draw"); toast("처음부터 다시 시작"); return; }
+});
+document.addEventListener("input", (e) => {
+  const el = e.target.closest("#names input"); if (!el) return;
+  S.names[+el.dataset.i] = el.value; save();
+});
+document.addEventListener("keydown", (e) => {
+  if (e.target.closest("input")) return;
+  const i = STEPS.findIndex(([k]) => k === S.step);
+  if (e.key === "ArrowRight" && i < STEPS.length - 1) go(STEPS[i + 1][0]);
+  if (e.key === "ArrowLeft" && i > 0) go(STEPS[i - 1][0]);
+});
+
+if (!drawn() && S.step !== "draw") S.step = "draw";
+go(S.step);
+})();
+</script>
+</body>
+</html>
