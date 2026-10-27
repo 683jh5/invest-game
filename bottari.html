@@ -69,16 +69,18 @@ h1 em{font-style:normal;color:var(--sand)}
 .ware p{font-size:clamp(20px,1.6vw,26px);font-weight:700;line-height:1.5}
 .ware p span{color:var(--sand)}
 /* order layout */
-.orderwrap{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px;flex:1;min-height:0}
+.orderwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:24px;flex:1;min-height:0}
 .warebig{display:flex;flex-direction:column;gap:14px;min-height:0}
-.warebig img{width:100%;flex:1;min-height:0;object-fit:contain;object-position:top;border-radius:18px}
+.warebig img{width:100%;height:auto;max-height:62vh;object-fit:contain;object-position:left top;border-radius:18px}
 .warebig p{font-size:clamp(20px,1.6vw,28px);font-weight:700;line-height:1.45;background:rgba(0,0,0,.32);border-radius:14px;padding:12px 18px}
 .warebig p span{color:var(--sand)}
-#orderGrid{grid-auto-rows:min-content;overflow:auto}
-#orderGrid .slot{min-height:0;padding:14px 18px;gap:4px}
-#orderGrid .slot .sd{font-size:clamp(26px,2vw,36px)}
-#orderGrid .slot .goal{font-size:17px}
-#orderGrid .slot .clue{font-size:16px;padding:6px 10px;margin-top:4px}
+#orderGrid{overflow:auto;min-height:0;align-self:start}
+#orderGrid table{font-size:clamp(17px,1.3vw,24px);word-break:keep-all}
+#orderGrid th{padding:12px 14px;white-space:nowrap}
+#orderGrid td{padding:12px 14px;vertical-align:middle;line-height:1.35}
+#orderGrid td.tn{font-weight:900;color:var(--navy);white-space:nowrap}
+#orderGrid td.tn small{display:block;font-size:.72em;font-weight:700;color:var(--gray)}
+#orderGrid td.cl{font-size:.82em;color:var(--orange2);font-weight:700}
 /* one question at a time */
 .qbox{display:flex;flex-direction:column;align-items:center;gap:18px;background:var(--navy);border-radius:22px;padding:34px 40px;text-align:center}
 .qbox .qn{font-size:22px;font-weight:800;color:var(--sand);letter-spacing:2px}
@@ -134,7 +136,7 @@ td.m{font-weight:900;color:var(--navy)}
     <h1>R1 · <em>우리 상단의 주문</em></h1>
     <div class="orderwrap">
       <div class="warebig"><img src="img/bottari/ware.jpg" alt="상단의 창고: 기름, 쌀, 숯, 소금, 짚신, 부채. 서로 다른 물건 3개를 고르고 각 1개씩 가져갈 수 있음"><p>창고에서 <span>서로 다른 3개</span>를 골라 기록지에 쓰기 · 단서는 <span>목표 ①</span>을 주는 상인이 원하는 것</p></div>
-      <div class="grid" id="orderGrid"></div>
+      <div id="orderGrid"></div>
     </div>
     <div class="row"><button class="big" id="openMarket" type="button">모든 상단 보따리 완료 → 장터 공개</button></div>
   </section>
@@ -276,8 +278,7 @@ function cardHTML(i, extra = "", mini = false) {
     ${mini ? "" : `<p class="goal">① <b>${d.t1}</b><br>② <b>${d.t2}</b></p>`}${extra}</div>`;
 }
 function renderOrder() {
-  const g = $("#orderGrid"); g.style.gridTemplateColumns = `repeat(${S.n <= 3 ? 1 : S.n <= 6 ? 2 : 3}, minmax(0, 1fr))`;
-  g.innerHTML = S.picks.map((p, i) => cardHTML(i, `<p class="clue">단서 · ${SANGDAN[p].clue}</p>`)).join("");
+  $("#orderGrid").innerHTML = `<table><tr><th style="width:22%">팀 · 상단</th><th style="width:22%">목표 ①</th><th style="width:22%">목표 ②</th><th>단서</th></tr>${S.picks.map((p, i) => { const d = SANGDAN[p]; return `<tr><td class="tn"><small>${esc(nameOf(i))}</small>${d.n} 상단</td><td>${d.t1}</td><td>${d.t2}</td><td class="cl">${d.clue}</td></tr>`; }).join("")}</table>`;
 }
 
 /* market */
