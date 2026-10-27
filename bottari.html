@@ -68,6 +68,22 @@ h1 em{font-style:normal;color:var(--sand)}
 .ware img{height:clamp(120px,15vh,190px);border-radius:12px}
 .ware p{font-size:clamp(20px,1.6vw,26px);font-weight:700;line-height:1.5}
 .ware p span{color:var(--sand)}
+/* order layout */
+.orderwrap{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:24px;flex:1;min-height:0}
+.warebig{display:flex;flex-direction:column;gap:14px;min-height:0}
+.warebig img{width:100%;flex:1;min-height:0;object-fit:contain;object-position:top;border-radius:18px}
+.warebig p{font-size:clamp(20px,1.6vw,28px);font-weight:700;line-height:1.45;background:rgba(0,0,0,.32);border-radius:14px;padding:12px 18px}
+.warebig p span{color:var(--sand)}
+#orderGrid{grid-auto-rows:min-content;overflow:auto}
+#orderGrid .slot{min-height:0;padding:14px 18px;gap:4px}
+#orderGrid .slot .sd{font-size:clamp(26px,2vw,36px)}
+#orderGrid .slot .goal{font-size:17px}
+#orderGrid .slot .clue{font-size:16px;padding:6px 10px;margin-top:4px}
+/* one question at a time */
+.qbox{display:flex;flex-direction:column;align-items:center;gap:18px;background:var(--navy);border-radius:22px;padding:34px 40px;text-align:center}
+.qbox .qn{font-size:22px;font-weight:800;color:var(--sand);letter-spacing:2px}
+.qbox .qt{font-size:clamp(34px,3.4vw,58px);font-weight:900;line-height:1.3;color:#fff}
+.qbox .qnav{display:flex;gap:12px}
 /* market */
 .market{display:grid;grid-template-columns:1fr 1fr;gap:22px;flex:1;min-height:0}
 table{width:100%;border-collapse:separate;border-spacing:0;background:var(--paper);color:var(--ink);border-radius:18px;overflow:hidden;font-size:clamp(18px,1.5vw,26px)}
@@ -116,8 +132,10 @@ td.m{font-weight:900;color:var(--navy)}
   <!-- 2. 주문 -->
   <section class="stage" data-s="order" hidden>
     <h1>R1 · <em>우리 상단의 주문</em></h1>
-    <div class="ware"><img src="img/bottari/ware.jpg" alt="상단의 창고: 기름, 쌀, 숯, 소금, 짚신, 부채"><p>창고에서 <span>서로 다른 3개</span>를 골라 기록지에 쓰기<br>단서는 <span>목표 ①</span>을 주는 상인이 원하는 것<br>모든 상단이 다 쓰면 장터 공개</p></div>
-    <div class="grid" id="orderGrid"></div>
+    <div class="orderwrap">
+      <div class="warebig"><img src="img/bottari/ware.jpg" alt="상단의 창고: 기름, 쌀, 숯, 소금, 짚신, 부채. 서로 다른 물건 3개를 고르고 각 1개씩 가져갈 수 있음"><p>창고에서 <span>서로 다른 3개</span>를 골라 기록지에 쓰기 · 단서는 <span>목표 ①</span>을 주는 상인이 원하는 것</p></div>
+      <div class="grid" id="orderGrid"></div>
+    </div>
     <div class="row"><button class="big" id="openMarket" type="button">모든 상단 보따리 완료 → 장터 공개</button></div>
   </section>
 
@@ -147,7 +165,7 @@ td.m{font-weight:900;color:var(--navy)}
   <section class="stage" data-s="cmp" hidden>
     <h1>두 라운드 <em>비교</em></h1>
     <div id="cmp"></div>
-    <div class="rules"><p><b>질문</b> 어떤 거래가 더 빨랐나?</p><p><b>질문</b> 받아 줄 상인을 찾아야 했나?</p><p><b>질문</b> 막힌 순간이 있었나?</p><p><b>질문</b> 달라지지 않은 점은?</p></div>
+    <div class="qbox" aria-live="polite"><span class="qn" id="qn"></span><p class="qt" id="qt"></p><div class="qnav"><button class="big ghost" id="qprev" type="button">← 이전 질문</button><button class="big" id="qnext" type="button">다음 질문 →</button></div></div>
   </section>
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
@@ -174,7 +192,7 @@ const MARKET = [
 const STEPS = [["draw", "상단 뽑기"], ["order", "주문"], ["market", "장터"], ["r1", "R1 결과"], ["r2", "조개 장터"], ["cmp", "비교"]];
 const KEY = "bottari-teacher-v1";
 
-let S = { n: 5, names: [], picks: [], step: "draw", market: false, r1: {}, r2: {} };
+let S = { n: 5, names: [], picks: [], step: "draw", market: false, r1: {}, r2: {}, q: 0 };
 try { const x = JSON.parse(localStorage.getItem(KEY) || "null"); if (x && typeof x === "object") S = Object.assign(S, x); } catch (_) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (_) {} };
 const nameOf = (i) => (S.names[i] || "").trim() || `${i + 1}팀`;
@@ -258,7 +276,7 @@ function cardHTML(i, extra = "", mini = false) {
     ${mini ? "" : `<p class="goal">① <b>${d.t1}</b><br>② <b>${d.t2}</b></p>`}${extra}</div>`;
 }
 function renderOrder() {
-  const g = $("#orderGrid"); setCols(g);
+  const g = $("#orderGrid"); g.style.gridTemplateColumns = `repeat(${S.n <= 3 ? 1 : S.n <= 6 ? 2 : 3}, minmax(0, 1fr))`;
   g.innerHTML = S.picks.map((p, i) => cardHTML(i, `<p class="clue">단서 · ${SANGDAN[p].clue}</p>`)).join("");
 }
 
@@ -289,13 +307,20 @@ function renderCmp() {
   const tot = (r) => S.picks.filter((_, i) => cnt(r, i) === 2).length;
   $("#cmp").innerHTML = `<table class="res"><tr><th>상단</th><th>R1 · 물물교환</th><th>R2 · 조개 화폐</th></tr>${rows}<tr><td><b>목표 2종 모두 확보</b></td><td><span class="pill">${tot("r1")} / ${S.n} 상단</span></td><td><span class="pill">${tot("r2")} / ${S.n} 상단</span></td></tr></table>`;
 }
+const QS = ["어떤 거래가 더 빨랐나?", "받아 줄 상인을 찾아야 했나?", "막힌 순간이 있었나?", "달라지지 않은 점은?", "모두가 조개를 받지 않겠다고 한다면, 장터는 어떻게 될까?"];
+function renderQ() {
+  const q = Math.max(0, Math.min(QS.length - 1, S.q || 0));
+  $("#qn").textContent = `질문 ${q + 1} / ${QS.length}`; $("#qt").textContent = QS[q];
+  $("#qprev").disabled = q === 0; $("#qnext").disabled = q === QS.length - 1;
+}
+function stepQ(d) { const q = (S.q || 0) + d; if (q < 0 || q >= QS.length) return false; S.q = q; save(); renderQ(); return true; }
 function renderStage(k) {
   if (k === "draw") renderDraw();
   if (k === "order") renderOrder();
   if (k === "market") renderMarket();
   if (k === "r1") renderRound("r1", $("#r1Grid"));
   if (k === "r2") { renderBuy(); renderRound("r2", $("#r2Grid"), true); }
-  if (k === "cmp") renderCmp();
+  if (k === "cmp") { renderCmp(); renderQ(); }
 }
 
 /* events */
@@ -307,11 +332,13 @@ document.addEventListener("click", (e) => {
   if (e.target.closest("#redo")) { if (!busy) { S.picks = []; save(); renderDraw(); renderSteps(); } return; }
   if (e.target.closest("#next1")) { go("order"); return; }
   if (e.target.closest("#openMarket")) { S.market = true; save(); go("market"); return; }
+  if (e.target.closest("#qnext")) { stepQ(1); return; }
+  if (e.target.closest("#qprev")) { stepQ(-1); return; }
   if (e.target.closest("#reveal")) { S.market = true; save(); renderMarket(); return; }
   const sb = e.target.closest(".stamp button");
   if (sb) { const r = sb.dataset.r, i = sb.dataset.i, g = sb.dataset.g; S[r][i] = Object.assign({}, S[r][i]); S[r][i][g] = !S[r][i][g]; save(); sb.setAttribute("aria-pressed", String(S[r][i][g])); return; }
   if (e.target.closest("#full")) { try { const d = document.documentElement; const pr = document.fullscreenElement ? document.exitFullscreen() : (d.requestFullscreen ? d.requestFullscreen() : null); if (pr && pr.catch) pr.catch(() => {}); } catch (_) {} return; }
-  if (e.target.closest("#reset")) { if (busy) return; S = { n: S.n, names: S.names, picks: [], step: "draw", market: false, r1: {}, r2: {} }; save(); go("draw"); toast("처음부터 다시 시작"); return; }
+  if (e.target.closest("#reset")) { if (busy) return; S = { n: S.n, names: S.names, picks: [], step: "draw", market: false, r1: {}, r2: {}, q: 0 }; save(); go("draw"); toast("처음부터 다시 시작"); return; }
 });
 document.addEventListener("input", (e) => {
   const el = e.target.closest("#names input"); if (!el) return;
@@ -320,6 +347,7 @@ document.addEventListener("input", (e) => {
 document.addEventListener("keydown", (e) => {
   if (e.target.closest("input")) return;
   const i = STEPS.findIndex(([k]) => k === S.step);
+  if (S.step === "cmp" && (e.key === "ArrowRight" || e.key === "ArrowLeft") && stepQ(e.key === "ArrowRight" ? 1 : -1)) return;
   if (e.key === "ArrowRight" && i < STEPS.length - 1) go(STEPS[i + 1][0]);
   if (e.key === "ArrowLeft" && i > 0) go(STEPS[i - 1][0]);
 });
