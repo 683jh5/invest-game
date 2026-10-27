@@ -59,9 +59,13 @@ h1 em{font-style:normal;color:var(--sand)}
 .slot .goal b{color:var(--ink)}
 .slot .clue{margin-top:auto;font-size:18px;font-weight:600;color:var(--orange2);background:#FDF0E4;border-radius:10px;padding:8px 12px}
 .slot.mini{min-height:0;padding:16px 20px}.slot.mini .sd{font-size:clamp(28px,2.4vw,40px)}
-.slot .stamp{position:absolute;right:16px;top:14px;display:flex;gap:6px}
-.slot .stamp button{padding:6px 12px;border-radius:999px;font-size:16px;font-weight:800;background:#ECE3D2;color:#9A8C74}
-.slot .stamp button[aria-pressed="true"]{background:var(--ok);color:#fff}
+.slot .stamp{display:flex;gap:10px;margin-top:10px}
+.slot .stamp button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:14px 10px;border-radius:16px;background:#ECE3D2;color:#6F6350;border:3px solid #DCCFB8;word-break:keep-all;text-align:center}
+.slot .stamp .sn{font-size:clamp(17px,1.25vw,22px);font-weight:800;line-height:1.25}
+.slot .stamp .ss{font-size:clamp(22px,1.7vw,30px);font-weight:900}
+.slot .stamp .ss::after{content:"미확보"}
+.slot .stamp button[aria-pressed="true"]{background:var(--ok);border-color:var(--ok);color:#fff}
+.slot .stamp button[aria-pressed="true"] .ss::after{content:"✓ 확보"}
 @keyframes pop{0%{transform:scale(.92)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
 /* ware */
 .ware{display:flex;gap:28px;align-items:center;background:rgba(0,0,0,.28);border-radius:20px;padding:16px 22px}
@@ -296,10 +300,11 @@ function renderMarket() {
 /* results */
 function stampHTML(round, i) {
   const st = S[round][i] || {};
-  return `<div class="stamp"><button type="button" data-r="${round}" data-i="${i}" data-g="a" aria-pressed="${!!st.a}">① 확보</button><button type="button" data-r="${round}" data-i="${i}" data-g="b" aria-pressed="${!!st.b}">② 확보</button></div>`;
+  const d = SANGDAN[S.picks[i]];
+  return `<div class="stamp"><button type="button" data-r="${round}" data-i="${i}" data-g="a" aria-pressed="${!!st.a}" aria-label="① ${d.t1} 확보"><span class="sn">① ${d.t1}${round === "r2" ? "<br>조개 1개" : ""}</span><span class="ss"></span></button><button type="button" data-r="${round}" data-i="${i}" data-g="b" aria-pressed="${!!st.b}" aria-label="② ${d.t2} 확보"><span class="sn">② ${d.t2}${round === "r2" ? "<br>조개 2개" : ""}</span><span class="ss"></span></button></div>`;
 }
 function renderRound(round, el, mini = false) {
-  el.style.gridTemplateColumns = `repeat(${mini ? Math.min(S.n, 6) : cols(S.n)}, minmax(0, 1fr))`;
+  el.style.gridTemplateColumns = `repeat(${mini ? (S.n <= 3 ? S.n : S.n <= 6 ? 3 : 4) : cols(S.n)}, minmax(0, 1fr))`;
   el.innerHTML = S.picks.map((p, i) => cardHTML(i, stampHTML(round, i), mini)).join("");
 }
 function renderBuy() {
@@ -323,8 +328,8 @@ function renderStage(k) {
   if (k === "draw") renderDraw();
   if (k === "order") renderOrder();
   if (k === "market") renderMarket();
-  if (k === "r1") renderRound("r1", $("#r1Grid"));
-  if (k === "r2") { renderBuy(); renderRound("r2", $("#r2Grid"), true); }
+  if (k === "r1") renderRound("r1", $("#r1Grid"), true);
+  if (k === "r2") { $("#buy").innerHTML = ""; renderRound("r2", $("#r2Grid"), true); }
   if (k === "cmp") { renderCmp(); renderQ(); }
 }
 
