@@ -72,6 +72,12 @@ button{cursor:pointer;border:none}
 .set .cnt b{min-width:34px;text-align:center;font-size:22px}
 .note{font-size:15px;color:#A99C88;line-height:1.6;margin-top:14px}
 .sh{font-size:22px;font-weight:900;margin:26px 0 10px}
+.sded{display:flex;flex-direction:column;gap:8px}
+.sdr{display:grid;grid-template-columns:44px minmax(0,1.3fr) minmax(0,.8fr) minmax(0,1.6fr) 40px;gap:8px;align-items:center}
+.sdr input{min-width:0;padding:9px 11px;border-radius:9px;border:2px solid rgba(255,255,255,.18);background:rgba(0,0,0,.3);color:#fff;font-size:16px;font-weight:700;-webkit-user-select:text;user-select:text}
+.sdr input[type=color]{padding:2px;height:40px;width:44px;background:none}
+.sdr button{height:40px;border-radius:9px;background:rgba(255,255,255,.1);color:#fff;font-size:20px}
+.sdr.hd2{font-size:13px;color:#A99C88;font-weight:700}
 .roster{display:grid;grid-template-columns:minmax(260px,1fr) minmax(260px,1.4fr);gap:14px}
 @media(max-width:700px){.roster{grid-template-columns:1fr}}
 .roster textarea{width:100%;min-height:170px;padding:12px 14px;border-radius:10px;border:2px solid rgba(255,255,255,.18);background:rgba(0,0,0,.3);color:#fff;font:inherit;font-size:17px;font-weight:600;line-height:1.5;resize:vertical;-webkit-user-select:text;user-select:text}
@@ -148,6 +154,9 @@ button{cursor:pointer;border:none}
     <span class="cnt"><button id="capM" aria-label="정원 줄이기">−</button><b id="cap"></b><button id="capP" aria-label="정원 늘리기">+</button></span>
     <span>· 정원이 다 차면 인원이 가장 적은 상단부터 한 명씩 더 들어가요</span>
   </div>
+  <h2 class="sh">상단 목록 <small style="font-size:15px;color:#CFC3AE;font-weight:600">이름·색·테이블 색·물건을 바꾸거나 상단을 더하고 뺄 수 있어요</small></h2>
+  <div class="sded" id="sdEd"></div>
+  <div class="set"><button class="tb" id="sdAdd">+ 상단 추가</button><button class="tb" id="sdDef">기본 6상단으로 되돌리기</button><span id="sdMsg" style="color:#FFD3A8"></span></div>
   <h2 class="sh">참가자 명단</h2>
   <div class="roster">
     <label class="txt" style="display:block"><textarea id="iRoster" placeholder="한 줄에 한 명씩, 또는 쉼표로 구분해서 이름을 넣어 주세요&#10;비워 두면 누구나 이름을 써서 입장할 수 있어요"></textarea></label>
@@ -172,7 +181,7 @@ button{cursor:pointer;border:none}
 (function(){
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const SD=[
+const DEF_SD=[
   {id:'silk', n:'비단 상단', c:'#8E44AD', t:'보라', g:'비단 · 명주실'},
   {id:'grain',n:'곡물 상단', c:'#D4A017', t:'노랑', g:'쌀 · 보리'},
   {id:'pot',  n:'도자기 상단',c:'#2E86C1', t:'파랑', g:'그릇 · 항아리'},
@@ -189,6 +198,7 @@ const CKEY='gate-sangdan-conf-v1';
 let C;try{C=JSON.parse(localStorage.getItem(CKEY)||'null')}catch(e){C=null}
 if(!C)C={txt:Object.assign({},DEF),pin:''};
 const saveC=()=>{try{localStorage.setItem(CKEY,JSON.stringify(C))}catch(e){}};
+let SD=(Array.isArray(C.sd)&&C.sd.length)?C.sd:DEF_SD.map(x=>Object.assign({},x));
 function renderTxt(){
   $('#tKick').textContent=C.txt.kick;$('#tHead').textContent=C.txt.head;$('#tSub').textContent=C.txt.sub;
   document.title=(C.txt.head||'상단 입장')+(C.txt.kick?' · '+C.txt.kick:'');
@@ -253,8 +263,8 @@ function show(name,t,again,hs){
   $('#rNm').textContent=again?`${name}님은 이미 뽑았어요!`:`${name}님은`;
   $('#rSd').textContent=hs?t.n+' 행수':t.n;
   $('#next').textContent=hs?'다음 행수':'다음 친구';
-  $('#rGo').textContent=hs?`상인들이 기다리는 ${t.t} 테이블로!`:`${t.t} 테이블로 가세요!`;
-  $('#rGoods').textContent=`우리 상단의 물건 · ${t.g}`;
+  $('#rGo').textContent=hs?`상인들이 기다리는 ${t.t?t.t+' ':''}테이블로!`:`${t.t?t.t+' ':'우리 '}테이블로 가세요!`;
+  $('#rGoods').textContent=t.g?`우리 상단의 물건 · ${t.g}`:'';
   r.hidden=false;clearTimeout(timer);timer=setTimeout(back,12000);
 }
 function back(){
@@ -299,7 +309,7 @@ function rStat(){
   $('#rStat').innerHTML=R.length?`명단 <b>${R.length}명</b> · 입장 <b>${A.length-extra.length}명</b> · 아직 안 온 친구 <b>${wait.length}명</b>`+(wait.length?`<div class="chips">${wait.map(n=>`<span>${esc(n)}</span>`).join('')}</div>`:'')+(extra.length?`<div style="margin-top:8px">명단 밖 입장: ${extra.map(esc).join(', ')}</div>`:''):'명단이 비어 있어서 누구나 입장할 수 있어요. 이름을 넣으면 명단에 있는 이름만 문을 열 수 있어요.';
 }
 function aStat(){const A=adults(),got=A.filter(n=>hsOf(n));$('#aStat').innerHTML=A.length?`행수 후보 <b>${A.length}명</b> · 배정 <b>${got.length}명</b>`+(A.length>on().length?`<div style="margin-top:6px;color:#FFD3A8">사용하는 상단(${on().length}개)보다 많아요. 남는 분은 뽑을 수 없어요.</div>`:''):'비어 있으면 행수 뽑기를 쓰지 않아요.'}
-function openPanel(){renderCols();$('#iRoster').value=S.roster||'';$('#iAdults').value=S.adults||'';aStat();rStat();$('#iKick').value=C.txt.kick;$('#iHead').value=C.txt.head;$('#iSub').value=C.txt.sub;$('#panel').hidden=false}
+function openPanel(){renderSdEd();$('#sdMsg').textContent='';renderCols();$('#iRoster').value=S.roster||'';$('#iAdults').value=S.adults||'';aStat();rStat();$('#iKick').value=C.txt.kick;$('#iHead').value=C.txt.head;$('#iSub').value=C.txt.sub;$('#panel').hidden=false}
 async function h(v){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('gate:'+v));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return 'p:'+v}}
 let P={mode:'',v:'',first:''};
 function pinOpen(mode){P={mode,v:'',first:''};pinView();$('#pin').hidden=false}
@@ -337,6 +347,21 @@ function bindReset(){$('#reset').onclick=()=>{
 }}
 $('#fs').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}};
 bindReset();
+function ensureM(){SD.forEach(x=>{if(!S.m[x.id])S.m[x.id]=[]})}
+function saveSD(){C.sd=SD;saveC();ensureM();save()}
+function renderSdEd(){
+  $('#sdEd').innerHTML='<div class="sdr hd2"><span>색</span><span>상단 이름</span><span>테이블 색 이름</span><span>상단의 물건</span><span></span></div>'+SD.map((x,i)=>`<div class="sdr"><input type="color" value="${esc(x.c)}" data-sd="${i}" data-f="c" aria-label="${esc(x.n)} 색"><input value="${esc(x.n)}" maxlength="14" data-sd="${i}" data-f="n" placeholder="예: 비단 상단" aria-label="상단 이름"><input value="${esc(x.t)}" maxlength="8" data-sd="${i}" data-f="t" placeholder="예: 보라" aria-label="테이블 색 이름"><input value="${esc(x.g)}" maxlength="30" data-sd="${i}" data-f="g" placeholder="예: 비단 · 명주실" aria-label="상단의 물건"><button data-sdx="${i}" aria-label="${esc(x.n)} 빼기">×</button></div>`).join('');
+}
+$('#sdEd').addEventListener('input',e=>{const t=e.target;if(t.dataset.sd==null)return;SD[+t.dataset.sd][t.dataset.f]=t.value;saveSD();renderCols()});
+$('#sdEd').addEventListener('click',e=>{const b=e.target.closest('[data-sdx]');if(!b)return;const x=SD[+b.dataset.sdx];
+  if((S.m[x.id]||[]).length||S.h[x.id]){$('#sdMsg').textContent=`${x.n}에 들어간 사람이 있어요. 먼저 다른 상단으로 옮겨 주세요`;return}
+  if(SD.length<=1){$('#sdMsg').textContent='상단은 하나 이상 있어야 해요';return}
+  SD.splice(+b.dataset.sdx,1);delete S.m[x.id];delete S.off[x.id];saveSD();$('#sdMsg').textContent='';renderSdEd();renderCols()});
+$('#sdAdd').onclick=()=>{if(SD.length>=12){$('#sdMsg').textContent='상단은 12개까지 만들 수 있어요';return}
+  SD.push({id:'u'+Math.random().toString(36).slice(2,8),n:'새 상단',c:'#607D8B',t:'회색',g:''});saveSD();$('#sdMsg').textContent='';renderSdEd();renderCols()};
+$('#sdDef').onclick=()=>{if(all().length||Object.keys(S.h).length){$('#sdMsg').textContent="명단이 비어 있을 때만 되돌릴 수 있어요. '처음부터'를 먼저 눌러 주세요";return}
+  SD=DEF_SD.map(x=>Object.assign({},x));S.m={};S.off={};saveSD();$('#sdMsg').textContent='';renderSdEd();renderCols()};
+
 renderTxt();
 leftTxt();
 })();
