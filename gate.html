@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>과거의 문 · 상단 입장</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css">
+<style>
+:root{--navy:#043B72;--orange:#F58220;--orange2:#CB6015;--sand:#F0B26B;--ink:#1C2430;--gray:#48535B;--paper:#FBF6EC;--line:#E3D5BC}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{word-break:keep-all;font-family:'Pretendard Variable',Pretendard,'Noto Sans KR',sans-serif;background:#1B1612;color:var(--paper);overflow:hidden;-webkit-user-select:none;user-select:none}
+button,input{font:inherit}
+button{cursor:pointer;border:none}
+.bg{position:fixed;inset:0;background:linear-gradient(180deg,rgba(4,20,45,.35),rgba(4,20,45,.9)),url(img/bottari/door.jpg) center/cover;z-index:-1}
+/* 입장 화면 */
+.gate{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:24px;text-align:center}
+.gate .kick{font-size:clamp(18px,2.2vw,26px);font-weight:700;color:var(--sand);letter-spacing:2px}
+.gate h1{font-size:clamp(44px,7vw,96px);font-weight:900;letter-spacing:-2px;line-height:1.1}
+.gate p{font-size:clamp(18px,2.2vw,26px);color:#E9DECB}
+.form{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;width:min(720px,100%)}
+.form input{flex:1;min-width:220px;padding:22px 24px;border-radius:18px;border:3px solid rgba(255,255,255,.25);background:rgba(0,0,0,.35);color:#fff;font-size:clamp(24px,3vw,34px);font-weight:800;text-align:center;-webkit-user-select:text;user-select:text}
+.form input:focus{outline:none;border-color:var(--sand)}
+.form input::placeholder{color:rgba(255,255,255,.45)}
+.big{padding:22px 40px;border-radius:18px;background:var(--orange);color:var(--ink);font-weight:900;font-size:clamp(24px,3vw,34px);box-shadow:0 7px 0 var(--orange2)}
+.big:active{transform:translateY(4px);box-shadow:0 3px 0 var(--orange2)}
+.msg{min-height:1.6em;font-size:20px;font-weight:700;color:#FFD3A8}
+.left{font-size:17px;color:#CFC3AE}
+/* 룰렛 · 결과 */
+.draw{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding:24px;background:rgba(10,12,18,.72);text-align:center}
+.who{font-size:clamp(26px,3.4vw,44px);font-weight:800}
+.wheel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;width:min(900px,100%)}
+.wc{border-radius:22px;padding:26px 12px;background:rgba(255,255,255,.1);border:4px solid transparent;font-size:clamp(24px,3vw,40px);font-weight:900;color:rgba(255,255,255,.55);transition:transform .08s}
+.wc.hot{background:var(--c);color:#fff;border-color:#fff;transform:scale(1.06)}
+.res{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;background:var(--c);text-align:center;animation:pop .5s ease}
+.res .nm{font-size:clamp(30px,4vw,54px);font-weight:800;color:rgba(255,255,255,.92)}
+.res .sd{font-size:clamp(70px,12vw,170px);font-weight:900;letter-spacing:-3px;line-height:1;color:#fff;text-shadow:0 6px 0 rgba(0,0,0,.18)}
+.res .go{font-size:clamp(28px,4vw,52px);font-weight:900;color:#fff;background:rgba(0,0,0,.18);border-radius:999px;padding:12px 34px}
+.res .goods{font-size:clamp(18px,2.2vw,26px);color:rgba(255,255,255,.9);font-weight:600}
+.res .big{margin-top:12px;background:#fff;box-shadow:0 7px 0 rgba(0,0,0,.2)}
+@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:none;opacity:1}}
+/* 강사 버튼 · 명단 */
+.gear{position:fixed;right:14px;top:14px;width:46px;height:46px;border-radius:12px;background:rgba(255,255,255,.1);color:rgba(255,255,255,.6);font-size:22px}
+.panel{position:fixed;inset:0;background:#15110E;overflow:auto;padding:22px 26px 40px}
+.ph{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.ph h2{font-size:28px;font-weight:900;margin-right:auto}
+.ph h2 small{font-size:17px;color:#CFC3AE;font-weight:600;margin-left:8px}
+.tb{padding:11px 16px;border-radius:11px;background:rgba(255,255,255,.1);color:var(--paper);font-weight:700;font-size:16px}
+.tb.o{background:var(--orange);color:var(--ink)}
+.cols{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.col{background:var(--paper);color:var(--ink);border-radius:18px;overflow:hidden;border-top:12px solid var(--c)}
+.col.off{opacity:.45}
+.col h3{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 6px;font-size:23px;font-weight:900}
+.col h3 span{font-size:16px;color:var(--gray);font-weight:700}
+.col .tc{padding:0 16px 8px;font-size:15px;color:var(--gray);font-weight:600}
+.col ul{list-style:none;padding:0 10px 12px}
+.col li{display:flex;align-items:center;gap:6px;padding:8px 6px;border-top:1px solid var(--line);font-size:19px;font-weight:700}
+.col li b{flex:1}
+.col li select{font:inherit;font-size:14px;padding:4px;border-radius:8px;border:1px solid var(--line);background:#fff}
+.col li button{background:none;color:var(--gray);font-size:20px;padding:0 6px}
+.col .add{display:flex;gap:6px;padding:0 12px 14px}
+.col .add input{flex:1;min-width:0;padding:8px 10px;border-radius:9px;border:1.5px solid var(--line);font-size:16px;-webkit-user-select:text;user-select:text}
+.col .add button{padding:8px 12px;border-radius:9px;background:var(--ink);color:#fff;font-weight:700}
+.col .tog{display:flex;align-items:center;gap:6px;padding:0 16px 10px;font-size:14px;color:var(--gray);font-weight:600}
+.set{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin:18px 0 8px;font-size:17px;color:#E9DECB}
+.set .cnt{display:inline-flex;align-items:center;gap:8px}
+.set .cnt button{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.12);color:#fff;font-size:22px;font-weight:800}
+.set .cnt b{min-width:34px;text-align:center;font-size:22px}
+.note{font-size:15px;color:#A99C88;line-height:1.6;margin-top:14px}
+.confirm{display:inline-flex;gap:8px;align-items:center;background:#3A1E12;border-radius:11px;padding:6px 10px;font-size:15px}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<section class="gate" id="gate">
+  <div class="kick">청소년 AI금융캠프 · 시간상단</div>
+  <h1>과거의 문이 열린다</h1>
+  <p>이름을 쓰고 문을 열면, 오늘 내가 속할 상단이 정해져요</p>
+  <form class="form" id="form" autocomplete="off">
+    <input id="nm" maxlength="12" placeholder="이름 또는 별명" aria-label="이름 또는 별명">
+    <button class="big" type="submit">문 열기</button>
+  </form>
+  <div class="msg" id="msg" role="status"></div>
+  <div class="left" id="left"></div>
+</section>
+
+<section class="draw" id="draw" hidden>
+  <div class="who" id="who"></div>
+  <div class="wheel" id="wheel"></div>
+</section>
+
+<section class="res" id="res" hidden>
+  <div class="nm" id="rNm"></div>
+  <div class="sd" id="rSd"></div>
+  <div class="go" id="rGo"></div>
+  <div class="goods" id="rGoods"></div>
+  <button class="big" id="next">다음 친구</button>
+</section>
+
+<button class="gear" id="gear" aria-label="강사 명단 열기">⚙</button>
+
+<section class="panel" id="panel" hidden>
+  <div class="ph">
+    <h2>상단 명단 <small id="total"></small></h2>
+    <button class="tb" id="fs">전체 화면</button>
+    <span id="rsBox"><button class="tb" id="reset">처음부터</button></span>
+    <button class="tb o" id="close">입장 화면으로</button>
+  </div>
+  <div class="cols" id="cols"></div>
+  <div class="set">
+    <span>상단별 정원</span>
+    <span class="cnt"><button id="capM" aria-label="정원 줄이기">−</button><b id="cap"></b><button id="capP" aria-label="정원 늘리기">+</button></span>
+    <span>· 정원이 다 차면 인원이 가장 적은 상단부터 한 명씩 더 들어가요</span>
+  </div>
+  <p class="note">배정 방식: 그 순간 인원이 가장 적은 상단들 중에서 무작위로 정해요. 그래서 먼저 온 친구도 상단을 고를 수 없고, 늦게 온 친구는 빈자리로 들어가요.<br>이름은 이 태블릿 브라우저에만 저장되고 다른 곳으로 보내지 않아요. 캠프가 끝나면 '처음부터'로 지워 주세요.</p>
+</section>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const SD=[
+  {id:'silk', n:'비단 상단', c:'#8E44AD', t:'보라', g:'비단 · 명주실'},
+  {id:'grain',n:'곡물 상단', c:'#D4A017', t:'노랑', g:'쌀 · 보리'},
+  {id:'pot',  n:'도자기 상단',c:'#2E86C1', t:'파랑', g:'그릇 · 항아리'},
+  {id:'herb', n:'약초 상단', c:'#2E8B57', t:'초록', g:'약초 · 탕약'},
+  {id:'paper',n:'종이 상단', c:'#E67E22', t:'주황', g:'한지 · 지우산'},
+  {id:'salt', n:'소금 상단', c:'#C0392B', t:'빨강', g:'소금 · 젓갈'}
+];
+const KEY='gate-sangdan-v1';
+let S;try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
+if(!S||!S.m)S={cap:3,m:{},off:{}};
+SD.forEach(s=>{if(!S.m[s.id])S.m[s.id]=[]});
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const on=()=>SD.filter(s=>!S.off[s.id]);
+const all=()=>SD.flatMap(s=>S.m[s.id]);
+const sd=id=>SD.find(s=>s.id===id);
+
+function pick(){
+  const L=on();if(!L.length)return null;
+  const min=Math.min(...L.map(s=>S.m[s.id].length));
+  const c=L.filter(s=>S.m[s.id].length===min);
+  return c[Math.floor(Math.random()*c.length)];
+}
+function leftTxt(){
+  const n=all().length,capT=on().length*S.cap,r=Math.max(0,capT-n);
+  $('#left').textContent=n?`지금까지 ${n}명 입장 · 남은 자리 ${r}`:'';
+}
+$('#form').addEventListener('submit',e=>{
+  e.preventDefault();
+  const v=$('#nm').value.trim().replace(/\s+/g,' ');
+  if(!v){$('#msg').textContent='이름이나 별명을 먼저 써 주세요';return}
+  if(all().includes(v)){$('#msg').textContent='이미 있는 이름이에요. 성이나 별명을 붙여 주세요';return}
+  const t=pick();if(!t){$('#msg').textContent='열린 상단이 없어요. 선생님을 불러 주세요';return}
+  $('#msg').textContent='';$('#nm').blur();
+  S.m[t.id].push(v);save();
+  roll(v,t);
+});
+function roll(name,t){
+  const L=on();
+  $('#who').textContent=`${name}의 상단은…`;
+  $('#wheel').innerHTML=L.map(s=>`<div class="wc" style="--c:${s.c}" data-id="${s.id}">${esc(s.n)}</div>`).join('');
+  $('#gate').hidden=true;$('#draw').hidden=false;
+  const cards=[...$('#wheel').children],end=L.indexOf(t);
+  let i=Math.floor(Math.random()*L.length),steps=L.length*3+((end-i+L.length)%L.length),k=0;
+  (function tick(){
+    cards.forEach(c=>c.classList.remove('hot'));cards[i].classList.add('hot');
+    if(k>=steps){setTimeout(()=>show(name,t),550);return}
+    k++;i=(i+1)%L.length;
+    setTimeout(tick,60+Math.pow(k/steps,3)*360);
+  })();
+}
+let timer=null;
+function show(name,t){
+  $('#draw').hidden=true;
+  const r=$('#res');r.style.setProperty('--c',t.c);
+  $('#rNm').textContent=`${name}님은`;
+  $('#rSd').textContent=t.n;
+  $('#rGo').textContent=`${t.t} 테이블로 가세요!`;
+  $('#rGoods').textContent=`우리 상단의 물건 · ${t.g}`;
+  r.hidden=false;clearTimeout(timer);timer=setTimeout(back,12000);
+}
+function back(){
+  clearTimeout(timer);$('#res').hidden=true;$('#draw').hidden=true;$('#gate').hidden=false;
+  $('#nm').value='';leftTxt();
+}
+$('#next').onclick=back;
+
+/* 강사 명단 */
+function renderCols(){
+  $('#cap').textContent=S.cap;
+  $('#total').textContent=`${all().length}명`;
+  $('#cols').innerHTML=SD.map(s=>{
+    const L=S.m[s.id];
+    return `<div class="col${S.off[s.id]?' off':''}" style="--c:${s.c}">
+      <h3>${esc(s.n)}<span>${L.length}명</span></h3>
+      <div class="tc">${s.t} 테이블 · ${esc(s.g)}</div>
+      <label class="tog"><input type="checkbox" data-tog="${s.id}"${S.off[s.id]?'':' checked'}> 이번 캠프에 사용</label>
+      <ul>${L.map((n,i)=>`<li><b>${esc(n)}</b><select data-mv="${s.id}" data-i="${i}" aria-label="${esc(n)} 상단 옮기기"><option value="">옮기기</option>${SD.filter(x=>x.id!==s.id).map(x=>`<option value="${x.id}">${esc(x.n)}</option>`).join('')}</select><button data-del="${s.id}" data-i="${i}" aria-label="${esc(n)} 지우기">×</button></li>`).join('')}</ul>
+      <div class="add"><input data-addin="${s.id}" maxlength="12" placeholder="이름 직접 추가"><button data-add="${s.id}">추가</button></div>
+    </div>`}).join('');
+}
+$('#cols').addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.tog){S.off[t.dataset.tog]=!t.checked;save();renderCols();return}
+  if(t.dataset.mv&&t.value){const from=t.dataset.mv,i=+t.dataset.i,[n]=S.m[from].splice(i,1);S.m[t.value].push(n);save();renderCols()}
+});
+$('#cols').addEventListener('click',e=>{
+  const d=e.target.closest('[data-del]');
+  if(d){S.m[d.dataset.del].splice(+d.dataset.i,1);save();renderCols();return}
+  const a=e.target.closest('[data-add]');
+  if(a){const inp=$(`[data-addin="${a.dataset.add}"]`),v=inp.value.trim();if(v&&!all().includes(v)){S.m[a.dataset.add].push(v);save();renderCols()}}
+});
+$('#capM').onclick=()=>{S.cap=Math.max(1,S.cap-1);save();renderCols()};
+$('#capP').onclick=()=>{S.cap=Math.min(8,S.cap+1);save();renderCols()};
+$('#gear').onclick=()=>{renderCols();$('#panel').hidden=false};
+$('#close').onclick=()=>{$('#panel').hidden=true;back()};
+function resetBtn(){$('#rsBox').innerHTML='<button class="tb" id="reset">처음부터</button>';bindReset()}
+function bindReset(){$('#reset').onclick=()=>{
+  $('#rsBox').innerHTML='<span class="confirm">명단을 모두 지울까요? <button class="tb o" id="rsY">지우기</button><button class="tb" id="rsN">취소</button></span>';
+  $('#rsY').onclick=()=>{S={cap:S.cap,m:{},off:S.off};SD.forEach(s=>S.m[s.id]=[]);save();resetBtn();renderCols()};
+  $('#rsN').onclick=resetBtn;
+}}
+$('#fs').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}};
+bindReset();
+leftTxt();
+})();
+</script>
+</body>
+</html>
