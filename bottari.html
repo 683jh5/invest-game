@@ -129,21 +129,17 @@ td.m{font-weight:900;color:var(--navy)}
 
   <!-- 1. 뽑기 -->
   <section class="stage" data-s="draw">
-    <h1>우리 팀은 <em>어느 상단?</em></h1>
-    <p class="lead" id="drawLead">팀 수와 이름을 정하고 뽑기 시작. 상단이 하나씩 공개됨.</p>
-    <div class="setup" id="setup">
-      <div class="cnt"><button type="button" id="minus" aria-label="팀 줄이기">−</button><b id="cntv">5팀</b><button type="button" id="plus" aria-label="팀 늘리기">+</button></div>
-      <div class="names" id="names"></div>
-    </div>
-    <div class="row"><button class="big" id="go" type="button">상단 뽑기 시작</button><button class="big ghost" id="redo" type="button" hidden>다시 뽑기</button><button class="big ghost" id="next1" type="button" hidden>주문 보기 →</button></div>
+    <h1>오늘의 <em>여섯 상단</em></h1>
+    <p class="lead" id="drawLead">입장할 때 뽑은 상단 그대로 진행. 이번 캠프에 쓰는 상단과 팀(회사) 이름을 확인하고 주문 보기.</p>
     <div class="grid" id="drawGrid"></div>
+    <div class="row"><button class="big" id="next1" type="button">주문 보기 →</button></div>
   </section>
 
   <!-- 2. 주문 -->
   <section class="stage" data-s="order" hidden>
     <h1>R1 · <em>우리 상단의 주문</em></h1>
     <div class="orderwrap">
-      <div class="warebig"><img src="img/bottari/ware.jpg" alt="상단의 창고: 기름, 쌀, 숯, 소금, 짚신, 부채. 서로 다른 물건 3개를 고르고 각 1개씩 가져갈 수 있음"><p>창고에서 <span>서로 다른 3개</span>를 골라 기록지에 쓰기 · 단서는 <span>목표 ①</span>을 주는 상인이 원하는 것</p></div>
+      <div class="warebig"><img src="img/bottari/ware.jpg" alt="상단의 창고: 기름, 쌀, 숯, 소금, 짚신, 부채. 서로 다른 물건 3개를 고르고 각 1개씩 가져갈 수 있음"><p>창고에서 <span>서로 다른 3개</span>를 골라 정하기 · 단서는 <span>목표 ①</span>을 주는 상인이 원하는 것</p></div>
       <div id="orderGrid"></div>
     </div>
     <div class="row"><button class="big" id="openMarket" type="button">모든 상단 보따리 완료 → 장터 공개</button></div>
@@ -192,6 +188,7 @@ const SANGDAN = [
   { n: "도자기", t1: "포장용 짚 1묶음", t2: "나무 상자 1개", clue: "짚단 농가는 군불 땔거리가 필요함" },
   { n: "약초", t1: "포장용 종이 1묶음", t2: "끈 1묶음", clue: "종이 가게는 밤에 켤 등잔불이 필요함" },
   { n: "종이", t1: "닥나무 껍질 1묶음", t2: "종이 뜨는 발 1개", clue: "닥나무 농가는 나물 절일 것이 필요함" },
+  { n: "소금", t1: "바가지 1개", t2: "나무 상자 1개", clue: "바가지 장수는 더위를 식힐 부채가 필요함" },
 ];
 const MARKET = [
   ["누에 농가", "쌀", "명주실 1타래"], ["자루 장수", "소금", "곡식 자루 1개"], ["짚단 농가", "숯", "포장용 짚 1묶음"],
@@ -199,14 +196,14 @@ const MARKET = [
   ["염색 장인", "천", "쪽물감 1통"], ["목수", "천", "나무 상자 1개"], ["발 장인", "천", "종이 뜨는 발 1개"],
   ["새끼 꼬는 집", "바가지", "새끼줄 1묶음"], ["끈 공방", "바가지", "끈 1묶음"], ["바가지 장수", "부채", "바가지 1개"],
 ];
-const STEPS = [["draw", "상단 뽑기"], ["order", "주문"], ["market", "장터"], ["r1", "R1 결과"], ["r2", "조개 장터"], ["cmp", "비교"]];
-const KEY = "bottari-teacher-v1";
+const STEPS = [["draw", "상단 확인"], ["order", "주문"], ["market", "장터"], ["r1", "R1 결과"], ["r2", "조개 장터"], ["cmp", "비교"]];
+const KEY = "bottari-teacher-v2";
 
-let S = { n: 5, names: [], picks: [], step: "draw", market: false, r1: {}, r2: {}, q: 0, clue: {} };
+let S = { n: 6, names: [], picks: [], step: "draw", market: false, r1: {}, r2: {}, q: 0, clue: {}, use: [true, true, true, true, true, true], nm: [] };
 try { const x = JSON.parse(localStorage.getItem(KEY) || "null"); if (x && typeof x === "object") S = Object.assign(S, x); } catch (_) {}
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (_) {} };
-const nameOf = (i) => (S.names[i] || "").trim() || `${i + 1}팀`;
-const drawn = () => S.picks.length === S.n && S.picks.every((p) => p !== null && p !== undefined);
+const nameOf = (i) => ((S.nm || [])[S.picks[i]] || "").trim();
+const drawn = () => S.picks.length > 0;
 let busy = false;
 
 function toast(m) { const t = $("#toast"); t.textContent = m; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), 2400); }
@@ -228,55 +225,20 @@ function go(k) {
   renderSteps(); renderStage(k);
 }
 
-/* draw */
-function renderNames() {
-  $("#cntv").textContent = `${S.n}팀`;
-  $("#names").innerHTML = Array.from({ length: S.n }, (_, i) => `<input type="text" data-i="${i}" maxlength="10" aria-label="${i + 1}번 팀 이름" placeholder="${i + 1}팀" value="${esc(S.names[i] || "")}">`).join("");
-}
-function slotHTML(i, p, cls = "") {
-  const sd = p === null || p === undefined ? null : SANGDAN[p];
-  return `<div class="slot ${cls}" data-i="${i}"><span class="tm">${esc(nameOf(i))}</span><span class="sd ${sd ? "" : "wait"}">${sd ? sd.n + " 상단" : "?"}</span></div>`;
-}
+/* 상단 확인 (뽑기 없음 · 입장 때 뽑은 상단 그대로) */
 function renderDraw() {
-  const g = $("#drawGrid"); setCols(g);
-  const has = drawn();
-  g.innerHTML = Array.from({ length: S.n }, (_, i) => slotHTML(i, S.picks[i], has ? "done" : "")).join("");
-  $("#setup").hidden = has; $("#go").hidden = has; $("#redo").hidden = !has; $("#next1").hidden = !has;
-  $("#drawLead").textContent = has ? "상단 배정 완료. 팀 이름 뒤에 ‘상단’을 붙여 부르기." : "팀 수와 이름을 정하고 뽑기 시작. 상단이 하나씩 공개됨.";
-  if (!has) renderNames();
+  const g = $("#drawGrid"); g.style.gridTemplateColumns = "repeat(3, minmax(0, 1fr))";
+  g.innerHTML = SANGDAN.map((d, k) => `<div class="slot ${S.use[k] ? "done" : ""}" style="${S.use[k] ? "" : "opacity:.45"}">
+    <label class="tm" style="display:flex;gap:8px;align-items:center;cursor:pointer"><input type="checkbox" data-use="${k}" ${S.use[k] ? "checked" : ""} style="width:22px;height:22px"> 이번 캠프에 사용</label>
+    <span class="sd">${d.n} 상단</span>
+    <input type="text" data-nm="${k}" maxlength="14" placeholder="팀(회사) 이름 · 선택" value="${esc((S.nm || [])[k] || "")}" aria-label="${d.n} 상단 팀 이름" style="padding:10px 12px;border-radius:10px;border:2px solid var(--line);font:inherit;font-size:18px;font-weight:700">
+  </div>`).join("");
 }
-function plan(n) {
-  // 5개 상단을 고르게 섞어 배정 (6팀 이상이면 상단이 두 번째로 돌아옴)
-  const out = [];
-  while (out.length < n) {
-    const bag = [0, 1, 2, 3, 4];
-    for (let i = bag.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [bag[i], bag[j]] = [bag[j], bag[i]]; }
-    out.push(...bag);
-  }
-  return out.slice(0, n);
-}
-async function runDraw() {
-  if (busy) return; busy = true;
-  const target = plan(S.n);
-  S.picks = Array(S.n).fill(null); S.r1 = {}; S.r2 = {}; S.market = false; S.clue = {}; S.q = 0; save();
-  $("#setup").hidden = true; $("#go").hidden = true; $("#redo").hidden = true; $("#next1").hidden = true;
-  const g = $("#drawGrid"); setCols(g);
-  g.innerHTML = Array.from({ length: S.n }, (_, i) => slotHTML(i, null)).join("");
-  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  for (let i = 0; i < S.n; i++) {
-    const el = $(`.slot[data-i="${i}"]`, g); const sd = $(".sd", el);
-    el.classList.add("spin"); sd.classList.remove("wait");
-    const spins = reduce ? 1 : 14 + Math.floor(Math.random() * 6);
-    for (let k = 0; k < spins; k++) {
-      sd.textContent = SANGDAN[(target[i] + spins - k) % 5].n + " 상단";
-      await new Promise((r) => setTimeout(r, reduce ? 0 : 45 + k * k * 1.1));
-    }
-    sd.textContent = SANGDAN[target[i]].n + " 상단";
-    el.classList.remove("spin"); el.classList.add("done");
-    S.picks[i] = target[i]; save();
-    await new Promise((r) => setTimeout(r, reduce ? 0 : 420));
-  }
-  busy = false; renderDraw(); renderSteps(); toast("상단 배정 완료!");
+function applyPicks() {
+  const picks = SANGDAN.map((_, k) => k).filter((k) => S.use[k]);
+  const same = picks.length === S.picks.length && picks.every((v, i) => v === S.picks[i]);
+  if (!same) { S.r1 = {}; S.r2 = {}; S.clue = {}; S.market = false; S.q = 0; }
+  S.picks = picks; S.n = picks.length; save();
 }
 
 /* order */
@@ -308,12 +270,12 @@ function renderRound(round, el, mini = false) {
   el.innerHTML = S.picks.map((p, i) => cardHTML(i, stampHTML(round, i), mini)).join("");
 }
 function renderBuy() {
-  $("#buy").innerHTML = `<table><tr><th>팀 · 상단</th><th>조개 1개로 사기</th><th>조개 2개로 사기</th></tr>${S.picks.map((p, i) => `<tr><td class="m">${esc(nameOf(i))} · ${SANGDAN[p].n}</td><td>${SANGDAN[p].t1}</td><td>${SANGDAN[p].t2}</td></tr>`).join("")}</table>`;
+  $("#buy").innerHTML = `<table><tr><th>팀 · 상단</th><th>조개 1개로 사기</th><th>조개 2개로 사기</th></tr>${S.picks.map((p, i) => `<tr><td class="m">${nameOf(i) ? esc(nameOf(i)) + " · " : ""}${SANGDAN[p].n}</td><td>${SANGDAN[p].t1}</td><td>${SANGDAN[p].t2}</td></tr>`).join("")}</table>`;
 }
 function renderCmp() {
   const cnt = (r, i) => ((S[r][i] || {}).a ? 1 : 0) + ((S[r][i] || {}).b ? 1 : 0);
   const cell = (n) => `<span class="${n === 2 ? "yes" : "no"}">${n} / 2</span>`;
-  const rows = S.picks.map((p, i) => `<tr><td class="m">${esc(nameOf(i))} · ${SANGDAN[p].n} 상단</td><td>${cell(cnt("r1", i))}</td><td>${cell(cnt("r2", i))}</td></tr>`).join("");
+  const rows = S.picks.map((p, i) => `<tr><td class="m">${nameOf(i) ? esc(nameOf(i)) + " · " : ""}${SANGDAN[p].n} 상단</td><td>${cell(cnt("r1", i))}</td><td>${cell(cnt("r2", i))}</td></tr>`).join("");
   const tot = (r) => S.picks.filter((_, i) => cnt(r, i) === 2).length;
   $("#cmp").innerHTML = `<table class="res"><tr><th>상단</th><th>R1 · 물물교환</th><th>R2 · 조개 화폐</th></tr>${rows}<tr><td><b>목표 2종 모두 확보</b></td><td><span class="pill">${tot("r1")} / ${S.n} 상단</span></td><td><span class="pill">${tot("r2")} / ${S.n} 상단</span></td></tr></table>`;
 }
@@ -336,11 +298,7 @@ function renderStage(k) {
 /* events */
 document.addEventListener("click", (e) => {
   const st = e.target.closest("[data-go]"); if (st && !st.disabled) { go(st.dataset.go); return; }
-  if (e.target.closest("#minus")) { if (S.n > 2) { S.n--; save(); renderNames(); renderDraw(); } return; }
-  if (e.target.closest("#plus")) { if (S.n < 12) { S.n++; save(); renderNames(); renderDraw(); } return; }
-  if (e.target.closest("#go")) { runDraw(); return; }
-  if (e.target.closest("#redo")) { if (!busy) { S.picks = []; save(); renderDraw(); renderSteps(); } return; }
-  if (e.target.closest("#next1")) { go("order"); return; }
+  if (e.target.closest("#next1")) { if (!S.use.some(Boolean)) { toast("상단을 하나 이상 골라 주세요"); return; } applyPicks(); go("order"); return; }
   if (e.target.closest("#openMarket")) { S.market = true; save(); go("market"); return; }
   const cb = e.target.closest("[data-clue]"); if (cb) { S.clue = Object.assign({}, S.clue, { [cb.dataset.clue]: true }); save(); renderOrder(); return; }
   if (e.target.closest("#allclue")) { S.clue = Object.fromEntries(S.picks.map((_, i) => [i, true])); save(); renderOrder(); return; }
@@ -350,11 +308,15 @@ document.addEventListener("click", (e) => {
   const sb = e.target.closest(".stamp button");
   if (sb) { const r = sb.dataset.r, i = sb.dataset.i, g = sb.dataset.g; S[r][i] = Object.assign({}, S[r][i]); S[r][i][g] = !S[r][i][g]; save(); sb.setAttribute("aria-pressed", String(S[r][i][g])); return; }
   if (e.target.closest("#full")) { try { const d = document.documentElement; const pr = document.fullscreenElement ? document.exitFullscreen() : (d.requestFullscreen ? d.requestFullscreen() : null); if (pr && pr.catch) pr.catch(() => {}); } catch (_) {} return; }
-  if (e.target.closest("#reset")) { if (busy) return; S = { n: S.n, names: S.names, picks: [], step: "draw", market: false, r1: {}, r2: {}, q: 0, clue: {} }; save(); go("draw"); toast("처음부터 다시 시작"); return; }
+  if (e.target.closest("#reset")) { if (busy) return; S = { n: S.n, names: [], picks: [], step: "draw", market: false, r1: {}, r2: {}, q: 0, clue: {}, use: S.use, nm: S.nm }; save(); go("draw"); toast("처음부터 다시 시작"); return; }
 });
 document.addEventListener("input", (e) => {
-  const el = e.target.closest("#names input"); if (!el) return;
-  S.names[+el.dataset.i] = el.value; save();
+  const el = e.target.closest("[data-nm]"); if (!el) return;
+  S.nm = S.nm || []; S.nm[+el.dataset.nm] = el.value; save();
+});
+document.addEventListener("change", (e) => {
+  const el = e.target.closest("[data-use]"); if (!el) return;
+  S.use[+el.dataset.use] = el.checked; save(); renderDraw(); applyPicks(); renderSteps();
 });
 document.addEventListener("keydown", (e) => {
   if (e.target.closest("input")) return;
@@ -364,7 +326,8 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "ArrowLeft" && i > 0) go(STEPS[i - 1][0]);
 });
 
-if (!drawn() && S.step !== "draw") S.step = "draw";
+if (!S.use || S.use.length < SANGDAN.length) S.use = SANGDAN.map(() => true);
+if (!drawn()) applyPicks();
 go(S.step);
 })();
 </script>
