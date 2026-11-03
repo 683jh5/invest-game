@@ -68,6 +68,20 @@ button{cursor:pointer;border:none}
 .set .cnt button{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.12);color:#fff;font-size:22px;font-weight:800}
 .set .cnt b{min-width:34px;text-align:center;font-size:22px}
 .note{font-size:15px;color:#A99C88;line-height:1.6;margin-top:14px}
+.sh{font-size:22px;font-weight:900;margin:26px 0 10px}
+.txt{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.txt label{display:flex;flex-direction:column;gap:6px;font-size:15px;color:#CFC3AE;font-weight:700}
+.txt input{padding:12px 14px;border-radius:10px;border:2px solid rgba(255,255,255,.18);background:rgba(0,0,0,.3);color:#fff;font-size:18px;font-weight:700;-webkit-user-select:text;user-select:text}
+.txt input:focus{outline:none;border-color:var(--sand)}
+.pin{position:fixed;inset:0;background:rgba(10,10,14,.85);display:grid;place-items:center;padding:20px}
+.pbox{background:#221B15;border-radius:22px;padding:26px 24px;width:min(360px,100%);text-align:center;display:flex;flex-direction:column;gap:14px;align-items:center}
+.pbox h3{font-size:24px;font-weight:900}
+.pbox p{font-size:15px;color:#CFC3AE;min-height:1.4em}
+.dots{display:flex;gap:12px}
+.dots i{width:18px;height:18px;border-radius:50%;border:2px solid var(--sand)}
+.dots i.f{background:var(--sand)}
+.pad{display:grid;grid-template-columns:repeat(3,72px);gap:10px}
+.pad button{height:64px;border-radius:14px;background:rgba(255,255,255,.1);color:#fff;font-size:26px;font-weight:800}
 .confirm{display:inline-flex;gap:8px;align-items:center;background:#3A1E12;border-radius:11px;padding:6px 10px;font-size:15px}
 </style>
 </head>
@@ -75,9 +89,9 @@ button{cursor:pointer;border:none}
 <div class="bg"></div>
 
 <section class="gate" id="gate">
-  <div class="kick">청소년 AI금융캠프 · 시간상단</div>
-  <h1>과거의 문이 열린다</h1>
-  <p>이름을 쓰고 문을 열면, 오늘 내가 속할 상단이 정해져요</p>
+  <div class="kick" id="tKick"></div>
+  <h1 id="tHead"></h1>
+  <p id="tSub"></p>
   <form class="form" id="form" autocomplete="off">
     <input id="nm" maxlength="12" placeholder="이름 또는 별명" aria-label="이름 또는 별명">
     <button class="big" type="submit">문 열기</button>
@@ -101,6 +115,16 @@ button{cursor:pointer;border:none}
 
 <button class="gear" id="gear" aria-label="강사 명단 열기">⚙</button>
 
+<section class="pin" id="pin" hidden>
+  <div class="pbox">
+    <h3 id="pinT">비밀번호</h3>
+    <p id="pinS"></p>
+    <div class="dots" id="dots"></div>
+    <div class="pad" id="pad"></div>
+    <button class="tb" id="pinX">취소</button>
+  </div>
+</section>
+
 <section class="panel" id="panel" hidden>
   <div class="ph">
     <h2>상단 명단 <small id="total"></small></h2>
@@ -114,6 +138,13 @@ button{cursor:pointer;border:none}
     <span class="cnt"><button id="capM" aria-label="정원 줄이기">−</button><b id="cap"></b><button id="capP" aria-label="정원 늘리기">+</button></span>
     <span>· 정원이 다 차면 인원이 가장 적은 상단부터 한 명씩 더 들어가요</span>
   </div>
+  <h2 class="sh">입장 화면 글자</h2>
+  <div class="txt">
+    <label>맨 위 작은 글씨<input id="iKick" maxlength="40"></label>
+    <label>큰 제목<input id="iHead" maxlength="30"></label>
+    <label>안내 문구<input id="iSub" maxlength="60"></label>
+  </div>
+  <div class="set"><button class="tb" id="tDef">기본 글자로 되돌리기</button><button class="tb" id="pinC">비밀번호 바꾸기</button></div>
   <p class="note">배정 방식: 그 순간 인원이 가장 적은 상단들 중에서 무작위로 정해요. 그래서 먼저 온 친구도 상단을 고를 수 없고, 늦게 온 친구는 빈자리로 들어가요.<br>이름은 이 태블릿 브라우저에만 저장되고 다른 곳으로 보내지 않아요. 캠프가 끝나면 '처음부터'로 지워 주세요.</p>
 </section>
 
@@ -132,6 +163,15 @@ const SD=[
 const KEY='gate-sangdan-v1';
 let S;try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
 if(!S||!S.m)S={cap:3,m:{},off:{}};
+const DEF={kick:'청소년 AI금융캠프',head:'과거의 문이 열린다',sub:'이름을 쓰고 문을 열면, 오늘 내가 속할 상단이 정해져요'};
+const CKEY='gate-sangdan-conf-v1';
+let C;try{C=JSON.parse(localStorage.getItem(CKEY)||'null')}catch(e){C=null}
+if(!C)C={txt:Object.assign({},DEF),pin:''};
+const saveC=()=>{try{localStorage.setItem(CKEY,JSON.stringify(C))}catch(e){}};
+function renderTxt(){
+  $('#tKick').textContent=C.txt.kick;$('#tHead').textContent=C.txt.head;$('#tSub').textContent=C.txt.sub;
+  document.title=(C.txt.head||'상단 입장')+(C.txt.kick?' · '+C.txt.kick:'');
+}
 SD.forEach(s=>{if(!S.m[s.id])S.m[s.id]=[]});
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const on=()=>SD.filter(s=>!S.off[s.id]);
@@ -215,7 +255,35 @@ $('#cols').addEventListener('click',e=>{
 });
 $('#capM').onclick=()=>{S.cap=Math.max(1,S.cap-1);save();renderCols()};
 $('#capP').onclick=()=>{S.cap=Math.min(8,S.cap+1);save();renderCols()};
-$('#gear').onclick=()=>{renderCols();$('#panel').hidden=false};
+function openPanel(){renderCols();$('#iKick').value=C.txt.kick;$('#iHead').value=C.txt.head;$('#iSub').value=C.txt.sub;$('#panel').hidden=false}
+async function h(v){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('gate:'+v));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return 'p:'+v}}
+let P={mode:'',v:'',first:''};
+function pinOpen(mode){P={mode,v:'',first:''};pinView();$('#pin').hidden=false}
+function pinView(){
+  const t={enter:['비밀번호','강사 설정을 열려면 4자리 숫자를 눌러 주세요'],new1:['비밀번호 만들기','처음이에요. 강사 설정용 4자리 숫자를 정해 주세요'],new2:['한 번 더','같은 숫자를 한 번 더 눌러 주세요']}[P.mode];
+  $('#pinT').textContent=t[0];if(!P.err)$('#pinS').textContent=t[1];
+  $('#dots').innerHTML=[0,1,2,3].map(i=>`<i class="${i<P.v.length?'f':''}"></i>`).join('');
+}
+$('#pad').innerHTML=['1','2','3','4','5','6','7','8','9','','0','←'].map(k=>k?`<button data-k="${k}" aria-label="${k==='←'?'지우기':k}">${k}</button>`:'<span></span>').join('');
+$('#pad').addEventListener('click',async e=>{
+  const b=e.target.closest('[data-k]');if(!b)return;const k=b.dataset.k;P.err=false;
+  if(k==='←'){P.v=P.v.slice(0,-1);pinView();return}
+  if(P.v.length>=4)return;P.v+=k;pinView();if(P.v.length<4)return;
+  await new Promise(r=>setTimeout(r,150));
+  if(P.mode==='enter'){
+    if(await h(P.v)===C.pin){$('#pin').hidden=true;openPanel()}
+    else{P.v='';P.err=true;$('#pinS').textContent='비밀번호가 달라요. 다시 눌러 주세요';pinView()}
+  }else if(P.mode==='new1'){P.first=P.v;P.v='';P.mode='new2';pinView()}
+  else if(P.mode==='new2'){
+    if(P.v===P.first){C.pin=await h(P.v);saveC();$('#pin').hidden=true;openPanel()}
+    else{P.v='';P.first='';P.mode='new1';P.err=true;$('#pinS').textContent='두 번 누른 숫자가 달라요. 처음부터 다시 정해 주세요';pinView()}
+  }
+});
+$('#pinX').onclick=()=>{$('#pin').hidden=true};
+$('#gear').onclick=()=>pinOpen(C.pin?'enter':'new1');
+$('#pinC').onclick=()=>{$('#panel').hidden=true;pinOpen('new1')};
+['Kick','Head','Sub'].forEach(n=>$('#i'+n).addEventListener('input',e=>{C.txt[n.toLowerCase()]=e.target.value;saveC();renderTxt()}));
+$('#tDef').onclick=()=>{C.txt=Object.assign({},DEF);saveC();renderTxt();openPanel()};
 $('#close').onclick=()=>{$('#panel').hidden=true;back()};
 function resetBtn(){$('#rsBox').innerHTML='<button class="tb" id="reset">처음부터</button>';bindReset()}
 function bindReset(){$('#reset').onclick=()=>{
@@ -225,6 +293,7 @@ function bindReset(){$('#reset').onclick=()=>{
 }}
 $('#fs').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}};
 bindReset();
+renderTxt();
 leftTxt();
 })();
 </script>
