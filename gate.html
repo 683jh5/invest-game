@@ -69,6 +69,13 @@ button{cursor:pointer;border:none}
 .set .cnt b{min-width:34px;text-align:center;font-size:22px}
 .note{font-size:15px;color:#A99C88;line-height:1.6;margin-top:14px}
 .sh{font-size:22px;font-weight:900;margin:26px 0 10px}
+.roster{display:grid;grid-template-columns:minmax(260px,1fr) minmax(260px,1.4fr);gap:14px}
+@media(max-width:700px){.roster{grid-template-columns:1fr}}
+.roster textarea{width:100%;min-height:170px;padding:12px 14px;border-radius:10px;border:2px solid rgba(255,255,255,.18);background:rgba(0,0,0,.3);color:#fff;font:inherit;font-size:17px;font-weight:600;line-height:1.5;resize:vertical;-webkit-user-select:text;user-select:text}
+.roster .st{background:rgba(255,255,255,.06);border-radius:12px;padding:14px 16px;font-size:16px;color:#E9DECB;line-height:1.7}
+.roster .st b{color:var(--sand)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chips span{background:rgba(255,255,255,.12);border-radius:999px;padding:3px 11px;font-size:15px;font-weight:700}
 .txt{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
 .txt label{display:flex;flex-direction:column;gap:6px;font-size:15px;color:#CFC3AE;font-weight:700}
 .txt input{padding:12px 14px;border-radius:10px;border:2px solid rgba(255,255,255,.18);background:rgba(0,0,0,.3);color:#fff;font-size:18px;font-weight:700;-webkit-user-select:text;user-select:text}
@@ -138,6 +145,11 @@ button{cursor:pointer;border:none}
     <span class="cnt"><button id="capM" aria-label="정원 줄이기">−</button><b id="cap"></b><button id="capP" aria-label="정원 늘리기">+</button></span>
     <span>· 정원이 다 차면 인원이 가장 적은 상단부터 한 명씩 더 들어가요</span>
   </div>
+  <h2 class="sh">참가자 명단</h2>
+  <div class="roster">
+    <label class="txt" style="display:block"><textarea id="iRoster" placeholder="한 줄에 한 명씩, 또는 쉼표로 구분해서 이름을 넣어 주세요&#10;비워 두면 누구나 이름을 써서 입장할 수 있어요"></textarea></label>
+    <div class="st" id="rStat"></div>
+  </div>
   <h2 class="sh">입장 화면 글자</h2>
   <div class="txt">
     <label>맨 위 작은 글씨<input id="iKick" maxlength="40"></label>
@@ -176,6 +188,8 @@ SD.forEach(s=>{if(!S.m[s.id])S.m[s.id]=[]});
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
 const on=()=>SD.filter(s=>!S.off[s.id]);
 const all=()=>SD.flatMap(s=>S.m[s.id]);
+const norm=v=>String(v||'').trim().replace(/\s+/g,' ');
+const roster=()=>[...new Set(String(S.roster||'').split(/[\n,]/).map(norm).filter(Boolean))];
 const sd=id=>SD.find(s=>s.id===id);
 
 function pick(){
@@ -192,7 +206,10 @@ $('#form').addEventListener('submit',e=>{
   e.preventDefault();
   const v=$('#nm').value.trim().replace(/\s+/g,' ');
   if(!v){$('#msg').textContent='이름이나 별명을 먼저 써 주세요';return}
-  if(all().includes(v)){$('#msg').textContent='이미 있는 이름이에요. 성이나 별명을 붙여 주세요';return}
+  const R=roster();
+  const done=SD.find(x=>S.m[x.id].includes(v));
+  if(done){$('#msg').textContent='';$('#nm').blur();show(v,done,true);return}
+  if(R.length&&!R.includes(v)){$('#msg').textContent='명단에 없는 이름이에요. 띄어쓰기까지 확인해서 다시 써 주세요';return}
   const t=pick();if(!t){$('#msg').textContent='열린 상단이 없어요. 선생님을 불러 주세요';return}
   $('#msg').textContent='';$('#nm').blur();
   S.m[t.id].push(v);save();
@@ -213,10 +230,10 @@ function roll(name,t){
   })();
 }
 let timer=null;
-function show(name,t){
+function show(name,t,again){
   $('#draw').hidden=true;
   const r=$('#res');r.style.setProperty('--c',t.c);
-  $('#rNm').textContent=`${name}님은`;
+  $('#rNm').textContent=again?`${name}님은 이미 뽑았어요!`:`${name}님은`;
   $('#rSd').textContent=t.n;
   $('#rGo').textContent=`${t.t} 테이블로 가세요!`;
   $('#rGoods').textContent=`우리 상단의 물건 · ${t.g}`;
@@ -229,7 +246,7 @@ function back(){
 $('#next').onclick=back;
 
 /* 강사 명단 */
-function renderCols(){
+function renderCols(){if(document.getElementById('rStat'))rStat();
   $('#cap').textContent=S.cap;
   $('#total').textContent=`${all().length}명`;
   $('#cols').innerHTML=SD.map(s=>{
@@ -253,9 +270,14 @@ $('#cols').addEventListener('click',e=>{
   const a=e.target.closest('[data-add]');
   if(a){const inp=$(`[data-addin="${a.dataset.add}"]`),v=inp.value.trim();if(v&&!all().includes(v)){S.m[a.dataset.add].push(v);save();renderCols()}}
 });
+$('#iRoster').addEventListener('input',e=>{S.roster=e.target.value;save();rStat()});
 $('#capM').onclick=()=>{S.cap=Math.max(1,S.cap-1);save();renderCols()};
 $('#capP').onclick=()=>{S.cap=Math.min(8,S.cap+1);save();renderCols()};
-function openPanel(){renderCols();$('#iKick').value=C.txt.kick;$('#iHead').value=C.txt.head;$('#iSub').value=C.txt.sub;$('#panel').hidden=false}
+function rStat(){
+  const R=roster(),A=all(),wait=R.filter(n=>!A.includes(n)),extra=R.length?A.filter(n=>!R.includes(n)):[];
+  $('#rStat').innerHTML=R.length?`명단 <b>${R.length}명</b> · 입장 <b>${A.length-extra.length}명</b> · 아직 안 온 친구 <b>${wait.length}명</b>`+(wait.length?`<div class="chips">${wait.map(n=>`<span>${esc(n)}</span>`).join('')}</div>`:'')+(extra.length?`<div style="margin-top:8px">명단 밖 입장: ${extra.map(esc).join(', ')}</div>`:''):'명단이 비어 있어서 누구나 입장할 수 있어요. 이름을 넣으면 명단에 있는 이름만 문을 열 수 있어요.';
+}
+function openPanel(){renderCols();$('#iRoster').value=S.roster||'';rStat();$('#iKick').value=C.txt.kick;$('#iHead').value=C.txt.head;$('#iSub').value=C.txt.sub;$('#panel').hidden=false}
 async function h(v){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('gate:'+v));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){return 'p:'+v}}
 let P={mode:'',v:'',first:''};
 function pinOpen(mode){P={mode,v:'',first:''};pinView();$('#pin').hidden=false}
@@ -288,7 +310,7 @@ $('#close').onclick=()=>{$('#panel').hidden=true;back()};
 function resetBtn(){$('#rsBox').innerHTML='<button class="tb" id="reset">처음부터</button>';bindReset()}
 function bindReset(){$('#reset').onclick=()=>{
   $('#rsBox').innerHTML='<span class="confirm">명단을 모두 지울까요? <button class="tb o" id="rsY">지우기</button><button class="tb" id="rsN">취소</button></span>';
-  $('#rsY').onclick=()=>{S={cap:S.cap,m:{},off:S.off};SD.forEach(s=>S.m[s.id]=[]);save();resetBtn();renderCols()};
+  $('#rsY').onclick=()=>{S={cap:S.cap,m:{},off:S.off,roster:S.roster};SD.forEach(s=>S.m[s.id]=[]);save();resetBtn();renderCols()};
   $('#rsN').onclick=resetBtn;
 }}
 $('#fs').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}catch(e){}};
