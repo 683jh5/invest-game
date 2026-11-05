@@ -156,7 +156,7 @@
   #s-report table{width:100%;border-collapse:collapse;font-size:12px}#s-report td,#s-report th{padding:5px 8px;border-bottom:1px solid #E3E8EF;text-align:left}#s-report th{background:#F7F8FA;font-weight:700}
   #s-report .ref{background:#FDF0E4;border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.6}
   #s-report .ft{margin-top:14px;font-size:11px;color:#5A6470;display:flex;justify-content:space-between;border-top:1px solid #E3E8EF;padding-top:8px}
-  @media print{body *{visibility:hidden}#s-report-wrap{position:static !important;left:0 !important}#s-report,#s-report *{visibility:visible}#s-report{width:100%;padding:0;border-top:none}}
+  @media print{@page{margin:10mm}body{margin:0}body>*{display:none !important}#s-report-wrap{display:block !important;position:static !important;left:0 !important}#s-report{width:100%;padding:0;border-top:none}}
 </style>
 <style>
 /* ── 청소년 AI금융캠프 장표 디자인에 맞춘 덮어쓰기 ──
@@ -216,6 +216,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 <!-- 로그인 -->
@@ -962,7 +963,18 @@ $('btn-rep-png').onclick=async()=>{
   const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download=`투자리포트_${myName.replace(/\s+/g,'_')}.png`;document.body.appendChild(a);a.click();document.body.removeChild(a);
   toast('리포트 이미지를 저장했어요');
 };
-$('btn-rep-pdf').onclick=()=>{buildReport();toast('인쇄 창에서 "PDF로 저장"을 고르세요');setTimeout(()=>window.print(),300);};
+$('btn-rep-pdf').onclick=async()=>{
+  buildReport();
+  if(typeof html2canvas==='undefined'||!window.jspdf){toast('PDF 기능을 불러오지 못했어요. 인쇄 창으로 저장합니다');setTimeout(()=>window.print(),300);return;}
+  toast('PDF를 만드는 중…');
+  const c=await html2canvas($('s-report'),{scale:2,backgroundColor:'#fff'});
+  const pdf=new window.jspdf.jsPDF({orientation:'p',unit:'mm',format:'a4'});
+  const pw=210,ph=297,m=10;let w=pw-m*2,h=w*c.height/c.width;
+  if(h>ph-m*2){h=ph-m*2;w=h*c.width/c.height;}
+  pdf.addImage(c.toDataURL('image/png'),'PNG',(pw-w)/2,m,w,h);
+  pdf.save(`투자리포트_${myName.replace(/\s+/g,'_')}.pdf`);
+  toast('리포트 PDF를 저장했어요');
+};
 // ── 단어장 ──
 function openGlossary(){$('gl-list').innerHTML=GLOSSARY.map(([t,d,e])=>`<div class="gl-row"><b>${t}</b><div>${d}<div class="ex">예) ${e}</div></div></div>`).join('');$('gl-modal').classList.add('show');}
 $('s-gl-btn').onclick=openGlossary;$('s-gl-btn2').onclick=openGlossary;
