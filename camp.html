@@ -133,6 +133,16 @@
     .modal-card{max-width:640px}
     #s-review,#s-result{max-width:760px;margin:0 auto}
   }
+
+  .s-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+  .s-hdr-l{display:flex;gap:6px;flex:0 0 auto}.s-hdr-c{text-align:center;flex:1;min-width:0}.s-hdr-r{flex:0 0 auto;min-width:40px;text-align:right}
+  .ico-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:var(--card);font-size:1.2rem;cursor:pointer;color:var(--accent-d)}
+  .drawer-bg{position:fixed;inset:0;background:rgba(10,30,60,.45);z-index:600;display:none}.drawer-bg.show{display:block}
+  .drawer{position:absolute;left:0;top:0;bottom:0;width:280px;background:var(--card);box-shadow:4px 0 24px rgba(0,0,0,.2);padding:14px 0}
+  .drawer-hd{display:flex;justify-content:space-between;align-items:center;padding:4px 16px 12px 22px;font-weight:900;font-size:1.1rem;color:var(--orange)}
+  .drawer-it{padding:16px 22px;border-top:1px solid var(--border);font-size:1.05rem;cursor:pointer;color:var(--ink)}.drawer-it:hover{background:var(--accent-bg)}
+  .stock-card{text-align:center}.stock-card .tg{white-space:normal}
+  .s-decide-done #btn-decide{background:#2f7d4f}
 </style>
 <style>
 /* ── 청소년 AI금융캠프 장표 디자인에 맞춘 덮어쓰기 ──
@@ -319,10 +329,21 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
 </div>
 <!-- 학생 -->
 <div id="screen-student" class="screen" style="padding:20px">
-  <div style="text-align:center;margin-bottom:14px">
-    <div id="s-name-lbl" style="font-size:1.4rem;font-weight:700"></div>
-    <div id="s-code-lbl" style="color:var(--ink3);font-size:.83rem"></div>
+  <div class="s-hdr">
+    <div class="s-hdr-l"><button class="ico-btn" id="s-menu-btn" title="메뉴">☰</button><button class="ico-btn" id="s-back-btn" title="뒤로">‹</button></div>
+    <div class="s-hdr-c"><div id="s-name-lbl" style="font-size:1.25rem;font-weight:800"></div><div id="s-code-lbl" style="color:var(--ink3);font-size:.8rem"></div><div id="s-decide-txt" style="font-size:.78rem;color:var(--ink2);margin-top:2px"></div></div>
+    <div class="s-hdr-r" id="s-decide"><button class="btn btn-danger" id="btn-decide" style="margin:0;width:auto;padding:10px 16px;white-space:nowrap">✅ 투자 결정하기</button></div>
   </div>
+  <div id="s-drawer-bg" class="drawer-bg"><div class="drawer">
+    <div class="drawer-hd"><span>미래 기업 모의투자</span><button class="ico-btn" id="s-drawer-close">✕</button></div>
+    <div class="drawer-it" data-act="home">HOME</div>
+    <div class="drawer-it" data-act="intro">체험 안내</div>
+    <div class="drawer-it" data-act="stocks">투자 대상</div>
+    <div class="drawer-it" data-act="rank">체험 랭킹</div>
+    <div class="drawer-it" data-act="report">나의 리포트</div>
+    <div class="drawer-it" data-act="glossary">투자 단어장</div>
+    <div class="drawer-it" data-act="logout">로그아웃</div>
+  </div></div>
   <div id="s-waiting" style="display:none;width:100%">
    <div class="w-left">
     <div class="card" style="max-width:100%">
@@ -365,10 +386,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
       <button class="btn btn-secondary" id="s-news-btn" style="position:relative;margin:0;flex:1;font-size:.84rem"><span id="s-news-txt">지난 뉴스 모아 보기</span><span id="s-news-badge" class="news-badge" style="display:none">NEW</span></button>
       <button class="btn btn-secondary" id="s-gl-btn2" style="margin:0;flex:1;font-size:.84rem">📖 단어장</button>
     </div>
-    <div class="decide-box" id="s-decide">
-      <div id="s-decide-txt" style="font-size:.86rem;margin-bottom:8px">사고팔기를 마쳤으면 결정을 눌러요. 결정하면 이번 라운드에는 더 바꿀 수 없어요.</div>
-      <button class="btn btn-danger" id="btn-decide" style="margin:0">✅ 투자 결정하기</button>
-    </div>
+
    </div>
    <div class="s-right">
     <div class="tabs">
@@ -459,6 +477,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
   <div id="gl-list"></div></div></div>
 <div id="sd-modal" class="modal-bg"><div class="modal-card" id="sd-card"></div></div>
 <div id="nd-modal" class="modal-bg"><div class="modal-card" id="nd-card"></div></div>
+<div id="pg-modal" class="modal-bg"><div class="modal-card" id="pg-card"></div></div>
 <div class="toast" id="toast"></div>
 <script>
 const FB_URL='https://geang-invest-default-rtdb.firebaseio.com';
@@ -735,7 +754,7 @@ async function poll(){
     updateStudentScreen(data);
     $('s-quarter').textContent=(sessionStatus==='trading')?`${sessionQuarter} / ${totalQ} 라운드 진행 중`:'';
     $('s-timer-box').style.display=(sessionTimerEnd&&sessionStatus==='trading')?'block':'none';
-    renderStudentNews(data.news||{});renderStudentStocks();updateStudentAsset();renderPortfolio();renderTradesList();renderStudentRankLive(data.students||{});renderIndicators();renderDecide();if(sessionStatus==='waiting')renderInfoList();
+    lastStudents=data.students||{};renderStudentNews(data.news||{});renderStudentStocks();updateStudentAsset();renderPortfolio();renderTradesList();renderStudentRankLive(data.students||{});renderIndicators();renderDecide();if(sessionStatus==='waiting')renderInfoList();
     if(sessionStatus==='review')renderStudentReview(data.students||{});
     if(sessionStatus==='closed')renderStudentResult(data.students||{});
     if(sessionTimerEnd&&sessionStatus==='trading')startTimer('s-timer');
@@ -855,7 +874,7 @@ function openNews(id){
   $('nd-modal').classList.add('show');
 }
 function closeModal(id){$(id).classList.remove('show');}
-['gl-modal','sd-modal','nd-modal'].forEach(id=>{$(id).onclick=e=>{if(e.target.id===id)closeModal(id);};});
+['gl-modal','sd-modal','nd-modal','pg-modal'].forEach(id=>{$(id).onclick=e=>{if(e.target.id===id)closeModal(id);};});
 // ── 시장 지표 ──
 function renderIndicators(){
   const el=$('s-ind');if(!el)return;
@@ -866,11 +885,11 @@ function renderIndicators(){
 }
 // ── 투자 결정 ──
 function renderDecide(){
-  const box=$('s-decide');if(!box)return;
-  const done=studentData.decided===sessionQuarter;
-  box.className='decide-box'+(done?' done':'');
-  $('s-decide-txt').innerHTML=done?'<b>투자 결정 완료!</b> 강사님이 이 라운드를 마감하면 결과가 나와요.':'사고팔기를 마쳤으면 결정을 눌러요. 결정하면 이번 라운드에는 더 바꿀 수 없어요.';
-  const b=$('btn-decide');b.textContent=done?'결정 취소 (다시 고치기)':'✅ 투자 결정하기';b.className='btn '+(done?'btn-secondary':'btn-danger');b.style.margin='0';
+  const b=$('btn-decide');if(!b)return;
+  const done=studentData.decided===sessionQuarter;const on=(sessionStatus==='trading');
+  b.style.display=on?'inline-block':'none';
+  b.textContent=done?'결정 취소':'✅ 투자 결정하기';b.className='btn '+(done?'btn-secondary':'btn-danger');b.style.margin='0';b.style.width='auto';b.style.padding='10px 16px';
+  $('s-decide-txt').textContent=on?(done?`${sessionQuarter}라운드 투자 결정 완료 · 강사님이 마감하면 결과가 나와요`:'사고팔기를 마치면 오른쪽 "투자 결정하기"를 눌러요'):'';
 }
 $('btn-decide').onclick=async()=>{
   if(sessionStatus!=='trading')return toast('지금은 결정할 수 없어요');
@@ -879,6 +898,23 @@ $('btn-decide').onclick=async()=>{
   await fbUpdate(`classes/${myCode}/students/${myName}`,{decided:studentData.decided});
   renderDecide();toast(done?'결정을 취소했어요. 다시 고칠 수 있어요':`${sessionQuarter}라운드 투자 결정 완료!`);
 };
+// ── 메뉴 · 뒤로가기 ──
+let lastStudents={};
+$('s-menu-btn').onclick=()=>$('s-drawer-bg').classList.add('show');
+$('s-drawer-close').onclick=()=>$('s-drawer-bg').classList.remove('show');
+$('s-drawer-bg').onclick=e=>{if(e.target.id==='s-drawer-bg')$('s-drawer-bg').classList.remove('show');};
+$('s-back-btn').onclick=()=>{let closed=false;['pg-modal','sd-modal','nd-modal','gl-modal','news-modal'].forEach(id=>{if($(id).classList.contains('show')){$(id).classList.remove('show');closed=true;}});if(!closed){document.querySelector('#s-invest .tab[data-tab="s-buy"]')?.click();window.scrollTo({top:0,behavior:'smooth'});}};
+function pageModal(title,html){$('pg-card').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h2 style="margin:0">${title}</h2><button class="btn btn-secondary" style="width:auto;padding:7px 16px;margin:0" onclick="closeModal('pg-modal')">‹ 뒤로</button></div>${html}`;$('pg-modal').classList.add('show');}
+document.querySelectorAll('.drawer-it').forEach(it=>{it.onclick=()=>{
+  $('s-drawer-bg').classList.remove('show');const a=it.dataset.act;
+  if(a==='home'){['pg-modal','sd-modal','nd-modal','gl-modal','news-modal'].forEach(id=>$(id).classList.remove('show'));document.querySelector('#s-invest .tab[data-tab="s-buy"]')?.click();window.scrollTo({top:0,behavior:'smooth'});}
+  else if(a==='intro'){pageModal('체험 안내',`<div class="intro-step"><div class="n">1</div><div>모든 참여자에게 <b>1,000만 원</b>의 투자 자금이 가상으로 주어져요.</div></div><div class="intro-step"><div class="n">2</div><div><b>8개 종목</b>의 특징을 먼저 읽어 두세요. 종목마다 성격과 값이 달라요.</div></div><div class="intro-step"><div class="n">3</div><div>라운드마다 <b>기준금리·환율·시장지수</b>와 <b>회사 뉴스</b>가 나와요. 뉴스를 누르면 자세한 내용이 보여요.</div></div><div class="intro-step"><div class="n">4</div><div>정보를 보고 사고판 뒤 <b>투자 결정하기</b>를 누르면 그 라운드가 끝나요. 강사님이 다음 라운드를 열면 결과가 나와요.</div></div><div style="font-size:.8rem;color:var(--orange);font-weight:700;margin-top:6px">* 모든 회사·숫자·소식은 수업용 가상 설정이에요. 실제 투자 추천이 아니에요.</div>`);}
+  else if(a==='stocks'){pageModal('투자 대상',`<div class="info-list">${stockEntries().map(([id,s])=>`<div class="it" onclick="openStockDetail('${id}')"><div class="ico">${s.emoji}</div><div style="flex:1;min-width:0"><div class="nm">${s.name} <span style="font-weight:500;color:var(--ink2);font-size:.8rem">· ${fmt(s.price)}</span></div><div class="tg">${(s.tags||[]).join(' ')}</div><div class="ds">${s.desc||s.cap||''}</div></div><div style="color:var(--ink3)">›</div></div>`).join('')}</div>`);}
+  else if(a==='rank'){const arr=Object.entries(lastStudents).map(([n,d])=>({n,total:assetOf(d,stockPrices),seed:d.seed||classSeed})).sort((a,b)=>b.total-a.total);pageModal('체험 랭킹',arr.length?`<table class="ranking-table"><thead><tr><th>순위</th><th>이름</th><th>총자산</th><th>수익률</th></tr></thead><tbody>${arr.map((s,i)=>{const pct=(s.total-s.seed)/s.seed*100;return `<tr style="${s.n===myName?'background:var(--accent-bg);':''}"><td>#${i+1}</td><td>${s.n}${s.n===myName?' (나)':''}</td><td>${fmt(s.total)}</td><td class="${pctCls(pct)}">${pctStr(pct)}</td></tr>`}).join('')}</tbody></table>`:'<div class="muted">아직 참여자가 없어요</div>');}
+  else if(a==='report'){let total=studentData.cash;Object.entries(studentData.portfolio).forEach(([sid,q])=>{total+=(stockPrices[sid]?.price||0)*q});const seed=(lastStudents[myName]||{}).seed||classSeed;const pl=total-seed;pageModal('나의 리포트',`<div style="display:flex;gap:10px;margin-bottom:10px"><div style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px"><div style="font-size:.74rem;color:var(--ink2)">총 자산</div><div style="font-weight:900">${fmt(total)}</div></div><div style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px"><div style="font-size:.74rem;color:var(--ink2)">누적 수익률</div><div class="${pctCls(pl)}" style="font-weight:900">${pctStr(pl/seed*100)}</div></div></div><div class="sec-title">내 보유 종목</div>${holdingsHTML()}<div class="sec-title">라운드별 거래 내역</div>${tradesHTML()}`);}
+  else if(a==='glossary'){openGlossary();}
+  else if(a==='logout'){if(!confirm('로그아웃할까요? 수업 코드로 다시 들어올 수 있어요.'))return;if(pollIv)clearInterval(pollIv);if(timerIv)clearInterval(timerIv);clearSession();role=null;myName='';myCode='';showScreen('login');$('form-student').style.display='none';}
+};});
 // ── 단어장 ──
 function openGlossary(){$('gl-list').innerHTML=GLOSSARY.map(([t,d,e])=>`<div class="gl-row"><b>${t}</b><div>${d}<div class="ex">예) ${e}</div></div></div>`).join('');$('gl-modal').classList.add('show');}
 $('s-gl-btn').onclick=openGlossary;$('s-gl-btn2').onclick=openGlossary;
@@ -886,7 +922,7 @@ $('s-gl-btn').onclick=openGlossary;$('s-gl-btn2').onclick=openGlossary;
 function renderInfoList(){
   const el=$('s-info-list');if(!el||el.dataset.n==String(Object.keys(stockPrices).length))return;
   el.dataset.n=String(Object.keys(stockPrices).length);
-  el.innerHTML=Object.entries(stockPrices).map(([id,s])=>`<div class="it" onclick="openStockDetail('${id}')"><div class="ico">${s.emoji}</div><div style="flex:1;min-width:0"><div class="nm">${s.name} <span style="font-weight:500;color:var(--ink2);font-size:.8rem">· ${fmt(s.price)}</span></div><div class="tg">${(s.tags||[]).join(' ')}</div><div class="ds">${s.desc||s.cap||''}</div></div><div style="color:var(--ink3)">›</div></div>`).join('');
+  el.innerHTML=stockEntries().map(([id,s])=>`<div class="it" onclick="openStockDetail('${id}')"><div class="ico">${s.emoji}</div><div style="flex:1;min-width:0"><div class="nm">${s.name} <span style="font-weight:500;color:var(--ink2);font-size:.8rem">· ${fmt(s.price)}</span></div><div class="tg">${(s.tags||[]).join(' ')}</div><div class="ds">${s.desc||s.cap||''}</div></div><div style="color:var(--ink3)">›</div></div>`).join('');
 }
 function bigWon(n){if(n>=1e12)return (n/1e12).toFixed(1).replace(/\.0$/,'')+'조 원';if(n>=1e8)return Math.round(n/1e8).toLocaleString('ko-KR')+'억 원';return fmt(n);}
 function chartSVG(hist,labels){
@@ -1051,9 +1087,11 @@ function updateStudentScreen(data){
   else if(sessionStatus==='review')$('s-review').style.display='block';
   else $('s-result').style.display='block';
 }
+const ORDER=DEFAULT_STOCKS.map(s=>s.id);
+function stockEntries(){return Object.entries(stockPrices).sort((a,b)=>{const i=ORDER.indexOf(a[0]),j=ORDER.indexOf(b[0]);return (i<0?99:i)-(j<0?99:j)});}
 function renderStudentStocks(){
   const grid=$('s-stock-grid');if(!grid)return;
-  grid.innerHTML=Object.entries(stockPrices).map(([id,s])=>{
+  grid.innerHTML=stockEntries().map(([id,s])=>{
     const pct=((s.price-(s.origPrice||s.price))/(s.origPrice||s.price)*100);
     const tag=pct>0?'tag-up':pct<0?'tag-dn':'tag-fl';
     return `<div class="stock-card${selStock===id?' sel':''}" onclick="selectStock('${id}')"><div style="font-size:1.4rem">${s.emoji}</div><div style="font-weight:700;font-size:.92rem">${s.name}</div><div class="tg">${(s.tags||[]).join(' ')}</div><div class="s-price">${fmt(s.price)}</div><span class="tag ${tag}">${pctStr(pct)}</span><div style="font-size:.68rem;color:var(--ink3);margin-top:5px">${s.cap||''}</div></div>`;
@@ -1150,7 +1188,7 @@ function renderStudentReview(students){
   $('s-rev-rank').innerHTML=`현재 <b>${arr.length}명 중 ${idx+1}위</b> · 누적 <span class="${pctCls((total-mySeed)/mySeed)}">${pctStr((total-mySeed)/mySeed*100)}</span>`;
   const note=$('s-rev-note');if(note)note.textContent=(qMode(sessionQuarter)==='auto')?'이번 라운드 보유 종목이 다음 라운드에 전액 현금으로 정산됩니다. 강사님이 시작하면 넘어가요…':'강사님이 다음 라운드를 시작하면 자동으로 넘어갑니다…';
   $('s-rev-holdings').innerHTML=holdingsHTML();
-  const ch=$('s-rev-chg');if(ch)ch.innerHTML=Object.entries(stockPrices).map(([id,s])=>{const p=lastPrevPrices[id]||s.price;const pc=(s.price-p)/p*100;return `<div class="chg-row"><span>${s.emoji} ${s.name}</span><span>${fmt(p)} → <b>${fmt(s.price)}</b> <span class="${pctCls(pc)}">${pctStr(pc)}</span></span></div>`}).join('');
+  const ch=$('s-rev-chg');if(ch)ch.innerHTML=stockEntries().map(([id,s])=>{const p=lastPrevPrices[id]||s.price;const pc=(s.price-p)/p*100;return `<div class="chg-row"><span>${s.emoji} ${s.name}</span><span>${fmt(p)} → <b>${fmt(s.price)}</b> <span class="${pctCls(pc)}">${pctStr(pc)}</span></span></div>`}).join('');
 }
 // 강사 순위
 function rankArrow(prev,cur){if(!prev)return '<span class="arr-eq">–</span>';if(prev>cur)return `<span class="arr-up">▲${prev-cur}</span>`;if(prev<cur)return `<span class="arr-dn">▼${cur-prev}</span>`;return '<span class="arr-eq">–</span>';}
