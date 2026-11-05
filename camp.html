@@ -135,7 +135,7 @@
   }
 
   .s-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
-  .s-hdr-l{display:flex;gap:6px;flex:0 0 auto}.s-hdr-c{text-align:center;flex:1;min-width:0}.s-hdr-r{flex:0 0 auto;min-width:40px;text-align:right}
+  .s-hdr-l{flex:0 0 40px}.s-hdr-c{text-align:center;flex:1;min-width:0}.s-hdr-r{flex:0 0 auto;min-width:40px;text-align:right}
   .ico-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:var(--card);font-size:1.2rem;cursor:pointer;color:var(--accent-d)}
   .drawer-bg{position:fixed;inset:0;background:rgba(10,30,60,.45);z-index:600;display:none}.drawer-bg.show{display:block}
   .drawer{position:absolute;left:0;top:0;bottom:0;width:280px;background:var(--card);box-shadow:4px 0 24px rgba(0,0,0,.2);padding:14px 0}
@@ -330,7 +330,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
 <!-- 학생 -->
 <div id="screen-student" class="screen" style="padding:20px">
   <div class="s-hdr">
-    <div class="s-hdr-l"><button class="ico-btn" id="s-menu-btn" title="메뉴">☰</button><button class="ico-btn" id="s-back-btn" title="뒤로">‹</button></div>
+    <div class="s-hdr-l"><button class="ico-btn" id="s-menu-btn" title="메뉴">☰</button></div>
     <div class="s-hdr-c"><div id="s-name-lbl" style="font-size:1.25rem;font-weight:800"></div><div id="s-code-lbl" style="color:var(--ink3);font-size:.8rem"></div><div id="s-decide-txt" style="font-size:.78rem;color:var(--ink2);margin-top:2px"></div></div>
     <div class="s-hdr-r" id="s-decide"><button class="btn btn-danger" id="btn-decide" style="margin:0;width:auto;padding:10px 16px;white-space:nowrap">✅ 투자 결정하기</button></div>
   </div>
@@ -903,7 +903,6 @@ let lastStudents={};
 $('s-menu-btn').onclick=()=>$('s-drawer-bg').classList.add('show');
 $('s-drawer-close').onclick=()=>$('s-drawer-bg').classList.remove('show');
 $('s-drawer-bg').onclick=e=>{if(e.target.id==='s-drawer-bg')$('s-drawer-bg').classList.remove('show');};
-$('s-back-btn').onclick=()=>{let closed=false;['pg-modal','sd-modal','nd-modal','gl-modal','news-modal'].forEach(id=>{if($(id).classList.contains('show')){$(id).classList.remove('show');closed=true;}});if(!closed){document.querySelector('#s-invest .tab[data-tab="s-buy"]')?.click();window.scrollTo({top:0,behavior:'smooth'});}};
 function pageModal(title,html){$('pg-card').innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h2 style="margin:0">${title}</h2><button class="btn btn-secondary" style="width:auto;padding:7px 16px;margin:0" onclick="closeModal('pg-modal')">‹ 뒤로</button></div>${html}`;$('pg-modal').classList.add('show');}
 document.querySelectorAll('.drawer-it').forEach(it=>{it.onclick=()=>{
   $('s-drawer-bg').classList.remove('show');const a=it.dataset.act;
