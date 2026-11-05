@@ -135,12 +135,6 @@
   }
 
   body{word-break:keep-all;overflow-wrap:anywhere}
-  /* 고아 줄 방지: 짧은 글은 줄 길이 균형, 긴 문단은 마지막 줄 보호 */
-  p,.about-p,.nf-entry,.gl-row>div,td,.intro-step>div,#nd-card>div{text-wrap:pretty}
-  h1,h2,h3,.tm,.team,.news-card .h,.stock-card .tg,.info-list .ds,.info-list .nm,.sub,.ind-note,#s-decide-txt,.decide-box div,.sec-title,.card>div:first-child,.waiting-box div,.stat-lbl,.drawer-it{text-wrap:balance}
-  .intro-step>div{text-wrap:balance}
-  #pg-card .intro-step,#s-waiting .intro-step{max-width:560px}
-  .news-card .m{text-wrap:initial}
   #pg-modal{z-index:510}#sd-modal,#nd-modal,#gl-modal{z-index:520}
   .s-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
   .s-hdr-l{flex:0 0 40px}.s-hdr-c{text-align:center;flex:1;min-width:0}.s-hdr-r{flex:0 0 auto;min-width:40px;text-align:right}
@@ -359,7 +353,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
       <div class="intro-step"><div class="n">1</div><div>모든 참여자에게 <b>1,000만 원</b>의 투자 자금이 가상으로 주어져요.</div></div>
       <div class="intro-step"><div class="n">2</div><div>아래 <b>8개 종목</b>의 특징을 먼저 읽어 두세요. 종목마다 성격과 값이 달라요.</div></div>
       <div class="intro-step"><div class="n">3</div><div>라운드마다 <b>기준금리·환율·시장지수</b>와 <b>회사 뉴스</b>가 나와요. 뉴스를 누르면 자세한 내용이 보여요.</div></div>
-      <div class="intro-step"><div class="n">4</div><div>정보를 보고 사고판 뒤 <b>투자 결정하기</b>를 누르면 그 라운드가 끝나요. 강사님이 다음 라운드를 열면 결과가 나와요.</div></div>
+      <div class="intro-step"><div class="n">4</div><div>정보를 보고 사고판 뒤 <b>투자 결정하기</b>를 누르면 라운드가 끝나고, 다음 라운드에 결과가 나와요.</div></div>
       <div style="font-size:.8rem;color:var(--orange);font-weight:700;margin:6px 0 10px">* 모든 회사·숫자·소식은 수업용 가상 설정이에요. 실제 투자 추천이 아니에요.</div>
       <button class="btn btn-secondary" id="s-gl-btn" style="margin-bottom:6px">📖 투자 단어장 먼저 보기</button>
     </div>
@@ -915,7 +909,7 @@ function pageModal(title,html){$('pg-card').innerHTML=`<div style="display:flex;
 document.querySelectorAll('.drawer-it').forEach(it=>{it.onclick=()=>{
   $('s-drawer-bg').classList.remove('show');const a=it.dataset.act;
   if(a==='home'){['pg-modal','sd-modal','nd-modal','gl-modal','news-modal'].forEach(id=>$(id).classList.remove('show'));document.querySelector('#s-invest .tab[data-tab="s-buy"]')?.click();window.scrollTo({top:0,behavior:'smooth'});}
-  else if(a==='intro'){pageModal('체험 안내',`<div class="intro-step"><div class="n">1</div><div>모든 참여자에게 <b>1,000만 원</b>의 투자 자금이 가상으로 주어져요.</div></div><div class="intro-step"><div class="n">2</div><div><b>8개 종목</b>의 특징을 먼저 읽어 두세요. 종목마다 성격과 값이 달라요.</div></div><div class="intro-step"><div class="n">3</div><div>라운드마다 <b>기준금리·환율·시장지수</b>와 <b>회사 뉴스</b>가 나와요. 뉴스를 누르면 자세한 내용이 보여요.</div></div><div class="intro-step"><div class="n">4</div><div>정보를 보고 사고판 뒤 <b>투자 결정하기</b>를 누르면 그 라운드가 끝나요. 강사님이 다음 라운드를 열면 결과가 나와요.</div></div><div style="font-size:.8rem;color:var(--orange);font-weight:700;margin-top:6px">* 모든 회사·숫자·소식은 수업용 가상 설정이에요. 실제 투자 추천이 아니에요.</div>`);}
+  else if(a==='intro'){pageModal('체험 안내',`<div class="intro-step"><div class="n">1</div><div>모든 참여자에게 <b>1,000만 원</b>의 투자 자금이 가상으로 주어져요.</div></div><div class="intro-step"><div class="n">2</div><div><b>8개 종목</b>의 특징을 먼저 읽어 두세요. 종목마다 성격과 값이 달라요.</div></div><div class="intro-step"><div class="n">3</div><div>라운드마다 <b>기준금리·환율·시장지수</b>와 <b>회사 뉴스</b>가 나와요. 뉴스를 누르면 자세한 내용이 보여요.</div></div><div class="intro-step"><div class="n">4</div><div>정보를 보고 사고판 뒤 <b>투자 결정하기</b>를 누르면 라운드가 끝나고, 다음 라운드에 결과가 나와요.</div></div><div style="font-size:.8rem;color:var(--orange);font-weight:700;margin-top:6px">* 모든 회사·숫자·소식은 수업용 가상 설정이에요. 실제 투자 추천이 아니에요.</div>`);}
   else if(a==='stocks'){pageModal('투자 대상',`<div class="info-list">${stockEntries().map(([id,s])=>`<div class="it" onclick="openStockDetail('${id}')"><div class="ico">${s.emoji}</div><div style="flex:1;min-width:0"><div class="nm">${s.name} <span style="font-weight:500;color:var(--ink2);font-size:.8rem">· ${fmt(s.price)}</span></div><div class="tg">${(s.tags||[]).join(' ')}</div><div class="ds">${s.desc||s.cap||''}</div></div><div style="color:var(--ink3)">›</div></div>`).join('')}</div>`);}
   else if(a==='rank'){const arr=Object.entries(lastStudents).map(([n,d])=>({n,total:assetOf(d,stockPrices),seed:d.seed||classSeed})).sort((a,b)=>b.total-a.total);pageModal('체험 랭킹',arr.length?`<table class="ranking-table"><thead><tr><th>순위</th><th>이름</th><th>총자산</th><th>수익률</th></tr></thead><tbody>${arr.map((s,i)=>{const pct=(s.total-s.seed)/s.seed*100;return `<tr style="${s.n===myName?'background:var(--accent-bg);':''}"><td>#${i+1}</td><td>${s.n}${s.n===myName?' (나)':''}</td><td>${fmt(s.total)}</td><td class="${pctCls(pct)}">${pctStr(pct)}</td></tr>`}).join('')}</tbody></table>`:'<div class="muted">아직 참여자가 없어요</div>');}
   else if(a==='report'){let total=studentData.cash;Object.entries(studentData.portfolio).forEach(([sid,q])=>{total+=(stockPrices[sid]?.price||0)*q});const seed=(lastStudents[myName]||{}).seed||classSeed;const pl=total-seed;pageModal('나의 리포트',`<div style="display:flex;gap:10px;margin-bottom:10px"><div style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px"><div style="font-size:.74rem;color:var(--ink2)">총 자산</div><div style="font-weight:900">${fmt(total)}</div></div><div style="flex:1;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px"><div style="font-size:.74rem;color:var(--ink2)">누적 수익률</div><div class="${pctCls(pl)}" style="font-weight:900">${pctStr(pl/seed*100)}</div></div></div><div class="sec-title">내 보유 종목</div>${holdingsHTML()}<div class="sec-title">라운드별 거래 내역</div>${tradesHTML()}`);}
