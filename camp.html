@@ -135,6 +135,12 @@
   }
 
   body{word-break:keep-all;overflow-wrap:anywhere}
+  /* 고아 줄 방지: 짧은 글은 줄 길이 균형, 긴 문단은 마지막 줄 보호 */
+  p,.about-p,.nf-entry,.gl-row>div,td,.intro-step>div,#nd-card>div{text-wrap:pretty}
+  h1,h2,h3,.tm,.team,.news-card .h,.stock-card .tg,.info-list .ds,.info-list .nm,.sub,.ind-note,#s-decide-txt,.decide-box div,.sec-title,.card>div:first-child,.waiting-box div,.stat-lbl,.drawer-it{text-wrap:balance}
+  .intro-step>div{text-wrap:balance}
+  #pg-card .intro-step,#s-waiting .intro-step{max-width:560px}
+  .news-card .m{text-wrap:initial}
   #pg-modal{z-index:510}#sd-modal,#nd-modal,#gl-modal{z-index:520}
   .s-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
   .s-hdr-l{flex:0 0 40px}.s-hdr-c{text-align:center;flex:1;min-width:0}.s-hdr-r{flex:0 0 auto;min-width:40px;text-align:right}
