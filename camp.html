@@ -717,7 +717,9 @@ function clearSession(){try{localStorage.removeItem('geng_invest_session')}catch
 async function tryRestore(){
   let s=null;try{s=JSON.parse(localStorage.getItem('geng_invest_session'))}catch(e){}
   if(!s||!s.role||!s.myCode||!s.myName)return;
-  if(s.role==='teacher'&&location.hash.toLowerCase()!=='#teacher')return; // 강사 복귀는 강사용 주소에서만
+  const isT=location.hash.toLowerCase()==='#teacher';
+  if(s.role==='teacher'&&!isT)return; // 강사 복귀는 강사용 주소에서만
+  if(s.role==='student'&&isT)return; // 강사용 주소에서는 학생 세션을 자동 복귀하지 않음
   const data=await fbGet('classes/'+s.myCode);
   if(!data){clearSession();return;}
   role=s.role;myName=s.myName;myCode=s.myCode;
