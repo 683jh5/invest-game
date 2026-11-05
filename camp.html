@@ -145,6 +145,18 @@
   .drawer-it{padding:16px 22px;border-top:1px solid var(--border);font-size:1.05rem;cursor:pointer;color:var(--ink)}.drawer-it:hover{background:var(--accent-bg)}
   .stock-card{text-align:center}.stock-card .tg{white-space:normal}
   .s-decide-done #btn-decide{background:#2f7d4f}
+
+  #s-report{width:720px;background:#fff;color:#1A2E4A;padding:32px 36px;font-family:'Pretendard','Apple SD Gothic Neo','Malgun Gothic',sans-serif;border-top:8px solid #043B72}
+  #s-report h1{font-size:22px;font-weight:900;color:#043B72;margin:0 0 2px}
+  #s-report .sub{font-size:12px;color:#5A6470;margin-bottom:16px}
+  #s-report .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+  #s-report .kpi div{background:#ECEFF4;border-radius:10px;padding:10px;text-align:center}
+  #s-report .kpi .k{font-size:11px;color:#5A6470}#s-report .kpi .v{font-size:17px;font-weight:900}
+  #s-report h2{font-size:13px;font-weight:800;color:#043B72;margin:14px 0 6px;padding-left:8px;border-left:3px solid #F58220}
+  #s-report table{width:100%;border-collapse:collapse;font-size:12px}#s-report td,#s-report th{padding:5px 8px;border-bottom:1px solid #E3E8EF;text-align:left}#s-report th{background:#F7F8FA;font-weight:700}
+  #s-report .ref{background:#FDF0E4;border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.6}
+  #s-report .ft{margin-top:14px;font-size:11px;color:#5A6470;display:flex;justify-content:space-between;border-top:1px solid #E3E8EF;padding-top:8px}
+  @media print{body *{visibility:hidden}#s-report-wrap{position:static !important;left:0 !important}#s-report,#s-report *{visibility:visible}#s-report{width:100%;padding:0;border-top:none}}
 </style>
 <style>
 /* ── 청소년 AI금융캠프 장표 디자인에 맞춘 덮어쓰기 ──
@@ -203,6 +215,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
 @media (prefers-reduced-motion:reduce){.waiting-box .wait-dot{animation:none}}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body>
 <!-- 로그인 -->
@@ -447,6 +460,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
   <div id="s-result" style="display:none;width:100%">
     <div class="card" style="max-width:100%;text-align:center">
       <div style="font-size:1.05rem;margin-bottom:7px">최종 투자 결과</div>
+      <div style="display:flex;gap:7px;margin-bottom:10px"><button class="btn btn-primary" id="btn-rep-png" style="margin:0;flex:1">📥 리포트 이미지 저장</button><button class="btn btn-secondary" id="btn-rep-pdf" style="margin:0;flex:1">🖨 PDF로 저장</button></div>
+      <textarea id="s-reflect" placeholder="한 줄 소감 (선택) — 리포트에 들어가요. 예: 소문에 흔들리지 않고 분산한 게 도움이 됐다" style="margin-bottom:8px;min-height:56px"></textarea>
       <div class="my-rank" id="s-my-rank">#1</div>
       <div style="margin:10px 0 2px;font-size:1rem" id="s-final-asset"></div>
       <div id="s-final-pl" style="font-size:1rem;margin-bottom:2px"></div>
@@ -480,6 +495,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);
 <div id="sd-modal" class="modal-bg"><div class="modal-card" id="sd-card"></div></div>
 <div id="nd-modal" class="modal-bg"><div class="modal-card" id="nd-card"></div></div>
 <div id="pg-modal" class="modal-bg"><div class="modal-card" id="pg-card"></div></div>
+<div id="s-report-wrap" style="position:fixed;left:-9999px;top:0"><div id="s-report"></div></div>
 <div class="toast" id="toast"></div>
 <script>
 const FB_URL='https://geang-invest-default-rtdb.firebaseio.com';
@@ -838,7 +854,8 @@ async function endQuarter(){
   await fbUpdate('classes/'+myCode,{stocks:ns,prevPrices,status:'review',timerEnd:null});
   for(const [name,d] of Object.entries(students)){
     const start=d.roundStartAsset||d.seed||SEED;const nt=assetOf(d,ns);const qret=start?(nt-start)/start*100:0;
-    await fbUpdate(`classes/${myCode}/students/${name}`,{totalAsset:nt,roundStartAsset:nt,lastQReturn:qret,prevRank:(prevRank[name]||0),lastQ:q});
+    const ah=Array.isArray(d.assetHist)?d.assetHist.slice():[d.seed||SEED];ah[q]=nt;
+    await fbUpdate(`classes/${myCode}/students/${name}`,{totalAsset:nt,roundStartAsset:nt,lastQReturn:qret,prevRank:(prevRank[name]||0),lastQ:q,assetHist:ah});
   }
   toast(`${q}라운드 마감! 결과를 확인하세요`);
 }
@@ -918,6 +935,34 @@ document.querySelectorAll('.drawer-it').forEach(it=>{it.onclick=()=>{
   else if(a==='glossary'){openGlossary();}
   else if(a==='logout'){if(!confirm('로그아웃할까요? 수업 코드로 다시 들어올 수 있어요.'))return;if(pollIv)clearInterval(pollIv);if(timerIv)clearInterval(timerIv);clearSession();role=null;myName='';myCode='';showScreen('login');$('form-student').style.display='none';}
 };});
+
+// ── 투자 리포트 ──
+function buildReport(){
+  const list=Object.entries(lastStudents).map(([name,d])=>({name,total:d.totalAsset||d.seed||SEED,seed:d.seed||classSeed})).sort((a,b)=>b.total-a.total);
+  const idx=list.findIndex(s=>s.name===myName);const me=lastStudents[myName]||{};
+  const seed=me.seed||classSeed;const total=me.totalAsset||seed;const pl=total-seed;const pct=pl/seed*100;
+  const ah=Array.isArray(me.assetHist)?me.assetHist.filter(v=>v!=null):[seed,total];
+  const labels=ah.map((v,i)=>i===0?'시작':i+'R');
+  const rounds=[];for(let q=1;q<ah.length;q++){const a=ah[q-1],b=ah[q];rounds.push(`<tr><td>${q}라운드</td><td>${fmt(a)} → ${fmt(b)}</td><td class="${pctCls(b-a)}" style="font-weight:700">${pctStr((b-a)/a*100)}</td><td>${qTradeSummary(studentData.trades||[],q)||'거래 없음'}</td></tr>`);}
+  const hold=Object.entries(studentData.portfolio||{}).filter(([,q])=>q>0).map(([sid,q])=>{const s=stockPrices[sid]||{};const avg=studentData.avgCost[sid]||s.price;const val=(s.price||0)*q;const p=(val-avg*q)/(avg*q)*100;return `<tr><td>${s.emoji||''} ${s.name||sid}</td><td>${q}주</td><td>${fmt(avg)}</td><td>${fmt(s.price||0)}</td><td class="${pctCls(p)}">${pctStr(p)}</td></tr>`}).join('')||'<tr><td colspan="5" style="color:#5A6470">최종 보유 종목 없음 (전액 현금)</td></tr>';
+  const ref=($('s-reflect')?.value||'').trim();
+  const d=new Date();const ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;
+  $('s-report').innerHTML=`<h1>미래 기업 모의투자 · 투자 리포트</h1><div class="sub">${myName} · 청소년 AI금융캠프 · ${ymd} · 수업 코드 ${myCode}</div>
+  <div class="kpi"><div><div class="k">최종 순위</div><div class="v">${idx>=0?idx+1:'-'} / ${list.length}</div></div><div><div class="k">시작 자금</div><div class="v">${fmt(seed)}</div></div><div><div class="k">최종 자산</div><div class="v">${fmt(total)}</div></div><div><div class="k">수익률</div><div class="v ${pctCls(pct)}">${pctStr(pct)}</div></div></div>
+  <h2>라운드별 자산 흐름</h2>${chartSVG(ah,labels)}
+  <h2>라운드별 결과와 거래</h2><table><tr><th>라운드</th><th>자산 변화</th><th>수익률</th><th>거래</th></tr>${rounds.join('')||'<tr><td colspan="4">기록 없음</td></tr>'}</table>
+  <h2>최종 보유 종목</h2><table><tr><th>종목</th><th>수량</th><th>평균 매입가</th><th>최종가</th><th>손익</th></tr>${hold}</table>
+  ${ref?`<h2>한 줄 소감</h2><div class="ref">${ref.replace(/</g,'&lt;')}</div>`:''}
+  <div class="ft"><span>모든 회사·숫자·소식은 수업용 가상 설정 · 실제 투자 추천 아님</span><span>2026 청소년 AI금융캠프 · 이티원 경제교육센터</span></div>`;
+}
+$('btn-rep-png').onclick=async()=>{
+  buildReport();if(typeof html2canvas==='undefined')return toast('이미지 저장 기능을 불러오지 못했어요. PDF 저장을 이용하세요');
+  toast('리포트를 만드는 중…');
+  const c=await html2canvas($('s-report'),{scale:2,backgroundColor:'#fff'});
+  const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download=`투자리포트_${myName.replace(/\s+/g,'_')}.png`;document.body.appendChild(a);a.click();document.body.removeChild(a);
+  toast('리포트 이미지를 저장했어요');
+};
+$('btn-rep-pdf').onclick=()=>{buildReport();toast('인쇄 창에서 "PDF로 저장"을 고르세요');setTimeout(()=>window.print(),300);};
 // ── 단어장 ──
 function openGlossary(){$('gl-list').innerHTML=GLOSSARY.map(([t,d,e])=>`<div class="gl-row"><b>${t}</b><div>${d}<div class="ex">예) ${e}</div></div></div>`).join('');$('gl-modal').classList.add('show');}
 $('s-gl-btn').onclick=openGlossary;$('s-gl-btn2').onclick=openGlossary;
@@ -929,8 +974,9 @@ function renderInfoList(){
 }
 function bigWon(n){if(n>=1e12)return (n/1e12).toFixed(1).replace(/\.0$/,'')+'조 원';if(n>=1e8)return Math.round(n/1e8).toLocaleString('ko-KR')+'억 원';return fmt(n);}
 function chartSVG(hist,labels){
-  const w=400,h=150,pl=44,pr=10,pt=10,pb=24;const n=hist.length;if(n<2)return '';
+  const w=400,h=150,pr=10,pt=10,pb=24;const n=hist.length;if(n<2)return '';
   const mn=Math.min(...hist),mx=Math.max(...hist);const span=(mx-mn)||1;const lo=mn-span*.15,hi=mx+span*.15;
+  const pl=14+Math.round(hi).toLocaleString('ko-KR').length*5.6;
   const x=i=>pl+(w-pl-pr)*i/(n-1),y=v=>pt+(h-pt-pb)*(1-(v-lo)/(hi-lo));
   const pts=hist.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
   const grid=[0,.5,1].map(t=>{const v=lo+(hi-lo)*t;return `<line x1="${pl}" x2="${w-pr}" y1="${y(v)}" y2="${y(v)}" stroke="#e3e8ef"/><text x="${pl-4}" y="${y(v)+3}" font-size="9" text-anchor="end" fill="#6b7786">${Math.round(v).toLocaleString('ko-KR')}</text>`}).join('');
