@@ -199,6 +199,14 @@ let C;try{C=JSON.parse(localStorage.getItem(CKEY)||'null')}catch(e){C=null}
 if(!C)C={txt:Object.assign({},DEF),pin:''};
 const saveC=()=>{try{localStorage.setItem(CKEY,JSON.stringify(C))}catch(e){}};
 let SD=(Array.isArray(C.sd)&&C.sd.length)?C.sd:DEF_SD.map(x=>Object.assign({},x));
+// 1회 이전: 예전 저장값(종이 주황·옛 순서)을 새 기본(빨강·보라·노랑·초록·파랑·카키)으로
+if(!C.v2){
+  const order=DEF_SD.map(d=>d.id);
+  SD.forEach(x=>{const d=DEF_SD.find(y=>y.id===x.id);if(d&&(x.c||'').toUpperCase()==='#E67E22'){x.c=d.c;x.t=d.t;}});
+  SD.sort((a,b)=>{const i=order.indexOf(a.id),j=order.indexOf(b.id);return (i<0?99:i)-(j<0?99:j)});
+  if(C.txt&&C.txt.kick==='청소년 AI금융캠프'&&C.txt.head==='과거의 문이 열린다')C.txt=Object.assign({},DEF);
+  C.sd=SD;C.v2=1;saveC();
+}
 function renderTxt(){
   $('#tKick').textContent=C.txt.kick;$('#tHead').textContent=C.txt.head;$('#tSub').textContent=C.txt.sub;
   document.title=(C.txt.head||'상단 입장')+(C.txt.kick?' · '+C.txt.kick:'');
