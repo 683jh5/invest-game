@@ -182,12 +182,12 @@ button{cursor:pointer;border:none}
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const DEF_SD=[
+  {id:'salt', n:'소금 상단', c:'#C0392B', t:'빨강', g:'소금 · 젓갈'},
   {id:'silk', n:'비단 상단', c:'#8E44AD', t:'보라', g:'비단 · 명주실'},
   {id:'grain',n:'곡물 상단', c:'#D4A017', t:'노랑', g:'쌀 · 보리'},
-  {id:'pot',  n:'도자기 상단',c:'#2E86C1', t:'파랑', g:'그릇 · 항아리'},
   {id:'herb', n:'약초 상단', c:'#2E8B57', t:'초록', g:'약초 · 탕약'},
-  {id:'paper',n:'종이 상단', c:'#E67E22', t:'주황', g:'한지 · 지우산'},
-  {id:'salt', n:'소금 상단', c:'#C0392B', t:'빨강', g:'소금 · 젓갈'}
+  {id:'pot',  n:'도자기 상단',c:'#2E86C1', t:'파랑', g:'그릇 · 항아리'},
+  {id:'paper',n:'종이 상단', c:'#7D8A3C', t:'카키', g:'한지 · 지우산'}
 ];
 const KEY='gate-sangdan-v1';
 let S;try{S=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){S=null}
