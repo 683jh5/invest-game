@@ -252,6 +252,26 @@ function pageAdmin(){
   $('btn-results').onclick=()=>window.open(link('results',{e:EVID}),'_blank');
   $('btn-print').onclick=()=>{window.print()};
   $('btn-sw').onclick=()=>{U({wE:Math.max(0,Math.min(100,+$('s-we').value||0))});toast('비율 저장')};
+  $('btn-gocodes').onclick=()=>{document.querySelector('#mtabs .tab[data-p=tp-set]').click();setTimeout(()=>$('code-card').scrollIntoView({behavior:'smooth',block:'center'}),50)};
+  $('btn-scodes').onclick=async()=>{
+    const T=teams(E),want={expert:$('sc-expert').value.trim()};T.forEach(t=>want[t.id]=$('sc-'+t.id).value.trim());
+    const label=k=>k==='expert'?'전문가':tName(E,k);
+    for(const [k,v] of Object.entries(want))if(!/^\d{4}$/.test(v))return toast(`${label(k)} 코드는 숫자 4자리로`);
+    const vals=Object.values(want);const dup=vals.find((v,i)=>vals.indexOf(v)!==i);if(dup)return toast(`코드 ${dup}가 두 번 쓰였음`);
+    const old={expert:E.expertCode};T.forEach(t=>old[t.id]=t.code);
+    const changed=Object.keys(want).filter(k=>want[k]!==old[k]);if(!changed.length)return toast('바뀐 코드가 없음');
+    $('btn-scodes').disabled=true;
+    try{
+      for(const k of changed){const r=await db.get(P.code(want[k]));const mine=r&&r.ev===EVID;if(r&&!mine)throw new Error(`코드 ${want[k]}는 다른 평가에서 쓰는 중`)}
+      if(!confirm(`${changed.map(k=>`${label(k)}: ${old[k]} → ${want[k]}`).join('\n')}\n\n이렇게 바꿀까요? 이미 인쇄한 코드 카드는 다시 인쇄해야 해요.`)){$('btn-scodes').disabled=false;return}
+      for(const k of changed)if(!vals.includes(old[k]))await db.del(P.code(old[k]));
+      for(const k of changed)await db.set(P.code(want[k]),k==='expert'?{ev:EVID,role:'expert'}:{ev:EVID,role:'team',team:k});
+      const nt={};T.forEach(t=>nt[t.id]={name:t.name,order:t.order,code:want[t.id]});
+      await db.update(P.ev(EVID),{expertCode:want.expert,teams:nt});
+      toast('코드를 바꿨음');watch.now();
+    }catch(x){toast(x.message||'저장하지 못함. 인터넷 연결을 확인해 주세요')}
+    $('btn-scodes').disabled=false;
+  };
   $('btn-steams').onclick=()=>{const T={};teams(E).forEach(t=>T[t.id]={name:$('sn-'+t.id).value.trim()||t.name,order:t.order,code:t.code});U({teams:T});toast('팀 이름 저장')};
   $('btn-spcrit').onclick=()=>{const L=$('s-pcrit').value.split('\n').map(x=>x.trim()).filter(Boolean).map((x,i)=>{const [n,...d]=x.split('|');return {id:'k'+(i+1),name:n.trim(),desc:d.join('|').trim()}}).filter(x=>x.name);
     if(L.length<2||L.length>5)return toast('기준은 2~5개');if(Object.values(E.peers||{}).some(p=>p.at)&&!confirm('이미 제출한 학생이 있어요. 기준을 바꾸면 다시 제출해야 할 수 있어요. 바꿀까요?'))return;U({pcrit:L});toast('기준 저장')};
@@ -284,6 +304,7 @@ function pageAdmin(){
     $('praise').innerHTML=pr.length?T.map(t=>{const l=pr.filter(x=>x.t===t.id);return l.length?`<h3 style="margin-top:8px">${esc(t.name)}</h3><ul style="margin:0 0 8px 18px">${l.map(x=>`<li class="sub">${esc(x.v)} <span class="tiny">· ${esc(x.from)}</span></li>`).join('')}</ul>`:''}).join(''):'<p class="sub">아직 없음</p>';
     if(document.activeElement!==$('s-we'))$('s-we').value=e.wE??60;
     if(document.activeElement!==$('s-pcrit'))$('s-pcrit').value=pcrit(e).map(k=>k.name+(k.desc?' | '+k.desc:'')).join('\n');
+    if(!$('s-codes').contains(document.activeElement))$('s-codes').innerHTML=`<table><tr><th class="l">구분</th><th>지금 코드</th><th>새 코드</th></tr><tr><td class="l"><b>전문가</b></td><td><span class="codebig" style="font-size:1.2rem">${e.expertCode}</span></td><td><input id="sc-expert" class="code" style="font-size:1.2rem;letter-spacing:6px;margin:0;max-width:170px" maxlength="4" inputmode="numeric" value="${e.expertCode}"></td></tr>${T.map(t=>`<tr><td class="l"><b>${esc(t.name)}</b></td><td><span class="codebig" style="font-size:1.2rem">${t.code}</span></td><td><input id="sc-${t.id}" class="code" style="font-size:1.2rem;letter-spacing:6px;margin:0;max-width:170px" maxlength="4" inputmode="numeric" value="${t.code}"></td></tr>`).join('')}</table>`;
     if(!$('s-teams').contains(document.activeElement))$('s-teams').innerHTML=T.map(t=>`<div class="row" style="flex-wrap:nowrap"><input id="sn-${t.id}" value="${esc(t.name)}"><span class="tiny" style="white-space:nowrap;margin-bottom:10px">코드 ${t.code}</span></div>`).join('');
     $('s-del').innerHTML=`<h3>전문가</h3>${ex.map(([k,x])=>`<div class="between" style="padding:6px 0;border-bottom:1px solid rgba(110,150,255,.12)"><span>${esc(x.name)}</span><button class="btn btn-s sm" onclick="delItem('experts/${k}','${esc(x.name).replace(/'/g,'')}')">지우기</button></div>`).join('')||'<p class="tiny">없음</p>'}<h3 style="margin-top:14px">학생</h3>${P2.map(p=>`<div class="between" style="padding:6px 0;border-bottom:1px solid rgba(110,150,255,.12)"><span>${esc(tName(e,p.team))} · ${esc(p.nick)} ${p.at?'<span class="pill on">완료</span>':''}</span><button class="btn btn-s sm" onclick="delItem('peers/${p.k}','${esc(p.nick).replace(/'/g,'')}')">지우기</button></div>`).join('')||'<p class="tiny">없음</p>'}`;
   }

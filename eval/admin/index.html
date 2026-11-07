@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
-<link rel="stylesheet" href="../app.css?v=4">
+<link rel="stylesheet" href="../app.css?v=5">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body data-page="admin">
@@ -48,7 +48,7 @@
         <tr><td class="l"><b>팀 상호평가 (기준별 점수)</b><div class="tiny">모든 발표가 끝난 뒤 열기</div></td><td><span class="pill" id="st-peer"></span></td><td><button class="btn btn-s sm" id="tg-peer"></button></td></tr>
         <tr><td class="l"><b>최종 결과 공개</b><div class="tiny">숨김 → 1~3위 → 전체</div></td><td><span class="pill" id="st-reveal"></span></td><td><div class="row" style="justify-content:center"><button class="btn btn-s sm" data-rv="hidden">숨김</button><button class="btn btn-s sm" data-rv="top3">1~3위</button><button class="btn btn-o sm" data-rv="all">전체</button></div></td></tr>
       </table></div>
-      <div class="card"><h2>입장 코드</h2><div id="codes" style="overflow-x:auto"></div><p class="tiny" style="margin-top:8px">‘코드 카드 인쇄’를 누르면 팀별 코드 카드(QR 포함)를 한 장씩 인쇄할 수 있음</p></div>
+      <div class="card"><h2>입장 코드</h2><div id="codes" style="overflow-x:auto"></div><div class="between" style="margin-top:10px"><p class="tiny">‘코드 카드 인쇄’를 누르면 팀별 코드 카드(QR 포함)를 한 장씩 인쇄할 수 있음</p><button class="btn btn-s sm" id="btn-gocodes">코드 바꾸기</button></div></div>
     </div>
     <div class="pane" id="tp-status">
       <div class="card"><h2>전문가 채점</h2><div id="ematrix"></div></div>
@@ -61,6 +61,7 @@
     </div>
     <div class="pane" id="tp-set">
       <div class="card"><h2>전문가 반영 비율 (%)</h2><input id="s-we" type="number" min="0" max="100" style="max-width:200px"><p class="tiny">기본 60 · 나머지가 상호평가</p><button class="btn btn-p sm" id="btn-sw" style="margin-top:8px">저장</button></div>
+      <div class="card" id="code-card"><h2>입장 코드 바꾸기</h2><p class="tiny" style="margin-bottom:10px">숫자 4자리 · 코드끼리 겹치면 안 됨 · 이미 들어와 있는 학생·전문가는 바꿔도 그대로 이어서 할 수 있음</p><div id="s-codes"></div><button class="btn btn-p sm" id="btn-scodes">코드 저장</button></div>
       <div class="card"><h2>팀 이름 고치기</h2><div id="s-teams"></div><button class="btn btn-p sm" id="btn-steams">팀 이름 저장</button></div>
       <div class="card"><h2>상호평가 기준</h2><p class="tiny" style="margin-bottom:8px">한 줄에 “기준 이름 | 설명” · 2~5개 · 기준마다 학생이 다른 팀에 1~10점</p><textarea id="s-pcrit" style="min-height:120px"></textarea><button class="btn btn-p sm" id="btn-spcrit">기준 저장</button></div>
       <div class="card"><h2>잘못 들어온 제출 지우기</h2><div id="s-del"></div></div>
@@ -71,6 +72,6 @@
 <div id="print-area"></div>
 <div id="net-bar">서버에 연결할 수 없음 · 인터넷 연결을 확인해 주세요 (잠시 뒤 자동으로 다시 시도)</div>
 <div class="toast" id="toast"></div>
-<script src="../app.js?v=4"></script>
+<script src="../app.js?v=5"></script>
 </body>
 </html>
