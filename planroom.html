@@ -114,6 +114,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 .keyholder{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 12px 3px 4px;font-size:13px;font-weight:700;background:var(--surface);border:2px solid var(--c);color:var(--ink)}
 .keyholder .kb{display:inline-grid;place-items:center;background:var(--c);color:#fff;border-radius:999px;padding:0 9px;height:22px;font-size:12px}
 .keyholder.empty{border-style:dashed;color:var(--muted)}
+.keyholder.me{background:var(--c);color:#fff;box-shadow:0 0 0 4px color-mix(in srgb,var(--c) 22%,transparent)}.keyholder.me .kb{background:#fff;color:var(--c)}
+.mepick{display:flex;flex-wrap:wrap;gap:8px}.mepick button{border:2px solid var(--line,#CDCECB);background:#fff;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer;font:inherit}.mepick button[aria-pressed="true"]{background:#043B72;border-color:#043B72;color:#fff}
 .stack{display:flex;flex-direction:column;gap:16px}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
@@ -462,16 +464,16 @@ details.ex summary::before{background:#ECEFF4}
 
 <div class="wrap">
   <div class="resume" id="resume" hidden>
-        <div class="rtxt"><b>이 노트북에 전에 쓴 기획서가 있어요</b><span class="small"> · <span id="resumeWhen"></span> 저장</span><br><span class="small muted">지금은 빈 화면으로 시작했어요. 우리 팀이 쓰던 거라면 ‘이어서 쓰기’를 눌러요.</span></div>
-    <div class="row-btns"><button class="btn blue" type="button" id="resumeYes">이어서 쓰기</button><button class="btn light" type="button" id="resumeNo">새로 시작 (이전 내용 지우기)</button></div>
+        <div class="rtxt"><b>전에 쓴 기획서를 그대로 불러왔어요</b><span class="small"> · <span id="resumeWhen"></span> 저장</span><br><span class="small muted">내가 쓰던 게 맞으면 그냥 이어서 써요. 다른 사람 거라면 ‘새로 시작’을 눌러요.</span></div>
+    <div class="row-btns"><button class="btn blue" type="button" id="resumeYes">확인 · 이어서 쓰기</button><button class="btn light" type="button" id="resumeNo">새로 시작 (이전 내용 지우기)</button></div>
   </div>
 
   <header class="hero">
     <div class="hero-l">
             <div class="hero-copy">
-        <div class="badge-row"><span class="chip">청소년 AI금융캠프</span><span class="chip">DAY 2 · 기획 만들기</span></div>
+        <div class="badge-row"><span class="chip">청소년 AI금융캠프</span><span class="chip">1일차 기획 → 2일차 제작 · 발표</span></div>
         <h1>미래 금융앱 기획실</h1>
-        <p class="lede">미래 고객의 돈 고민을 찾아서, 우리 팀 앱의 기획서와 화면 3장, 바이브코딩 프롬프트까지 완성해요.</p>
+        <p class="lede">청소년이 쓸 수 있는 디지털 자산 거래소 앱을 기획해요. 고객의 돈 고민 → 기획서 → 화면 3장 → 제작 주문서까지 여기 한 곳에서 완성하고, 2일차 고치기 · 발표 원고도 이어서 써요.</p>
         <div class="hello" id="heroSay">다섯 역할 도장을 모두 모으면 앱 만들 준비 끝!</div>
       </div>
     </div>
@@ -498,14 +500,16 @@ details.ex summary::before{background:#ECEFF4}
         <div><h3>역할 나누기</h3><p class="cap">이름을 쓰고 맡을 역할을 눌러요. 여러 개 고를 수 있어요. 성은 빼고 이름만 써도 돼요.</p></div>
         <div class="members" id="members"></div>
         <div class="coverage" id="coverage"></div>
+        <div><h3>이 노트북은 누구 거예요?</h3><p class="cap">내 이름을 누르면 단계마다 <b>내 차례</b> 표시가 떠요. 순서는 이래요 — ① 먼저 각자 자기 기획실에 아이디어를 써요 ② 팀에서 하나로 합쳐요 ③ 그 뒤부터는 내 차례인 단계를 내가 이끌고, 정한 내용은 모두 자기 기획실에 받아 적어요.</p></div>
+        <div class="mepick" id="mepick"></div>
       </div>
       <div class="roles" id="rolecards"></div>
       <div class="grid2">
-        <div class="note mint"><b>기획실에서 완성할 것</b><br>1일차: 서비스 기획서 한 장 · 앱 화면 설계 3장 · 바이브코딩 프롬프트 · 2일차: IR Day에서 쓸 한 문장 소개. 단계마다 위쪽 띠에 <b>키보드를 잡을 역할</b>이 나와요. 그 역할을 맡은 친구가 입력하고, 나머지는 옆에서 같이 생각해요.</div>
+        <div class="note mint"><b>기획실에서 완성할 것</b><br>1일차: 고객 · 문제 · 서비스 캔버스 · 화면 설계 3장 · 제작 주문서 · 2일차: 고치기 · 한 문장 소개 · 발표 원고. 단계마다 위쪽 띠에 <b>그 단계를 이끄는 역할</b>이 나와요. 내 차례면 내가 먼저 쓰고 팀에 읽어 주고, 아니면 팀이 정한 내용을 내 기획실에 받아 적어요. 프롬프트는 각자 복사해 자기 Gemini에 붙여요.</div>
         <details class="card">
           <summary style="cursor:pointer;font-weight:700">선생님용 진행 메모</summary>
           <div class="stack small" style="gap:8px;margin-top:10px;color:var(--ink-2)">
-            <p>팀 대표 노트북 한 대로 써요. 저장은 그 브라우저에만 되니, 끝나면 PDF와 백업 파일(.json)을 꼭 받아 두세요.</p>
+            <p>학생 각자 자기 노트북에서 기획실을 써요. 저장은 각 노트북 브라우저에만 되니, 내일도 같은 노트북을 쓰게 하고 끝나면 PDF와 백업 파일(.json)을 받아 두세요. 팀 제출용 PDF는 대표(CEO) 노트북 것으로 받으면 돼요.</p>
             <p>04 AI 검증은 학생이 쓸 수 있는 AI 도구와 연령 조건을 캠프 전에 확인해 주세요. 쓸 수 없으면 선생님 화면 시연이나 ‘예시 답변’으로 진행해요.</p>
             <p>고객 카드와 예시는 모두 교육용 가상 설정이에요. 오전 모의투자의 가상 회사와 이어서 써도 좋아요.</p>
           </div>
@@ -556,7 +560,7 @@ details.ex summary::before{background:#ECEFF4}
 
   <!-- ================= CUSTOMER ================= -->
   <section class="station" data-station="cust" id="st-cust" hidden>
-    <div class="guide"><div class="head"><span class="kicker">03 고객 고르기 <span class="keyholder p-ceo" data-owner="ceo"></span></span><h2>미래에 우리는 누구를 도울까?</h2><p class="goal">앞 시간에 상상한 미래를 떠올리며 고객 한 명을 골라요. 그 고객의 돈 고민이 우리 앱의 출발점이에요.</p><div class="bubble" data-say="cust"></div></div></div>
+    <div class="guide"><div class="head"><span class="kicker">03 고객 고르기 <span class="keyholder p-ceo" data-owner="ceo"></span></span><h2>미래에 우리는 누구를 도울까?</h2><p class="goal">우리가 만들 것은 청소년이 쓸 수 있는 디지털 자산 거래소 앱이에요. 그 앱을 가장 먼저 쓸 고객 한 명을 골라요. 그 고객의 돈 고민이 출발점이에요.</p><div class="bubble" data-say="cust"></div></div></div>
     <div class="stack">
       <div class="cases" id="cases"></div>
       <div class="card field" id="otherwrap" hidden>
@@ -567,6 +571,11 @@ details.ex summary::before{background:#ECEFF4}
       <div class="grid2">
         <div class="card field"><label for="f-cu_problem">이 고객의 돈 고민</label><span class="hint">언제, 무엇을 하려다 막히나요? 한 가지만 적어요.</span><textarea id="f-cu_problem" data-f="cu_problem" placeholder="예: 날씨마다 하늘택시 요금이 달라서 한 달 교통비가 얼마나 들지 몰라요."></textarea></div>
         <div class="card field"><label for="f-cu_quote">이 고객이 할 것 같은 말 한마디</label><span class="hint">고객이 되어 혼잣말을 써 봐요.</span><textarea id="f-cu_quote" data-f="cu_quote" placeholder="예: “이번 달 교통비 또 넘었네… 미리 알았으면 좋겠다.”"></textarea></div>
+      </div>
+      <div class="card stack" style="gap:10px">
+        <h3>AI와 문제 문장 다듬기</h3>
+        <p class="cap">팀이 먼저 위 칸을 채운 다음, 프롬프트를 복사해 Gemini에 붙여요. AI가 준 문장 3개 중 ‘언제 · 왜’가 더 분명한 하나를 골라 돈 고민 칸에 고쳐 적어요.</p>
+        <div class="row-btns"><button class="btn violet" type="button" data-aicopy="p03">문제 다듬기 프롬프트 복사</button><span class="small muted">고객 · 돈 고민 · 한마디가 자동으로 들어가요</span></div>
       </div>
     </div>
     <div class="navfoot"><button class="btn light" data-go="start">← 팀 만들기</button><button class="btn blue" data-go="canvas">05 서비스 캔버스로 →</button></div>
@@ -604,7 +613,7 @@ details.ex summary::before{background:#ECEFF4}
 
   <!-- ================= CANVAS ================= -->
   <section class="station" data-station="canvas" id="st-canvas" hidden>
-    <div class="guide"><div class="head"><span class="kicker">05 서비스 캔버스 <span class="keyholder p-all" data-owner="all"></span></span><h2>포스트잇 여섯 장으로 앱을 설계해요</h2><p class="goal">고객 → 돈 고민 → 해결 아이디어 → 핵심 기능 → 앱 이름 → 돈 버는 방법이 한 줄로 이어지게 써요. 포스트잇마다 맡을 역할이 있어요.</p><div class="bubble" data-say="canvas"></div></div></div>
+    <div class="guide"><div class="head"><span class="kicker">05 서비스 캔버스 <span class="keyholder p-all" data-owner="all"></span></span><h2>포스트잇 여섯 장으로 청소년 자산 거래소 앱을 설계해요</h2><p class="goal">고객 → 돈 고민 → 해결 아이디어 → 핵심 기능 → 앱 이름 → 돈 버는 방법이 한 줄로 이어지게 써요. 포스트잇마다 맡을 역할이 있어요.</p><div class="bubble" data-say="canvas"></div></div></div>
     <div class="stack">
       <div class="card">
         <div class="row-btns" style="justify-content:space-between">
@@ -623,6 +632,19 @@ details.ex summary::before{background:#ECEFF4}
       </div>
       <div class="row-btns"><button class="btn light" type="button" id="fromcust">03 고객 단계에서 가져오기</button><span class="small muted">고객과 돈 고민을 1·2번 포스트잇에 채워 줘요 (빈 칸만).</span></div>
       <div class="board" id="board"></div>
+      <div class="card field"><label for="f-c_asset">자산 카드 · 우리 거래소에서 거래할 자산</label><span class="hint">이름 · 초기 가격(가상) · 스토리(왜 이 자산을 사고 싶을까?)를 한 줄씩 써요.</span><textarea id="f-c_asset" data-f="c_asset" placeholder="예: OO 탄소배출권 · 1토큰 = 10,000원 · 탄소를 적게 배출한 OO 기업의 배출권을 거래"></textarea></div>
+      <div class="card stack" style="gap:10px" id="padcard">
+        <h3>패들렛으로 팀 아이디어 합치기</h3>
+        <p class="cap">① 각자 쓴 내용을 <b>요약 복사</b>해 패들렛 우리 팀 칸에 올려요(제목: 팀 이름 · 내 별명). ② 팀이 하나를 고르거나 섞어서 <b>★ 우리 팀 기준</b> 글을 하나 올려요. ③ 모두 그 글을 복사해 아래 칸에 붙이고 <b>채우기</b>를 누르면 내 기획실 포스트잇이 똑같이 채워져요.</p>
+        <div class="row-btns"><button class="btn green" type="button" id="padcopy">① 내 아이디어 요약 복사</button><span class="small muted">팀 이름 · 포스트잇 6장 · 자산이 한 글로 복사돼요</span></div>
+        <div class="field"><label for="padpaste">③ 패들렛 ‘★ 우리 팀 기준’ 글 붙여넣기</label><textarea id="padpaste" rows="4" placeholder="패들렛 글을 통째로 복사해서 여기 붙여요. [고객] [돈 고민] 같은 꺾쇠 표시가 있으면 알아서 칸을 찾아 채워요."></textarea></div>
+        <div class="row-btns"><button class="btn blue" type="button" id="padfill">③ 채우기 (내 포스트잇 덮어쓰기)</button><button class="linkbtn" type="button" id="padfillempty">빈 칸만 채우기</button><span class="small muted" id="padmsg"></span></div>
+      </div>
+      <div class="card stack" style="gap:10px">
+        <h3>AI에게 캔버스 검토 받기</h3>
+        <p class="cap">여섯 장을 다 붙인 뒤에만 써요. AI가 6행 표로 정리해 주면, 팀이 동의하지 않는 ‘AI 제안’은 지우고 동의하는 것만 포스트잇에 고쳐 적어요.</p>
+        <div class="row-btns"><button class="btn violet" type="button" data-aicopy="p04">캔버스 검토 프롬프트 복사</button><span class="small muted">팀 이름 · 포스트잇 6장 · 자산이 자동으로 들어가요</span></div>
+      </div>
     </div>
     <div class="navfoot"><button class="btn light" data-go="cust">← 고객 고르기</button><button class="btn blue" data-go="screen">06 화면 설계로 →</button></div>
   </section>
@@ -634,16 +656,21 @@ details.ex summary::before{background:#ECEFF4}
       <div class="card"><h3>앱 테마 색</h3><div class="swatches" id="swatches" style="margin-top:10px"></div></div>
       <div class="screens" id="screens"></div>
       <div class="note lilac">화면마다 부품을 2개 이상 고르면 디자인 디렉터 도장 재료가 채워져요. 예시 숫자는 화면 모양을 보여 주는 가짜 값이에요.</div>
+      <div class="card stack" style="gap:10px">
+        <h3>AI로 화면 초안 그려 보기</h3>
+        <p class="cap">고른 부품과 색이 설계도 문장으로 바뀌어요. Gemini 캔버스에 붙여 넣으면 세 화면의 초안을 그려 줘요. 내일 제작의 출발점이에요.</p>
+        <div class="row-btns"><button class="btn violet" type="button" data-aicopy="p05">화면 초안 프롬프트 복사</button><span class="small muted">앱 이름 · 테마 색 · 화면 1~3 부품이 자동으로 들어가요</span></div>
+      </div>
     </div>
     <div class="navfoot"><button class="btn light" data-go="canvas">← 서비스 캔버스</button><button class="btn blue" data-go="prompt">07 프롬프트로 →</button></div>
   </section>
 
   <!-- ================= PROMPT ================= -->
   <section class="station" data-station="prompt" id="st-prompt" hidden>
-    <div class="guide"><div class="head"><span class="kicker">07 바이브코딩 프롬프트 <span class="keyholder p-cto" data-owner="cto"></span></span><h2>기획서가 프롬프트로 바뀌어요</h2><p class="goal">지금까지 쓴 내용이 프롬프트 한 장으로 자동으로 모였어요. 빈칸이 없는지 점검하고 복사해 둬요. 2일차 앱 만들기에 그대로 써요.</p><div class="bubble" data-say="prompt"></div></div></div>
+    <div class="guide"><div class="head"><span class="kicker">07 제작 주문서 · 바이브코딩 프롬프트 <span class="keyholder p-cto" data-owner="cto"></span></span><h2>기획서가 프롬프트로 바뀌어요</h2><p class="goal">지금까지 쓴 내용이 제작 주문서(프롬프트) 한 장으로 자동으로 모였어요. 빈칸이 없는지 점검하고 복사해 둬요. 2일차에 Lovable에 그대로 붙여 넣어요.</p><div class="bubble" data-say="prompt"></div></div></div>
     <div class="grid2">
       <div class="card stack" style="gap:12px">
-        <h3>우리 팀 프롬프트</h3>
+        <h3>우리 팀 제작 주문서(PRD)</h3>
         <div class="prompt" id="ptext" tabindex="0"></div>
         <div class="row-btns"><button class="btn violet" type="button" id="copyprompt">프롬프트 복사</button></div>
       </div>
@@ -685,6 +712,46 @@ details.ex summary::before{background:#ECEFF4}
     <div class="navfoot"><button class="btn light" data-go="prompt">← 프롬프트</button><button class="btn coral" data-go="save">기획서 저장하기 →</button></div>
   </section>
 
+  <!-- ================= FIX (2일차) ================= -->
+  <section class="station" data-station="fix" id="st-fix" hidden>
+    <div class="guide"><div class="head"><span class="kicker">09 고치기 · 2일차 <span class="keyholder p-cto" data-owner="cto"></span></span><h2>에러가 나거나 기능을 더 넣고 싶을 때</h2><p class="goal">앱을 만드는 중에 써요. 한 번에 하나씩만 고치는 게 핵심이에요. 아래 세 칸을 채우고 프롬프트를 복사해 Lovable이나 Gemini에 붙여요.</p><div class="bubble" data-say="fix"></div></div></div>
+    <div class="stack">
+      <div class="grid2">
+        <div class="card field"><label for="f-fx_want">하고 싶은 것</label><textarea id="f-fx_want" data-f="fx_want" placeholder="예: 매수 버튼을 누르면 잔고가 바로 줄어들게"></textarea></div>
+        <div class="card field"><label for="f-fx_bug">지금 보이는 문제 · 에러 문구</label><textarea id="f-fx_bug" data-f="fx_bug" placeholder="예: 버튼을 눌러도 아무 변화가 없다 / 빨간 글씨 에러 문구 그대로"></textarea></div>
+      </div>
+      <div class="card field"><label for="f-fx_keep">바꾸지 말아야 할 것</label><textarea id="f-fx_keep" data-f="fx_keep" class="short" rows="1" placeholder="예: 지금 색과 화면 3장 구성"></textarea></div>
+      <div class="card stack" style="gap:12px">
+        <h3>고치기 프롬프트</h3>
+        <div class="prompt" id="fxtext" tabindex="0"></div>
+        <div class="row-btns"><button class="btn violet" type="button" data-aicopy="p07">고치기 프롬프트 복사</button></div>
+        <div class="note lilac"><b>복사한 뒤 할 일</b><br>Lovable 같은 대화창에서 이어 고치는 중이면 그대로 붙여요. 새 대화창이면 프롬프트 맨 끝 “현재 코드:” 아래에 앱 코드 전체를 붙여 넣어요.</div>
+        <div class="note peach"><b>이런 기능은 넣지 않아요</b><br>실제 로그인, 실제 결제, 실제 주식 시세, 친구 연락처 불러오기. AI가 넣어 주면 빼 달라고 다시 요청해요.</div>
+      </div>
+    </div>
+    <div class="navfoot"><button class="btn light" data-go="pitch">← 한 문장 소개</button><button class="btn blue" data-go="speech">10 발표 원고로 →</button></div>
+  </section>
+
+  <!-- ================= SPEECH (IR Day) ================= -->
+  <section class="station" data-station="speech" id="st-speech" hidden>
+    <div class="guide"><div class="head"><span class="kicker">10 발표 원고 · IR Day <span class="keyholder p-cmo" data-owner="cmo"></span></span><h2>문제 → 해결 → 근거 → 다음</h2><p class="goal">앱 이름과 문제는 앞 단계에서 자동으로 들어와요. 세 칸만 채우고 프롬프트를 복사하면 역할별 발표 원고 · 30초 피치 · 예상 질문을 받을 수 있어요.</p><div class="bubble" data-say="speech"></div></div></div>
+    <div class="stack">
+      <div class="card field"><label for="f-sp_sol">해결 방법 · 시연 순서</label><textarea id="f-sp_sol" data-f="sp_sol" placeholder="예: 1토큰 1만 원 조각 매수 → 잔고 · 보유 수량 변화 → 체결 내역 확인"></textarea></div>
+      <div class="grid2">
+        <div class="card field"><label for="f-sp_ev">근거</label><textarea id="f-sp_ev" data-f="sp_ev" placeholder="예: 판단 규칙, 교차 테스트에서 받은 의견과 고친 점"></textarea></div>
+        <div class="card field"><label for="f-sp_next">다음에 만들 기능</label><textarea id="f-sp_next" data-f="sp_next" placeholder="예: 거래 알림, 랭킹 보드"></textarea></div>
+      </div>
+      <div class="card stack" style="gap:12px">
+        <h3>발표 원고 프롬프트</h3>
+        <div class="prompt" id="sptext" tabindex="0"></div>
+        <div class="row-btns"><button class="btn violet" type="button" data-aicopy="p08">발표 원고 프롬프트 복사</button></div>
+        <div class="note mint"><b>IR Day에서 쓰는 법</b><div class="checks"><div>팀당 5분 발표, 시연 화면 준비</div><div>원고 속 숫자는 운영 디렉터가 다시 계산해서 확인</div><div>예상 질문 하나는 답까지 미리 연습</div></div></div>
+        <div class="note sun"><b>마지막 자가 점검</b><div class="checks"><div>처음 30초 안에 문제가 나오는가?</div><div>시연 순서대로 실제로 눌러 봤는가?</div><div>팀원 모두 자기 역할을 한 문장으로 말할 수 있는가?</div></div></div>
+      </div>
+    </div>
+    <div class="navfoot"><button class="btn light" data-go="fix">← 고치기</button><button class="btn coral" data-go="save">기획서 저장하기 →</button></div>
+  </section>
+
   <!-- ================= SAVE ================= -->
   <section class="station" data-station="save" id="st-save" hidden>
     <div class="stack">
@@ -708,7 +775,7 @@ details.ex summary::before{background:#ECEFF4}
         <div class="confirm" id="confirmreset" hidden><span class="small">정말 모두 지울까요? 되돌릴 수 없어요.</span><button class="btn coral" type="button" id="resetyes">지우기</button><button class="btn light" type="button" id="resetno">취소</button></div>
       </div>
     </div>
-    <div class="navfoot"><button class="btn light" data-go="pitch">← 한 문장 소개</button><span></span></div>
+    <div class="navfoot"><button class="btn light" data-go="pitch">← 한 문장 소개</button><button class="btn light" data-go="fix">2일차 · 09 고치기 →</button></div>
   </section>
 </div>
 <div class="floatclock" id="floatclock" hidden><span id="fcTime">15:00</span><small id="fcPhase"></small></div>
@@ -784,6 +851,8 @@ const STATIONS = [
   { id: "screen", no: "6", t: "화면 설계", r: "cdo" },
   { id: "prompt", no: "7", t: "프롬프트", r: "cto" },
   { id: "pitch", no: "8", t: "한 문장 소개", r: "cmo" },
+  { id: "fix", no: "9", t: "고치기", r: "cto", opt: true },
+  { id: "speech", no: "10", t: "발표 원고", r: "cmo", opt: true },
   { id: "save", no: "↓", t: "저장하기", r: "" },
 ];
 const SAY = {
@@ -796,6 +865,8 @@ const SAY = {
   screen: "부품을 누른 순서대로 쌓여요. 다시 누르면 빠져요.",
   prompt: "빈칸이 보이면 앞 단계로 돌아가서 채워요.",
   pitch: "다른 팀이 3초 만에 알아듣게 써 봐요!",
+  fix: "한 번에 하나만 고쳐요. 에러 문구는 그대로 복사해서 붙여요.",
+  speech: "처음 30초 안에 문제가 나와야 해요. 숫자는 운영 디렉터가 다시 확인!",
 };
 const ART = {
   taxi: `<svg viewBox="0 0 120 80"><circle cx="96" cy="16" r="9" fill="#F0B26B"/><path d="M14 30h40M8 40h30" stroke="#fff" stroke-width="4" stroke-linecap="round"/><path d="M30 46q6-16 30-16h14q18 0 26 16z" fill="#043B72" stroke="#1C2430" stroke-width="3" stroke-linejoin="round"/><rect x="26" y="44" width="78" height="14" rx="6" fill="#F0B26B" stroke="#1C2430" stroke-width="3"/><path d="M58 32h14v12H54z" fill="#ECEFF4"/><path d="M20 62h30M80 62h30" stroke="#1C2430" stroke-width="4" stroke-linecap="round"/></svg>`,
@@ -1023,6 +1094,7 @@ function show(id, scroll) {
   if (nb) nav.scrollLeft = Math.max(0, nb.offsetLeft - nav.offsetLeft - (nav.clientWidth - nb.offsetWidth) / 2);
   $$(`[data-station="${id}"] textarea`).forEach(autosize);
   if (id === "prompt") $("#ptext").textContent = promptText();
+  if (id === "fix" || id === "speech") renderAiTexts();
   if (id === "save") { buildChecklist(); partyMood(); }
   floatClock();
   try { history.replaceState(null, "", "#" + id); } catch (e) {}
@@ -1053,6 +1125,8 @@ function stationDone(id) {
     case "screen": return stamps().cdo;
     case "prompt": return !!(state.chk1 && state.chk2 && state.chk3 && state.chk4);
     case "pitch": return TICKET.every(v);
+    case "fix": return !!(v("fx_want") && v("fx_keep"));
+    case "speech": return !!(v("sp_sol") && v("sp_ev") && v("sp_next"));
     default: return false;
   }
 }
@@ -1106,12 +1180,15 @@ function refresh() {
   cov.classList.toggle("ok", !un.length && mc >= 3);
   cov.textContent = mc < 3 ? `팀원 이름을 3명 이상 써요 (지금 ${mc}명).` : un.length ? `아직 주인 없는 역할: ${un.map((r) => r.n).join(", ")}` : "다섯 역할 모두 주인이 생겼어요!";
   $$("[data-rolewho]").forEach((el) => { const h = holders(el.dataset.rolewho); el.textContent = h.length ? `맡은 사람 · ${h.join(", ")}` : "아직 맡은 사람이 없어요"; });
+  const meI = +v("me") || 0, meRoles = meI ? rolesOf(meI) : [];
+  $("#mepick").innerHTML = members().map((m) => `<button type="button" data-me="${m.i}" aria-pressed="${m.i === meI}">${esc(m.name)}</button>`).join("") || `<span class="small muted">위에 팀원 이름을 먼저 써요.</span>`;
   $$("[data-owner]").forEach((el) => {
     const rk = el.dataset.owner;
-    if (rk === "all") { el.innerHTML = `<span class="kb">키보드</span>포스트잇 위 역할 친구가 차례로`; return; }
-    const r = ROLES.find((x) => x.k === rk), h = holders(rk);
-    el.classList.toggle("empty", !h.length);
-    el.innerHTML = `<span class="kb">키보드</span>${r.n}(${r.c})${h.length ? " · " + esc(h.join(", ")) : " · 아직 주인 없음"}`;
+    if (rk === "all") { el.classList.remove("me"); el.innerHTML = `<span class="kb">모두</span>포스트잇 위 역할 친구가 먼저 쓰고, 모두 받아 적어요`; return; }
+    const r = ROLES.find((x) => x.k === rk), h = holders(rk), mine = meRoles.includes(rk);
+    el.classList.toggle("empty", !h.length && !mine);
+    el.classList.toggle("me", mine);
+    el.innerHTML = mine ? `<span class="kb">내 차례!</span>${r.n}(${r.c}) · 내가 먼저 쓰고 팀에 읽어 줘요` : `<span class="kb">이끄는 역할</span>${r.n}(${r.c})${h.length ? " · " + esc(h.join(", ")) : " · 아직 주인 없음"}`;
   });
   $("#whoTeam").textContent = v("team") ? `팀 ${v("team")}` : "팀 이름 미입력";
   $("#whoCase").textContent = caseName() || "고객 미선택";
@@ -1131,6 +1208,7 @@ function refresh() {
   prevTicket = tdone;
   renderPhones();
   if (current === "prompt") $("#ptext").textContent = promptText();
+  if (current === "fix" || current === "speech") renderAiTexts();
   if (current === "save") { buildChecklist(); partyMood(); }
 }
 function partyMood() {
@@ -1175,27 +1253,43 @@ function screenLine(s) {
 }
 function promptText() {
   const th = THEMES.find((t) => t[0] === v("sc_theme"));
-  return `너는 중학생 팀의 바이브코딩 도우미야. 아래 기획서대로 스마트폰 화면 크기의 금융 앱을 HTML 파일 하나로 만들어 줘.
+  const nm = (v("c_name") || "").split(/[·\-—|]/)[0].trim() || "우리 거래소 앱";
+  return `# 제작 주문서(PRD) · ${nm}
+팀 ${blank(v("team"))} · 청소년 AI금융캠프 · 교육용 가상 서비스
 
-[팀] ${blank(v("team"))}
-[앱 이름 · 한 줄 소개] ${blank(v("c_name"))}
-[고객] ${blank(v("c_customer"))}
-[고객의 돈 고민] ${blank(v("c_problem"))}
-[고객이 할 것 같은 말] ${blank(v("cu_quote"))}
-[해결 아이디어] ${blank(v("c_idea"))}
-[핵심 기능 3개] ${blank(v("c_features"))}
-[돈 버는 방법] ${blank(v("c_money"))}
-[안전 기능] ${blank(v("ai_safety"))}
+[역할] 너는 청소년이 안전하게 쓸 수 있는 디지털 자산 거래소 앱을 만드는 개발자야. 아래 기획서대로 스마트폰 화면 크기의 앱을 HTML 파일 하나로 만들어 줘.
 
-[화면 설계] 테마 색: ${th ? `${th[1]} (${th[2]})` : "(아직 안 정함)"}
+## 1. 목적 · 왜 만드나
+- 고객의 돈 고민: ${blank(v("c_problem"))}
+- 우리 해결 아이디어: ${blank(v("c_idea"))}
+- 앱 이름 · 한 줄 소개: ${blank(v("c_name"))}
+
+## 2. 사용자 · 누가 쓰나
+- 고객: ${blank(v("c_customer"))}
+- 고객이 할 것 같은 말: ${blank(v("cu_quote"))}
+
+## 3. 핵심 기능 · 무엇을 하나
+- 핵심 기능 3개: ${blank(v("c_features"))}
+- 거래할 자산 · 초기 가격 · 스토리: ${blank(v("c_asset"))}
+- 돈 버는 방법: ${blank(v("c_money"))}
+- 안전 기능: ${blank(v("ai_safety"))}
+
+## 4. 화면 구성 · 어떻게 보이나
 ${SCREENS.map(screenLine).join("\n")}
+- 화면 아래 탭 메뉴로 세 화면을 오갈 수 있게
 
-[지켜 줄 것]
-- 실제 회사 이름, 실제 주가, 실제 개인정보는 쓰지 말고 가상 데이터로 채워 줘.
-- 화면 아래에 탭 메뉴를 두고 세 화면을 오갈 수 있게 해 줘.
+## 5. 디자인 방향 · 느낌
+- 테마 색: ${th ? `${th[1]} (${th[2]})` : "(아직 안 정함)"}
+- 중학생이 읽기 쉬운 말, 큰 숫자와 큰 버튼, 매수 · 매도 버튼은 엄지가 닿는 아래쪽
+
+## 6. 제작 조건 · 꼭 지킬 것
+- 실제 회사 이름, 실제 주가, 실제 개인정보는 쓰지 말고 가상 데이터로 채우고 "교육용 가상 데이터"라고 표시해 줘.
+- 외부 서버, 실제 로그인, 실제 결제, 실제 시세 연결은 넣지 마.
+- 지갑 잔고, 가격 차트, 매수 · 매도 버튼, 체결 내역이 보이게 해 줘.
+- 매수하면 잔고는 줄고 보유 수량은 늘고 체결 내역에 기록돼야 해. 잔고보다 큰 주문과 음수 입력은 막아 줘.
 - 버튼을 누르면 숫자나 화면이 실제로 바뀌게 해 줘.
-- 투자 기능이 있으면 "투자에는 손실 위험이 있어요" 안내가 보이게 해 줘.
-- 중학생이 읽기 쉬운 말로 써 줘.
+- 가장 중요한 기능 1개가 확실히 작동하게 먼저 만들어 줘.
+- "투자에는 손실 위험이 있어요" 안내가 보이게 해 줘.
 
 다 만든 뒤, 우리가 다음에 고쳐 볼 만한 점 3가지를 짧게 알려 줘.`;
 }
@@ -1242,11 +1336,13 @@ function model() {
     ["고른 이유", v("battle_reason")], ["의심 신호 가려내기", sortPlaced() ? `4장 중 ${sortRight()}장 맞힘` : ""]] });
   S.push({ title: "03 고객", kind: "fields", items: [["고른 고객", caseName()], ["돈 고민", v("cu_problem")], ["고객이 할 것 같은 말", v("cu_quote")]] });
   S.push({ title: "04 AI 정보 검증", kind: "pairs", q: v("q_text"), a: tf("a"), b: tf("b"), diff: v("ai_diff"), tail: [["우리 앱 안전 기능", v("ai_safety")]] });
-  S.push({ title: "05 서비스 캔버스", kind: "canvas", items: CANVAS.map((c) => [`${c.t} · ${RNAME[c.r]}`, v(c.k)]), checks: [] });
+  S.push({ title: "05 서비스 캔버스", kind: "canvas", items: [...CANVAS.map((c) => [`${c.t} · ${RNAME[c.r]}`, v(c.k)]), ["거래할 자산 · 초기 가격 · 스토리", v("c_asset")]], checks: [] });
   const th = THEMES.find((t) => t[0] === v("sc_theme"));
   S.push({ title: "06 화면 설계", kind: "fields", items: [["테마 색", th ? th[1] : ""], ...SCREENS.map((s) => [s.i === 2 ? `2. ${v("sc2_title") || s.t}` : `${s.i}. ${s.t}`, `${partsOf(s.i).map((p) => PNAME[p]).join(" → ") || "(부품 미선택)"}${v(`sc${s.i}_note`) ? "\n할 수 있는 일: " + v(`sc${s.i}_note`) : ""}`])] });
   S.push({ title: "07 바이브코딩 프롬프트", kind: "fields", items: [["프롬프트", promptText()], ["점검", [["고민과 기능 연결", state.chk1], ["실제 회사·지어낸 숫자 없음", state.chk2], ["화면 3장 반영", state.chk3], ["안전 기능", state.chk4]].map(([t, on]) => `${on ? "☑" : "☐"} ${t}`).join("   ")]] });
   S.push({ title: "08 한 문장 소개", kind: "fields", lead: TICKET.some(v) ? ticketText() : "", items: [["이 문장으로 발표를 시작할 사람", v("pi_stay")], ["다른 팀에게 물어볼 질문", v("pi_ask")]] });
+  if (["fx_want", "fx_bug", "fx_keep"].some(v)) S.push({ title: "09 고치기 (2일차)", kind: "fields", items: [["하고 싶은 것", v("fx_want")], ["문제 · 에러 문구", v("fx_bug")], ["바꾸지 말아야 할 것", v("fx_keep")]] });
+  if (["sp_sol", "sp_ev", "sp_next"].some(v)) S.push({ title: "10 발표 원고 (IR Day)", kind: "fields", items: [["해결 방법 · 시연 순서", v("sp_sol")], ["근거", v("sp_ev")], ["다음에 만들 기능", v("sp_next")]] });
   return S;
 }
 function stampStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")} ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; }
@@ -1471,6 +1567,8 @@ function buildChecklist() {
     ["05 서비스 캔버스", canvasCount(), 6],
     ["06 화면 설계", (v("sc_theme") ? 1 : 0) + SCREENS.filter((s) => partsOf(s.i).length >= 2).length, 4],
     ["08 한 문장 소개", TICKET.filter(v).length, 4],
+    ["09 고치기 (2일차)", ["fx_want", "fx_bug", "fx_keep"].filter(v).length, 3],
+    ["10 발표 원고 (IR Day)", ["sp_sol", "sp_ev", "sp_next"].filter(v).length, 3],
   ];
   $("#checklist").innerHTML = rows.map(([t, n, m]) => `<div><span>${t}</span><b class="${n === m ? "full" : ""}">${n} / ${m}</b></div>`).join("");
 }
@@ -1479,16 +1577,14 @@ function buildChecklist() {
 if (prevSaved) {
   const d = new Date(prevSaved.at);
   $("#resumeWhen").textContent = `${d.getMonth() + 1}월 ${d.getDate()}일 ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+  // 새로고침·다음 날 다시 열어도 빈 화면이 되지 않게 자동으로 복원
+  state = Object.assign({}, prevSaved.data, state);
+  qi = Math.max(0, QUIZ.findIndex((q) => state[q.k] === undefined)); if (qi < 0) qi = 0;
+  persist();
   $("#resume").hidden = false;
 }
-$("#resumeYes").addEventListener("click", () => {
-  if (!prevSaved) return;
-  state = Object.assign({}, prevSaved.data, state);
-  Object.assign(prevStamps, stamps()); prevCanvas = null; prevTicket = null;
-  qi = Math.max(0, QUIZ.findIndex((q) => state[q.k] === undefined)); if (qi < 0) qi = 0;
-  persist(); hydrate(); $("#resume").hidden = true; toast("이전에 쓴 내용을 불러왔어요");
-});
-$("#resumeNo").addEventListener("click", () => { try { localStorage.removeItem(PREV); } catch (e) {} prevSaved = null; $("#resume").hidden = true; toast("새로 시작해요!"); });
+$("#resumeYes").addEventListener("click", () => { $("#resume").hidden = true; toast("이어서 써요!"); });
+$("#resumeNo").addEventListener("click", () => { if (!confirm("전에 쓴 내용을 지우고 새로 시작할까요? 되돌릴 수 없어요.")) return; state = {}; try { localStorage.removeItem(KEY); localStorage.removeItem(AT); localStorage.removeItem(PREV); } catch (e) {} prevSaved = null; qi = 0; hydrate(); refresh(); $("#resume").hidden = true; toast("새로 시작해요!"); });
 hydrate();
 Object.assign(prevStamps, stamps());
 const startId = (location.hash || "").replace("#", "");
