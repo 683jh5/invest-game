@@ -52,7 +52,9 @@ const MAXP=10; // 상호평가: 기준마다 팀별 1~10점
 const PCRIT_DEFAULT=[
   {id:'k1',name:'팀워크',desc:'역할을 나눠 서로 도우며 함께 만들었는가'},
   {id:'k2',name:'현실 활용 가능성',desc:'만든 서비스를 실제로 쓸 수 있는가'},
-  {id:'k3',name:'성실함',desc:'이틀 동안 얼마나 성실하게 참여했는가'}
+  {id:'k3',name:'성실함',desc:'이틀 동안 얼마나 성실하게 참여했는가'},
+  {id:'k4',name:'창의성',desc:'다른 팀과 다른 우리만의 아이디어가 있는가'},
+  {id:'k5',name:'발표 전달력',desc:'발표를 듣고 어떤 서비스인지 바로 이해됐는가'}
 ];
 function pcrit(E){const c=E&&E.pcrit;const a=Array.isArray(c)?c:(c?Object.values(c):[]);const f=a.filter(Boolean);return f.length?f:PCRIT_DEFAULT}
 function teams(E){return (E&&E.teams)?Object.entries(E.teams).map(([id,t])=>({id,...t})).sort((a,b)=>a.order-b.order):[]}
