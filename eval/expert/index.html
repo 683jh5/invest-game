@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미래에셋 바이브코딩 캠프 평가 시스템</title>
+<meta name="description" content="전문가 평가 60%와 팀 상호평가 40%로 최종 순위를 산출하는 캠프 평가 시스템">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
+<link rel="stylesheet" href="../app.css?v=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body data-page="expert">
+<div class="hero short">
+  <a class="home" href="../">← 처음으로</a>
+  <button class="btn btn-g sm out hidden" id="btn-out">나가기</button>
+  <div class="brand">MIRAE ASSET</div>
+  <div class="hero-t">전문가 평가</div>
+  <div class="hero-s" id="hero-sub">디지털 자산 거래소 만들기</div>
+</div>
+<div class="wrap">
+  <div class="card" id="entry">
+    <div class="fhead"><span class="ic"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span><b>전문가 코드로 입장</b></div>
+    <label class="lb">전문가 코드</label><input id="in-code" class="code" maxlength="4" inputmode="numeric" placeholder="0000" autocomplete="off">
+    <label class="lb">이름</label><input id="in-name" maxlength="12" placeholder="예: 한여경" autocomplete="off">
+    <button class="btn btn-p block" id="btn-in">입장하기</button>
+  </div>
+  <div id="main" class="hidden">
+    <div class="card" style="padding:16px 22px"><span class="sub" id="who"></span></div>
+    <div class="card waiting hidden" id="closed"><div class="big">⏸</div><h2>전문가 평가가 닫혀 있음</h2><p class="sub">운영자가 열면 이어서 입력할 수 있음</p></div>
+    <div id="body">
+      <div class="tabs" id="tabs"></div>
+      <div class="card">
+        <div class="between"><h2 id="tname" style="margin:0"></h2><span class="pill" id="state"></span></div>
+        <p class="tiny" style="margin:6px 0 14px">막대를 움직여 점수를 정하고 저장 · 발표가 끝날 때마다 한 팀씩 저장</p>
+        <div id="crits"></div>
+        <label class="lb">한 줄 의견 (선택)</label><textarea id="memo" placeholder="잘한 점이나 보완할 점" style="min-height:70px"></textarea>
+        <div class="bar-fixed"><span>합계 <b id="total">0</b> / 100</span><button class="btn btn-o" id="btn-save">이 팀 점수 저장</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="net-bar">서버에 연결할 수 없음 · 인터넷 연결을 확인해 주세요 (잠시 뒤 자동으로 다시 시도)</div>
+<div class="toast" id="toast"></div>
+<script src="../app.js?v=1"></script>
+</body>
+</html>

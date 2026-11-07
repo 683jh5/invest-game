@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미래에셋 바이브코딩 캠프 평가 시스템</title>
+<meta name="description" content="전문가 평가 60%와 팀 상호평가 40%로 최종 순위를 산출하는 캠프 평가 시스템">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
+<link rel="stylesheet" href="../app.css?v=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body data-page="results" class="board">
+<div class="bwrap">
+  <div class="between"><div><div class="bbrand">MIRAE ASSET · 디지털 자산 거래소 만들기</div><div class="bt" id="b-title">불러오는 중</div><div class="bs" id="b-sub"></div></div><a class="btn btn-g sm" href="../">처음으로</a></div>
+  <div id="live" class="bgrid"><div class="bteams" id="bteams"></div><div class="bqr hidden" id="bqr"><div id="qr"></div><div class="tiny" id="qrt" style="color:#5b6676;font-size:.95rem;margin-top:8px"></div></div></div>
+  <div id="rank" class="hidden" style="margin-top:4vh"></div>
+</div>
+<div id="net-bar">서버에 연결할 수 없음 · 인터넷 연결을 확인해 주세요 (잠시 뒤 자동으로 다시 시도)</div>
+<div class="toast" id="toast"></div>
+<script src="../app.js?v=1"></script>
+</body>
+</html>

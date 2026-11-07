@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>미래에셋 바이브코딩 캠프 평가 시스템</title>
+<meta name="description" content="전문가 평가 60%와 팀 상호평가 40%로 최종 순위를 산출하는 캠프 평가 시스템">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
+<link rel="stylesheet" href="./app.css?v=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body data-page="home">
+<div class="hero">
+  
+  
+  <div class="brand">MIRAE ASSET</div>
+  <div class="hero-t">디지털 자산 거래소 만들기</div>
+  <div class="hero-s" id="hero-sub">바이브코딩 캠프</div>
+</div>
+<div class="wrap">
+  <a class="mcard" href="expert/"><span class="ic"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span><span><b>전문가 평가</b><em>전문가 코드로 입장</em></span></a>
+  <a class="mcard" href="team/"><span class="ic"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span><b>팀 상호평가</b><em>팀 코드로 입장</em></span></a>
+  <a class="mcard slim" href="results/"><span class="ic or"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></span><span><b>최종 결과 보기</b></span></a>
+  <div class="rule">
+    <b>평가 기준 100점</b>
+    <p>문제정의 15 · 금융투자 반영 25 · 앱 완성도 20 · 창의성·독창성 20 · 발표력 20</p>
+    <p>최종점수 = 전문가 평균 × 0.6 + 상호평가 평균 × 0.4</p>
+  </div>
+  <p class="tiny" id="demo-note" style="text-align:center;margin-top:14px"></p>
+  <a class="admin" href="admin/">관리자</a>
+</div>
+<div id="net-bar">서버에 연결할 수 없음 · 인터넷 연결을 확인해 주세요 (잠시 뒤 자동으로 다시 시도)</div>
+<div class="toast" id="toast"></div>
+<script src="./app.js?v=1"></script>
+</body>
+</html>
