@@ -205,3 +205,12 @@ body.board{background:linear-gradient(180deg,rgba(5,11,30,.82),rgba(5,11,30,.94)
 .rank .dt{color:#a3b1d1}
 .award{background:linear-gradient(135deg,#ff8a3d,#ffa851);color:#1a0e02}
 .hero{-webkit-mask-image:linear-gradient(#000 55%,transparent 100%);mask-image:linear-gradient(#000 55%,transparent 100%)}
+
+.sumrow{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.sumcard{background:linear-gradient(180deg,rgba(20,32,70,.92),rgba(12,22,50,.92));border:1px solid var(--border);border-radius:18px;padding:14px 18px;box-shadow:var(--glow)}
+.sumcard span{display:block;font-size:.8rem;color:var(--ink3)}
+.sumcard b{display:block;font-size:1.15rem;margin-top:4px;color:#f2f6ff}
+.codein{text-align:center;letter-spacing:3px;font-weight:800}
+.logline{font-size:.88rem;color:var(--ink2);padding:5px 0;border-bottom:1px solid rgba(110,150,255,.08)}
+.logline b{color:#9cc2ff;font-weight:700}
+@media (max-width:640px){.sumrow{grid-template-columns:1fr}}

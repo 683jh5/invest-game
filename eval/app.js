@@ -84,13 +84,17 @@ async function lookup(code){code=String(code||'').trim();if(!/^\d{4}$/.test(code
 function pageExpert(){
   let me=null,cur=null,draft={};
   const s=ss('expert');if(s&&s.ev){me=s.me;enter(s.ev)}
-  const qc=new URLSearchParams(location.search).get('c');if(qc)$('in-code').value=qc;
+  const qc=new URLSearchParams(location.search).get('c');if(qc){$('in-code').value=qc;peekE()}
+  $('in-code').oninput=peekE;
+  async function peekE(){const r=await lookup($('in-code').value),el=$('peek');$('name-wrap').classList.remove('hidden');el.textContent='';if(!r||r.role!=='expert')return;
+    if(r.xid){const ev=await db.get(P.ev(r.ev));const x=ev&&ev.expertList&&ev.expertList[r.xid];if(x){el.innerHTML=`<b>${esc(x.name)}</b> 님 코드`;$('name-wrap').classList.add('hidden')}}else el.textContent='공용 전문가 코드 · 이름을 입력해 주세요'}
   $('btn-in').onclick=async()=>{
-    const c=$('in-code').value.trim(),nm=$('in-name').value.trim();
-    if(nm.length<2)return toast('이름은 2글자 이상');
+    const c=$('in-code').value.trim();let nm=$('in-name').value.trim();
     const r=await lookup(c);if(!r||r.role!=='expert')return toast('전문가 코드가 맞지 않음');
     const ev=await db.get(P.ev(r.ev));if(!ev)return toast('평가를 찾을 수 없음');
-    me=key(nm);if(!(ev.experts&&ev.experts[me]))await db.set(`${P.ev(r.ev)}/experts/${me}`,{name:nm,joined:Date.now(),scores:{}});
+    if(r.xid){const x=ev.expertList&&ev.expertList[r.xid];if(!x)return toast('등록이 지워진 전문가 코드임');nm=x.name;me=r.xid}
+    else{if(nm.length<2)return toast('이름은 2글자 이상');me=key(nm)}
+    if(!(ev.experts&&ev.experts[me]))await db.set(`${P.ev(r.ev)}/experts/${me}`,{name:nm,joined:Date.now(),scores:{}});
     ss('expert',{ev:r.ev,me});enter(r.ev);
   };
   $('btn-out').onclick=()=>{ss('expert',null);location.reload()};
@@ -130,7 +134,8 @@ function pageTeam(){
   const s=ss('team');if(s&&s.ev){me=s.me;myTeam=s.team;enter(s.ev)}
   const qc=new URLSearchParams(location.search).get('c');if(qc){$('in-code').value=qc;peek()}
   $('in-code').oninput=peek;
-  async function peek(){const r=await lookup($('in-code').value);const el=$('peek');if(!r||r.role!=='team'){el.textContent='';return}const ev=await db.get(P.ev(r.ev));el.innerHTML=ev?`우리 팀: <b>${esc(tName(ev,r.team))}</b>`:''}
+  function seats(n){seat=0;$('seats').innerHTML=Array.from({length:n},(_,i)=>`<button type="button" class="seat" data-n="${i+1}">${i+1}번</button>`).join('');document.querySelectorAll('#seats .seat').forEach(b=>b.onclick=()=>{seat=+b.dataset.n;document.querySelectorAll('#seats .seat').forEach(x=>x.classList.toggle('on',x===b))})}
+  async function peek(){const r=await lookup($('in-code').value);const el=$('peek');if(!r||r.role!=='team'){el.textContent='';return}const ev=await db.get(P.ev(r.ev));el.innerHTML=ev?`우리 팀: <b>${esc(tName(ev,r.team))}</b>`:'';const t=ev&&ev.teams&&ev.teams[r.team];if(t)seats(Math.max(1,Math.min(12,+t.seats||6)))}
   $('btn-in').onclick=async()=>{
     if(!seat)return toast('내 자리 번호를 눌러 주세요');const nk=seat+'번';
     const r=await lookup($('in-code').value);if(!r||r.role!=='team')return toast('팀 코드가 맞지 않음');
@@ -248,38 +253,48 @@ function pageAdmin(){
   $('btn-back').onclick=()=>{ss('adminEv',null);showList()};
   document.querySelectorAll('#mtabs .tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('#mtabs .tab').forEach(x=>x.classList.remove('active'));t.classList.add('active');document.querySelectorAll('#manage .pane').forEach(p=>p.classList.remove('active'));$(t.dataset.p).classList.add('active')});
   const U=patch=>db.update(P.ev(EVID),patch).then(()=>watch.now());
-  $('tg-expert').onclick=()=>U({expertOpen:!E.expertOpen});
-  $('tg-peer').onclick=()=>U({peerOpen:!E.peerOpen});
-  document.querySelectorAll('[data-rv]').forEach(b=>b.onclick=()=>U({reveal:b.dataset.rv}));
+  const LOG=(type,msg)=>db.set(`${P.ev(EVID)}/log/${Date.now()}_${Math.random().toString(36).slice(2,6)}`,{at:Date.now(),type,msg}).catch(()=>{});
+  $('tg-expert').onclick=()=>{const v=!E.expertOpen;U({expertOpen:v});LOG('STATUS_CHANGE',`전문가 평가 ${v?'열기':'닫기'}`)};
+  $('tg-peer').onclick=()=>{const v=!E.peerOpen;U({peerOpen:v});LOG('STATUS_CHANGE',`팀 상호평가 ${v?'열기':'닫기'}`)};
+  document.querySelectorAll('[data-rv]').forEach(b=>b.onclick=()=>{U({reveal:b.dataset.rv});LOG('REVEAL',`결과 공개: ${{hidden:'숨김',top3:'1~3위',all:'전체'}[b.dataset.rv]}`)});
+  $('btn-close-all').onclick=()=>{const closing=E.expertOpen||E.peerOpen;if(closing){if(!confirm('전문가 평가와 팀 상호평가를 모두 닫을까요?'))return;U({expertOpen:false,peerOpen:false});LOG('STATUS_CHANGE','평가 마감 (전문가·상호평가 모두 닫기)')}else{U({expertOpen:true});LOG('STATUS_CHANGE','평가 다시 열기 (전문가 평가)')}};
+  // ── 시스템 관리
+  async function codeFree(c,self){if(!/^\d{4}$/.test(c))return '코드는 숫자 4자리';const used=[E.expertCode,...teams(E).map(t=>t.code),...Object.values(E.expertList||{}).map(x=>x.code)].filter(x=>x!==self);if(used.includes(c))return `코드 ${c}는 이 평가에서 이미 쓰는 중`;const r=await db.get(P.code(c));if(r&&r.ev!==EVID)return `코드 ${c}는 다른 평가에서 쓰는 중`;return null}
+  async function newCode(){const taken=new Set([E.expertCode,...teams(E).map(t=>t.code),...Object.values(E.expertList||{}).map(x=>x.code)]);return uniqueCode(taken)}
+  window.sysTeamSave=async tid=>{const t=E.teams[tid],ord=parseInt($('so-'+tid).value)||1,nm=$('sn-'+tid).value.trim(),cd=$('sc-'+tid).value.trim(),st=Math.max(1,Math.min(12,parseInt($('ss-'+tid).value)||6));
+    if(!nm)return toast('팀 이름을 입력');if(cd!==t.code){const er=await codeFree(cd,t.code);if(er)return toast(er);await db.del(P.code(t.code));await db.set(P.code(cd),{ev:EVID,role:'team',team:tid})}
+    await db.set(`${P.ev(EVID)}/teams/${tid}`,{name:nm,order:ord-1,code:cd,seats:st});LOG('TEAM_UPDATE',`${nm} 저장 (번호 ${ord} · 코드 ${cd} · ${st}명)`);toast(nm+' 저장');watch.now()};
+  window.sysTeamDel=async tid=>{const t=E.teams[tid];if(teams(E).length<=2)return toast('팀은 2개 이상 있어야 함');if(!confirm(`「${t.name}」 팀을 삭제할까요?\n이 팀이 받은 점수는 결과에서 빠져요.`))return;
+    await db.del(P.code(t.code));await db.del(`${P.ev(EVID)}/teams/${tid}`);LOG('TEAM_DELETE',`${t.name} 삭제 (코드 ${t.code})`);toast('삭제함');watch.now()};
+  const teamAdd=async()=>{const nm=$('na-name').value.trim();if(!nm)return toast('팀 이름을 입력');let cd=$('na-code').value.trim();
+    if(cd){const er=await codeFree(cd);if(er)return toast(er)}else cd=await newCode();
+    const ids=Object.keys(E.teams||{}).map(k=>parseInt(k.slice(1))||0),tid='t'+(Math.max(0,...ids)+1),ord=parseInt($('na-ord').value)||teams(E).length+1,st=Math.max(1,Math.min(12,parseInt($('na-seats').value)||6));
+    await db.set(P.code(cd),{ev:EVID,role:'team',team:tid});await db.set(`${P.ev(EVID)}/teams/${tid}`,{name:nm,order:ord-1,code:cd,seats:st});
+    LOG('TEAM_ADD',`${nm} 추가 (코드 ${cd} · ${st}명)`);['na-name','na-code'].forEach(i=>$(i).value='');toast(nm+' 추가');watch.now()};
+  let showCodes=false;$('btn-showcodes').onclick=()=>{showCodes=!showCodes;$('btn-showcodes').textContent=showCodes?'코드 숨기기':'코드 보기';document.querySelectorAll('#sys-experts input.xc').forEach(i=>i.type=showCodes?'text':'password')};
+  window.sysExpSave=async xid=>{const x=E.expertList[xid],nm=$('xn-'+xid).value.trim(),cd=$('xc-'+xid).value.trim();if(!nm)return toast('이름을 입력');
+    if(cd!==x.code){const er=await codeFree(cd,x.code);if(er)return toast(er);await db.del(P.code(x.code));await db.set(P.code(cd),{ev:EVID,role:'expert',xid})}
+    await db.set(`${P.ev(EVID)}/expertList/${xid}`,{name:nm,code:cd,order:x.order||0});if(E.experts&&E.experts[xid])await db.update(`${P.ev(EVID)}/experts/${xid}`,{name:nm});
+    LOG('EXPERT_UPDATE',`${nm} 저장`);toast(nm+' 저장');watch.now()};
+  window.sysExpDel=async xid=>{const x=E.expertList[xid];if(!confirm(`「${x.name}」 전문가를 삭제할까요?\n이 전문가가 매긴 점수도 함께 지워져요.`))return;
+    await db.del(P.code(x.code));await db.del(`${P.ev(EVID)}/expertList/${xid}`);await db.del(`${P.ev(EVID)}/experts/${xid}`);LOG('EXPERT_DELETE',`${x.name} 삭제`);toast('삭제함');watch.now()};
+  const expAdd=async()=>{const nm=$('xa-name').value.trim();if(!nm)return toast('전문가 이름을 입력');let cd=$('xa-code').value.trim();
+    if(cd){const er=await codeFree(cd);if(er)return toast(er)}else cd=await newCode();
+    const xid='x'+rid();await db.set(P.code(cd),{ev:EVID,role:'expert',xid});await db.set(`${P.ev(EVID)}/expertList/${xid}`,{name:nm,code:cd,order:Object.keys(E.expertList||{}).length});
+    LOG('EXPERT_ADD',`${nm} 추가`);['xa-name','xa-code'].forEach(i=>$(i).value='');toast(nm+' 추가');watch.now()};
+  $('btn-shared-save').onclick=async()=>{const cd=$('shared-code').value.trim();if(cd===E.expertCode)return toast('바뀐 코드가 없음');const er=await codeFree(cd,E.expertCode);if(er)return toast(er);
+    await db.del(P.code(E.expertCode));await db.set(P.code(cd),{ev:EVID,role:'expert'});await U({expertCode:cd});LOG('CODE_CHANGE',`공용 전문가 코드 ${E.expertCode} → ${cd}`);toast('공용 코드 저장')};
+  $('btn-reset').onclick=async()=>{if($('reset-pw').value.trim()!==ADMIN_KEY)return toast('초기화 비밀번호가 맞지 않음');if(!confirm('전문가 점수와 학생 평가를 모두 지울까요? 되돌릴 수 없어요.\n(팀·코드·전문가 명단은 그대로 남아요)'))return;
+    await U({experts:null,peers:null,expertOpen:true,peerOpen:false,reveal:'hidden'});LOG('RESET_ALL','모든 평가 데이터 초기화 · 평가 진행 중으로 되돌림');$('reset-pw').value='';toast('초기화함')};
   $('btn-results').onclick=()=>window.open(link('results',{e:EVID}),'_blank');
   $('btn-print').onclick=()=>{window.print()};
-  $('btn-sw').onclick=()=>{U({wE:Math.max(0,Math.min(100,+$('s-we').value||0))});toast('비율 저장')};
-  $('btn-gocodes').onclick=()=>{document.querySelector('#mtabs .tab[data-p=tp-set]').click();setTimeout(()=>$('code-card').scrollIntoView({behavior:'smooth',block:'center'}),50)};
-  $('btn-scodes').onclick=async()=>{
-    const T=teams(E),want={expert:$('sc-expert').value.trim()};T.forEach(t=>want[t.id]=$('sc-'+t.id).value.trim());
-    const label=k=>k==='expert'?'전문가':tName(E,k);
-    for(const [k,v] of Object.entries(want))if(!/^\d{4}$/.test(v))return toast(`${label(k)} 코드는 숫자 4자리로`);
-    const vals=Object.values(want);const dup=vals.find((v,i)=>vals.indexOf(v)!==i);if(dup)return toast(`코드 ${dup}가 두 번 쓰였음`);
-    const old={expert:E.expertCode};T.forEach(t=>old[t.id]=t.code);
-    const changed=Object.keys(want).filter(k=>want[k]!==old[k]);if(!changed.length)return toast('바뀐 코드가 없음');
-    $('btn-scodes').disabled=true;
-    try{
-      for(const k of changed){const r=await db.get(P.code(want[k]));const mine=r&&r.ev===EVID;if(r&&!mine)throw new Error(`코드 ${want[k]}는 다른 평가에서 쓰는 중`)}
-      if(!confirm(`${changed.map(k=>`${label(k)}: ${old[k]} → ${want[k]}`).join('\n')}\n\n이렇게 바꿀까요? 이미 인쇄한 코드 카드는 다시 인쇄해야 해요.`)){$('btn-scodes').disabled=false;return}
-      for(const k of changed)if(!vals.includes(old[k]))await db.del(P.code(old[k]));
-      for(const k of changed)await db.set(P.code(want[k]),k==='expert'?{ev:EVID,role:'expert'}:{ev:EVID,role:'team',team:k});
-      const nt={};T.forEach(t=>nt[t.id]={name:t.name,order:t.order,code:want[t.id]});
-      await db.update(P.ev(EVID),{expertCode:want.expert,teams:nt});
-      toast('코드를 바꿨음');watch.now();
-    }catch(x){toast(x.message||'저장하지 못함. 인터넷 연결을 확인해 주세요')}
-    $('btn-scodes').disabled=false;
-  };
-  $('btn-steams').onclick=()=>{const T={};teams(E).forEach(t=>T[t.id]={name:$('sn-'+t.id).value.trim()||t.name,order:t.order,code:t.code});U({teams:T});toast('팀 이름 저장')};
-  $('btn-spcrit').onclick=()=>{const L=$('s-pcrit').value.split('\n').map(x=>x.trim()).filter(Boolean).map((x,i)=>{const [n,...d]=x.split('|');return {id:'k'+(i+1),name:n.trim(),desc:d.join('|').trim()}}).filter(x=>x.name);
+  $('btn-sw').onclick=()=>{LOG('WEIGHT',`전문가 비율 ${$('s-we').value}%`);U({wE:Math.max(0,Math.min(100,+$('s-we').value||0))});toast('비율 저장')};
+  $('btn-gocodes').onclick=()=>document.querySelector('#mtabs .tab[data-p=tp-sys]').click();
+  $('btn-spcrit').onclick=()=>{LOG('CRITERIA','상호평가 기준 변경');const L=$('s-pcrit').value.split('\n').map(x=>x.trim()).filter(Boolean).map((x,i)=>{const [n,...d]=x.split('|');return {id:'k'+(i+1),name:n.trim(),desc:d.join('|').trim()}}).filter(x=>x.name);
     if(L.length<2||L.length>5)return toast('기준은 2~5개');if(Object.values(E.peers||{}).some(p=>p.at)&&!confirm('이미 제출한 학생이 있어요. 기준을 바꾸면 다시 제출해야 할 수 있어요. 바꿀까요?'))return;U({pcrit:L});toast('기준 저장')};
   $('btn-del-ev').onclick=async()=>{if(!confirm(`「${E.title}」 평가와 모든 점수를 지울까요? 되돌릴 수 없어요.`))return;if(prompt('지우려면 "삭제"라고 입력')!=='삭제')return;
-    clearInterval(pollIv);await db.del(P.code(E.expertCode));for(const t of teams(E))if(t.code)await db.del(P.code(t.code));await db.del(`${P.list}/${EVID}`);const C=await db.get(P.cur);if(C&&C.ev===EVID)await db.del(P.cur);await db.del(P.ev(EVID));ss('adminEv',null);toast('지웠음');showList()};
-  window.delItem=async(p,label)=>{if(!confirm(label+' 제출을 지울까요?'))return;await db.del(`${P.ev(EVID)}/${p}`);toast('지움');watch.now()};
+    clearInterval(pollIv);await db.del(P.code(E.expertCode));for(const t of teams(E))if(t.code)await db.del(P.code(t.code));for(const x of Object.values(E.expertList||{}))if(x.code)await db.del(P.code(x.code));await db.del(`${P.list}/${EVID}`);const C=await db.get(P.cur);if(C&&C.ev===EVID)await db.del(P.cur);await db.del(P.ev(EVID));ss('adminEv',null);toast('지웠음');showList()};
+  window.delItem=async(p,label)=>{if(!confirm(label+' 제출을 지울까요?'))return;await db.del(`${P.ev(EVID)}/${p}`);LOG('SUBMIT_DELETE',`${label} 제출 삭제`);toast('지움');watch.now()};
   window.csv=kind=>{const R=compute(E),rows=[];
     if(kind==='final'){rows.push(['순위','팀','전문가 평균','전문가 수','투자한 학생 수',...R.PC.map(k=>k.name+' 평균(10점)'),'상호평가','최종','기준별 1위']);R.ranked.forEach((r,i)=>rows.push([r.final!=null?i+1:'',r.name,f1(r.expert),r.nExp,r.nVoters,...R.PC.map(k=>f1(r.by[k.id].avg)),f1(r.peer),f1(r.final),r.badges.join(' · ')]))}
     if(kind==='expert'){rows.push(['전문가','팀',...CRIT.map(c=>`${c.name}(${c.max})`),'합계','의견']);Object.values(E.experts||{}).forEach(x=>teams(E).forEach(t=>{const s=x.scores&&x.scores[t.id];if(s)rows.push([x.name,t.name,...CRIT.map(c=>s[c.id]),CRIT.reduce((a,c)=>a+(+s[c.id]||0),0),s.memo||''])}))}
@@ -293,10 +308,17 @@ function pageAdmin(){
     const pill=(id,on)=>{$(id).className='pill '+(on?'on':'off');$(id).textContent=on?'열림':'닫힘'};
     pill('st-expert',e.expertOpen);pill('st-peer',e.peerOpen);$('tg-expert').textContent=e.expertOpen?'닫기':'열기';$('tg-peer').textContent=e.peerOpen?'닫기':'열기';
     $('st-reveal').className='pill '+((e.reveal||'hidden')==='hidden'?'':'or');$('st-reveal').textContent={hidden:'숨김',top3:'1~3위 공개',all:'전체 공개'}[e.reveal||'hidden'];
-    $('codes').innerHTML=`<table><tr><th class="l">구분</th><th>코드</th><th class="l">입장 주소</th></tr><tr><td class="l"><b>전문가</b> (모두 같은 코드)</td><td><span class="codebig">${e.expertCode}</span></td><td class="l tiny">${esc(link('expert'))}</td></tr>${T.map(t=>`<tr><td class="l"><b>${esc(t.name)}</b></td><td><span class="codebig">${t.code}</span></td><td class="l tiny">${esc(link('team',{c:t.code}))}</td></tr>`).join('')}</table>`;
-    const ps=JSON.stringify(T.map(t=>[t.name,t.code]))+e.expertCode;
-    if(ps!==printSig){printSig=ps;$('print-area').innerHTML=T.map(t=>`<div class="pcard"><div class="pn">${esc(t.name)}</div><div class="tiny" style="font-size:18px;margin-top:8px">팀 상호평가 · 팀 코드</div><div class="pc">${t.code}</div><div class="pq" id="pq-${t.id}"></div><div class="pu">${esc(link('team',{c:t.code}))}</div></div>`).join('')+`<div class="pcard"><div class="pn">전문가 평가</div><div class="tiny" style="font-size:18px;margin-top:8px">전문가 코드</div><div class="pc">${e.expertCode}</div><div class="pq" id="pq-ex"></div><div class="pu">${esc(link('expert'))}</div></div>`;
-      T.forEach(t=>drawQR($('pq-'+t.id),link('team',{c:t.code}),200));drawQR($('pq-ex'),link('expert',{c:e.expertCode}),200)}
+    const XL=Object.entries(e.expertList||{}).map(([id,x])=>({id,...x})).sort((a,b)=>(a.order||0)-(b.order||0));
+    // 요약 카드
+    const open=e.expertOpen||e.peerOpen;$('sum-state').textContent=open?(e.peerOpen?'상호평가 진행 중':'평가 진행 중'):((e.reveal||'hidden')!=='hidden'?'마감 · 결과 공개':'평가 마감');
+    $('btn-close-all').textContent=open?'평가 마감':'평가 다시 열기';
+    const exAll=new Map();XL.forEach(x=>exAll.set(x.id,(e.experts||{})[x.id]||{}));Object.entries(e.experts||{}).forEach(([k,x])=>{if(!exAll.has(k))exAll.set(k,x)});
+    const exDone=[...exAll.values()].filter(x=>T.length&&T.every(t=>x.scores&&x.scores[t.id])).length;$('sum-expert').textContent=`${exDone} / ${exAll.size}명 완료`;
+    const peAll=Object.values(e.peers||{}),tDone=T.filter(t=>peAll.filter(p=>p.team===t.id&&p.at).length>=(+t.seats||6)).length;$('sum-team').textContent=`${tDone} / ${T.length}팀 완료`;
+    $('codes').innerHTML=`<table><tr><th class="l">구분</th><th>코드</th><th class="l">입장 주소</th></tr><tr><td class="l"><b>전문가 공용</b> (이름 입력)</td><td><span class="codebig">${e.expertCode}</span></td><td class="l tiny">${esc(link('expert'))}</td></tr>${XL.map(x=>`<tr><td class="l"><b>${esc(x.name)}</b> (개인 코드)</td><td><span class="codebig">${x.code}</span></td><td class="l tiny">${esc(link('expert',{c:x.code}))}</td></tr>`).join('')}${T.map(t=>`<tr><td class="l"><b>${esc(t.name)}</b></td><td><span class="codebig">${t.code}</span></td><td class="l tiny">${esc(link('team',{c:t.code}))}</td></tr>`).join('')}</table>`;
+    const ps=JSON.stringify(T.map(t=>[t.name,t.code]))+e.expertCode+JSON.stringify(XL.map(x=>[x.name,x.code]));
+    if(ps!==printSig){printSig=ps;$('print-area').innerHTML=T.map(t=>`<div class="pcard"><div class="pn">${esc(t.name)}</div><div class="tiny" style="font-size:18px;margin-top:8px">팀 상호평가 · 팀 코드</div><div class="pc">${t.code}</div><div class="pq" id="pq-${t.id}"></div><div class="pu">${esc(link('team',{c:t.code}))}</div></div>`).join('')+`<div class="pcard"><div class="pn">전문가 평가</div><div class="tiny" style="font-size:18px;margin-top:8px">전문가 코드</div><div class="pc">${e.expertCode}</div><div class="pq" id="pq-ex"></div><div class="pu">${esc(link('expert'))}</div></div>`+XL.map(x=>`<div class="pcard"><div class="pn">${esc(x.name)}</div><div class="tiny" style="font-size:18px;margin-top:8px">전문가 평가 · 개인 코드</div><div class="pc">${x.code}</div><div class="pq" id="pq-${x.id}"></div><div class="pu">${esc(link('expert',{c:x.code}))}</div></div>`).join('');
+      T.forEach(t=>drawQR($('pq-'+t.id),link('team',{c:t.code}),200));drawQR($('pq-ex'),link('expert',{c:e.expertCode}),200);XL.forEach(x=>drawQR($('pq-'+x.id),link('expert',{c:x.code}),200))}
     $('ematrix').innerHTML=ex.length?`<div style="overflow-x:auto"><table><tr><th class="l">전문가</th>${T.map(t=>`<th>${esc(t.name)}</th>`).join('')}</tr>${ex.map(([k,x])=>`<tr><td class="l">${esc(x.name)}</td>${T.map(t=>{const s=x.scores&&x.scores[t.id];return `<td>${s?'<b>'+CRIT.reduce((a,c)=>a+(+s[c.id]||0),0)+'</b>':'<span class="tiny">—</span>'}</td>`}).join('')}</tr>`).join('')}</table></div>`:`<p class="sub">아직 들어온 전문가가 없음 · 전문가 코드 <b>${e.expertCode}</b></p>`;
     const P2=pe.map(([k,p])=>({k,...p}));
     $('pstat').innerHTML=`<table><tr><th class="l">팀</th><th>입장</th><th>제출 완료</th><th class="l">자리</th></tr>${T.map(t=>{const a=P2.filter(p=>p.team===t.id),d=a.filter(p=>p.at);return `<tr><td class="l"><b>${esc(t.name)}</b></td><td>${a.length}</td><td>${d.length}</td><td class="l"><div class="chips">${a.map(p=>`<span class="chip ${p.at?'ok':''}">${esc(p.nick)}</span>`).join('')}</div></td></tr>`}).join('')}</table><p class="tiny" style="margin-top:8px">전체 ${P2.filter(p=>p.at).length} / ${P2.length}명 완료</p>`;
@@ -306,8 +328,19 @@ function pageAdmin(){
     $('praise').innerHTML=pr.length?T.map(t=>{const l=pr.filter(x=>x.t===t.id);return l.length?`<h3 style="margin-top:8px">${esc(t.name)}</h3><ul style="margin:0 0 8px 18px">${l.map(x=>`<li class="sub">${esc(x.v)} <span class="tiny">· ${esc(x.from)}</span></li>`).join('')}</ul>`:''}).join(''):'<p class="sub">아직 없음</p>';
     if(document.activeElement!==$('s-we'))$('s-we').value=e.wE??60;
     if(document.activeElement!==$('s-pcrit'))$('s-pcrit').value=pcrit(e).map(k=>k.name+(k.desc?' | '+k.desc:'')).join('\n');
-    if(!$('s-codes').contains(document.activeElement))$('s-codes').innerHTML=`<table><tr><th class="l">구분</th><th>지금 코드</th><th>새 코드</th></tr><tr><td class="l"><b>전문가</b></td><td><span class="codebig" style="font-size:1.2rem">${e.expertCode}</span></td><td><input id="sc-expert" class="code" style="font-size:1.2rem;letter-spacing:6px;margin:0;max-width:170px" maxlength="4" inputmode="numeric" value="${e.expertCode}"></td></tr>${T.map(t=>`<tr><td class="l"><b>${esc(t.name)}</b></td><td><span class="codebig" style="font-size:1.2rem">${t.code}</span></td><td><input id="sc-${t.id}" class="code" style="font-size:1.2rem;letter-spacing:6px;margin:0;max-width:170px" maxlength="4" inputmode="numeric" value="${t.code}"></td></tr>`).join('')}</table>`;
-    if(!$('s-teams').contains(document.activeElement))$('s-teams').innerHTML=T.map(t=>`<div class="row" style="flex-wrap:nowrap"><input id="sn-${t.id}" value="${esc(t.name)}"><span class="tiny" style="white-space:nowrap;margin-bottom:10px">코드 ${t.code}</span></div>`).join('');
+    const busy=id=>$(id).contains(document.activeElement);
+    const inp=(id,v,w,extra='')=>`<input id="${id}" value="${esc(v)}" style="margin:0;${w?'max-width:'+w+'px':''}" ${extra}>`;
+    if(!busy('sys-teams'))$('sys-teams').innerHTML=`<table><tr><th>번호</th><th class="l">팀 이름</th><th>팀 코드</th><th>인원</th><th></th></tr>${T.map((t,i)=>`<tr><td style="width:70px">${inp('so-'+t.id,(t.order??i)+1,64,'inputmode="numeric"')}</td><td class="l">${inp('sn-'+t.id,t.name)}</td><td style="width:120px">${inp('sc-'+t.id,t.code,110,'class="codein" maxlength="4" inputmode="numeric"')}</td><td style="width:110px"><div class="row" style="flex-wrap:nowrap;gap:4px">${inp('ss-'+t.id,t.seats||6,64,'inputmode="numeric"')}<span class="tiny">명</span></div></td><td style="width:140px"><div class="row" style="flex-wrap:nowrap;gap:6px;justify-content:flex-end"><button class="btn btn-s sm" onclick="sysTeamSave('${t.id}')">저장</button><button class="btn btn-p sm" onclick="sysTeamDel('${t.id}')">삭제</button></div></td></tr>`).join('')}
+      <tr><td>${inp('na-ord',Math.max(0,...T.map(t=>(t.order??0)+1))+1,64,'inputmode="numeric"')}</td><td class="l">${inp('na-name','',0,'placeholder="팀 이름"')}</td><td>${inp('na-code','',110,'class="codein" maxlength="4" inputmode="numeric" placeholder="자동"')}</td><td><div class="row" style="flex-wrap:nowrap;gap:4px">${inp('na-seats',5,64,'inputmode="numeric"')}<span class="tiny">명</span></div></td><td><button class="btn btn-o sm" id="btn-team-add-r">추가</button></td></tr></table>`;
+    $('btn-team-add-r')&&($('btn-team-add-r').onclick=teamAdd);
+    $('sys-tcount').textContent=`총 ${T.length}팀`;
+    if(!busy('sys-shared'))$('shared-code').value=e.expertCode;
+    if(!busy('sys-experts'))$('sys-experts').innerHTML=`<table><tr><th class="l">전문가 이름</th><th>개인 코드</th><th>채점</th><th></th></tr>${XL.map(x=>{const sc=((e.experts||{})[x.id]||{}).scores||{},n=T.filter(t=>sc[t.id]).length;return `<tr><td class="l">${inp('xn-'+x.id,x.name)}</td><td style="width:140px"><input id="xc-${x.id}" type="${showCodes?'text':'password'}" value="${esc(x.code)}" maxlength="4" inputmode="numeric" autocomplete="new-password" class="xc codein" style="margin:0;max-width:130px"></td><td style="width:80px"><span class="pill ${n===T.length&&T.length?'on':''}">${n} / ${T.length}</span></td><td style="width:140px"><div class="row" style="flex-wrap:nowrap;gap:6px;justify-content:flex-end"><button class="btn btn-s sm" onclick="sysExpSave('${x.id}')">저장</button><button class="btn btn-p sm" onclick="sysExpDel('${x.id}')">삭제</button></div></td></tr>`}).join('')||'<tr><td class="l tiny" colspan="4">등록된 전문가가 없음 · 아래에서 추가하면 전문가마다 개인 코드가 생김</td></tr>'}
+      <tr><td class="l">${inp('xa-name','',0,'placeholder="이름"')}</td><td>${inp('xa-code','',130,'class="codein" maxlength="4" inputmode="numeric" placeholder="자동"')}</td><td></td><td><button class="btn btn-o sm" id="btn-exp-add-r">추가</button></td></tr></table>`;
+    $('btn-exp-add-r')&&($('btn-exp-add-r').onclick=expAdd);
+    $('sys-xcount').textContent=`총 ${XL.length}명`;
+    const LG=Object.values(e.log||{}).sort((a,b)=>b.at-a.at).slice(0,60);
+    $('sys-log').innerHTML=LG.length?LG.map(l=>`<div class="logline">${new Date(l.at).toLocaleString('ko-KR')} · <b>${esc(l.type)}</b> · ${esc(l.msg)}</div>`).join(''):'<p class="tiny">아직 기록 없음</p>';
     $('s-del').innerHTML=`<h3>전문가</h3>${ex.map(([k,x])=>`<div class="between" style="padding:6px 0;border-bottom:1px solid rgba(110,150,255,.12)"><span>${esc(x.name)}</span><button class="btn btn-s sm" onclick="delItem('experts/${k}','${esc(x.name).replace(/'/g,'')}')">지우기</button></div>`).join('')||'<p class="tiny">없음</p>'}<h3 style="margin-top:14px">학생</h3>${P2.map(p=>`<div class="between" style="padding:6px 0;border-bottom:1px solid rgba(110,150,255,.12)"><span>${esc(tName(e,p.team))} · ${esc(p.nick)} ${p.at?'<span class="pill on">완료</span>':''}</span><button class="btn btn-s sm" onclick="delItem('peers/${p.k}','${esc(p.nick).replace(/'/g,'')}')">지우기</button></div>`).join('')||'<p class="tiny">없음</p>'}`;
   }
 }
