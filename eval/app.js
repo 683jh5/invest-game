@@ -123,17 +123,19 @@ function pageExpert(){
 
 // ═════════ 팀 상호평가 ═════════
 function pageTeam(){
-  let me=null,myTeam=null,pk=null,pd=null,dirty=false;
+  let me=null,myTeam=null,pk=null,pd=null,dirty=false,seat=0;
+  document.querySelectorAll('#seats .seat').forEach(b=>b.onclick=()=>{seat=+b.dataset.n;document.querySelectorAll('#seats .seat').forEach(x=>x.classList.toggle('on',x===b))});
   const s=ss('team');if(s&&s.ev){me=s.me;myTeam=s.team;enter(s.ev)}
   const qc=new URLSearchParams(location.search).get('c');if(qc){$('in-code').value=qc;peek()}
   $('in-code').oninput=peek;
   async function peek(){const r=await lookup($('in-code').value);const el=$('peek');if(!r||r.role!=='team'){el.textContent='';return}const ev=await db.get(P.ev(r.ev));el.innerHTML=ev?`우리 팀: <b>${esc(tName(ev,r.team))}</b>`:''}
   $('btn-in').onclick=async()=>{
-    const nk=$('in-nick').value.trim();if(!nk)return toast('별명을 입력');
+    if(!seat)return toast('내 자리 번호를 눌러 주세요');const nk=seat+'번';
     const r=await lookup($('in-code').value);if(!r||r.role!=='team')return toast('팀 코드가 맞지 않음');
     const ev=await db.get(P.ev(r.ev));if(!ev)return toast('평가를 찾을 수 없음');
-    if(!confirm(`우리 팀이 「${tName(ev,r.team)}」 맞나요?\n\n우리 팀은 평가할 수 없어요.`))return;
-    me=key(r.team+'_'+nk);myTeam=r.team;
+    const k0=key(r.team+'_s'+seat),used=ev.peers&&ev.peers[k0];
+    if(!confirm(`「${tName(ev,r.team)}」 ${seat}번 자리 맞나요?${used?'\n\n이 자리로 이미 들어온 기록이 있어요. 같은 사람이면 확인을 눌러 이어서 하세요.':''}\n\n우리 팀은 평가할 수 없어요.`))return;
+    me=k0;myTeam=r.team;
     if(!(ev.peers&&ev.peers[me]))await db.set(`${P.ev(r.ev)}/peers/${me}`,{team:r.team,nick:nk,joined:Date.now()});
     ss('team',{ev:r.ev,me,team:r.team});enter(r.ev);
   };
@@ -259,7 +261,7 @@ function pageAdmin(){
   window.csv=kind=>{const R=compute(E),rows=[];
     if(kind==='final'){rows.push(['순위','팀','전문가 평균','전문가 수','투자한 학생 수',...R.PC.map(k=>k.name+' 평균(10점)'),'상호평가','최종','기준별 1위']);R.ranked.forEach((r,i)=>rows.push([r.final!=null?i+1:'',r.name,f1(r.expert),r.nExp,r.nVoters,...R.PC.map(k=>f1(r.by[k.id].avg)),f1(r.peer),f1(r.final),r.badges.join(' · ')]))}
     if(kind==='expert'){rows.push(['전문가','팀',...CRIT.map(c=>`${c.name}(${c.max})`),'합계','의견']);Object.values(E.experts||{}).forEach(x=>teams(E).forEach(t=>{const s=x.scores&&x.scores[t.id];if(s)rows.push([x.name,t.name,...CRIT.map(c=>s[c.id]),CRIT.reduce((a,c)=>a+(+s[c.id]||0),0),s.memo||''])}))}
-    if(kind==='peer'){rows.push(['평가한 학생 팀','별명','평가받은 팀',...R.PC.map(k=>k.name+'(10점)'),'칭찬']);Object.values(E.peers||{}).filter(p=>p.at).forEach(p=>teams(E).filter(t=>t.id!==p.team).forEach(t=>rows.push([tName(E,p.team),p.nick,t.name,...R.PC.map(k=>((p.scores||{})[k.id]||{})[t.id]||''),(p.praise||{})[t.id]||''])))}
+    if(kind==='peer'){rows.push(['평가한 학생 팀','자리','평가받은 팀',...R.PC.map(k=>k.name+'(10점)'),'칭찬']);Object.values(E.peers||{}).filter(p=>p.at).forEach(p=>teams(E).filter(t=>t.id!==p.team).forEach(t=>rows.push([tName(E,p.team),p.nick,t.name,...R.PC.map(k=>((p.scores||{})[k.id]||{})[t.id]||''),(p.praise||{})[t.id]||''])))}
     const body='﻿'+rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([body],{type:'text/csv'}));a.download=`평가_${{final:'최종',expert:'전문가',peer:'상호평가'}[kind]}_${E.title}.csv`;a.click()};
   let printSig='';
   function render(e){
@@ -275,7 +277,7 @@ function pageAdmin(){
       T.forEach(t=>drawQR($('pq-'+t.id),link('team',{c:t.code}),200));drawQR($('pq-ex'),link('expert',{c:e.expertCode}),200)}
     $('ematrix').innerHTML=ex.length?`<div style="overflow-x:auto"><table><tr><th class="l">전문가</th>${T.map(t=>`<th>${esc(t.name)}</th>`).join('')}</tr>${ex.map(([k,x])=>`<tr><td class="l">${esc(x.name)}</td>${T.map(t=>{const s=x.scores&&x.scores[t.id];return `<td>${s?'<b>'+CRIT.reduce((a,c)=>a+(+s[c.id]||0),0)+'</b>':'<span class="tiny">—</span>'}</td>`}).join('')}</tr>`).join('')}</table></div>`:`<p class="sub">아직 들어온 전문가가 없음 · 전문가 코드 <b>${e.expertCode}</b></p>`;
     const P2=pe.map(([k,p])=>({k,...p}));
-    $('pstat').innerHTML=`<table><tr><th class="l">팀</th><th>입장</th><th>제출 완료</th><th class="l">별명</th></tr>${T.map(t=>{const a=P2.filter(p=>p.team===t.id),d=a.filter(p=>p.at);return `<tr><td class="l"><b>${esc(t.name)}</b></td><td>${a.length}</td><td>${d.length}</td><td class="l"><div class="chips">${a.map(p=>`<span class="chip ${p.at?'ok':''}">${esc(p.nick)}</span>`).join('')}</div></td></tr>`}).join('')}</table><p class="tiny" style="margin-top:8px">전체 ${P2.filter(p=>p.at).length} / ${P2.length}명 완료</p>`;
+    $('pstat').innerHTML=`<table><tr><th class="l">팀</th><th>입장</th><th>제출 완료</th><th class="l">자리</th></tr>${T.map(t=>{const a=P2.filter(p=>p.team===t.id),d=a.filter(p=>p.at);return `<tr><td class="l"><b>${esc(t.name)}</b></td><td>${a.length}</td><td>${d.length}</td><td class="l"><div class="chips">${a.map(p=>`<span class="chip ${p.at?'ok':''}">${esc(p.nick)}</span>`).join('')}</div></td></tr>`}).join('')}</table><p class="tiny" style="margin-top:8px">전체 ${P2.filter(p=>p.at).length} / ${P2.length}명 완료</p>`;
     $('result').innerHTML=`<table><tr><th>순위</th><th class="l">팀</th><th>전문가 평균<br><span class="tiny">(채점 인원)</span></th>${R.PC.map(k=>`<th>${esc(k.name)}<br><span class="tiny">평균 (10점)</span></th>`).join('')}<th>상호평가</th><th>최종</th></tr>${R.ranked.map((r,i)=>`<tr><td><b>${r.final!=null?i+1:'—'}</b></td><td class="l"><b>${esc(r.name)}</b>${r.badges.map(b=>` <span class="pill or">${esc(b)}</span>`).join('')}</td><td>${f1(r.expert)} <span class="tiny">(${r.nExp})</span></td>${R.PC.map(k=>`<td>${f1(r.by[k.id].avg)}</td>`).join('')}<td>${f1(r.peer)} <span class="tiny">(${r.nVoters}명)</span></td><td><b>${f1(r.final)}</b></td></tr>`).join('')}</table>`;
     $('formula').textContent=`최종 = 전문가 평균 × ${Math.round(R.wE*100)}% + 상호평가 × ${Math.round(100-R.wE*100)}% · 상호평가 = 다른 팀 학생들이 준 기준별 점수(1~10점) 평균 ÷ 10 × 100, 기준 여러 개는 평균 · 학생은 우리 팀을 평가하지 못함 · 전문가 점수나 상호평가가 없으면 최종 점수를 내지 않음`;
     const pr=[];P2.forEach(p=>Object.entries(p.praise||{}).forEach(([t,v])=>pr.push({t,v,from:tName(e,p.team)})));
