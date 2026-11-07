@@ -107,46 +107,100 @@ input[type=range]{padding:0;margin:10px 0 2px;accent-color:var(--orange);height:
 .award{display:inline-block;background:var(--orange);color:#fff;border-radius:10px;padding:3px 10px;font-size:.9rem;font-weight:800;margin-left:10px;vertical-align:middle}
 @keyframes pop{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 @media (max-width:640px){.bgrid{grid-template-columns:1fr}.rank{grid-template-columns:60px 1fr 90px;padding:14px}}
+
+/* 첫 화면 (보내 준 시안) */
+#screen-home{padding:0;background:#f6f8fc}
+.hero{background:linear-gradient(135deg,#0f2a5c 0%,#1a3f7a 55%,#174a86 100%);color:#fff;text-align:center;padding:40px 20px 120px}
+.hero-t{font-size:clamp(1.9rem,6vw,3rem);font-weight:900;letter-spacing:-.5px}
+.hero-s{font-size:clamp(1rem,2.6vw,1.3rem);font-weight:700;color:#dbe6f5;margin-top:12px}
+.hwrap{max-width:800px;margin:-80px auto 0;padding:0 20px 20px;position:relative}
+.mcard{display:flex;align-items:center;gap:22px;width:100%;background:#fff;border:1px solid #e1e7f0;border-radius:24px;padding:32px 40px;margin-bottom:24px;box-shadow:0 10px 30px rgba(15,42,92,.08);text-align:left;font-family:inherit;color:var(--ink);cursor:pointer;transition:transform .15s,box-shadow .15s}
+button.mcard:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(15,42,92,.13)}
+.mcard.slim{padding:24px 40px}
+.mcard .ic{color:#0f2a5c;display:flex;flex:none}
+.mcard .ic.or{color:#e8802e}
+.mcard b{display:block;font-size:1.55rem;font-weight:800;color:#0e1a2b}
+.mcard em{display:block;font-style:normal;font-size:1.12rem;color:#5b6676;margin-top:6px}
+.fcard{display:block;cursor:default;padding:28px 32px}
+.fhead{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.fhead b{font-size:1.4rem;margin:0}
+.fcard .btn-p{background:#0f2a5c;padding:14px;font-size:1.05rem}
+.back{display:block;text-align:center;margin-top:16px;color:#5b6676;font-size:.92rem;text-decoration:none}
+.rule{background:#e3edf8;border-radius:24px;padding:26px 32px;margin-top:56px;color:#5b6676;line-height:1.75;font-size:1.08rem}
+.rule b{display:block;color:#0f2a5c;font-size:1.15rem;font-weight:800;margin-bottom:6px}
+.rule p{margin-top:6px}
+.admin{color:#4a5568;font-size:1.05rem;text-decoration:underline;text-underline-offset:3px}
+@media (max-width:560px){.mcard{padding:24px;gap:16px}.mcard.slim{padding:20px 24px}.mcard b{font-size:1.3rem}.mcard em{font-size:1rem}.rule{padding:20px}}
+/* 안쪽 화면 머리 띠 */
+.band{margin:-18px calc(50% - 50vw) 16px;padding:26px max(18px,calc(50vw - 50%)) 26px;background:linear-gradient(135deg,#0f2a5c 0%,#1a3f7a 55%,#174a86 100%);color:#fff}
+.band h1{color:#fff}.band .sub{color:#dbe6f5}.band .code-big{color:#fff}
+.band .btn-s{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.3)}
 </style>
 </head>
 <body>
 
 <!-- 첫 화면 -->
 <section class="screen active" id="screen-home">
-  <div class="wrap" style="max-width:760px;margin-top:4vh">
-    <div class="card">
-      <h1>IR Day 평가</h1>
-      <p class="sub">디지털 자산 거래소 발표 평가 · 전문가 60% + 다른 팀 40%</p>
-      <p class="tiny" id="demo-note" style="margin-top:6px"></p>
-      <label class="lb" style="margin-top:14px">평가 코드</label>
-      <input id="in-code" maxlength="4" placeholder="강사가 알려 준 4자리" style="text-transform:uppercase;font-size:1.3rem;font-weight:800;letter-spacing:4px;text-align:center">
-    </div>
-    <div class="grid3">
-      <button class="entry" onclick="openForm('peer')"><b>팀 상호평가</b><span>학생 · 기준마다 1,000만 원을 다른 팀에 투자하기</span></button>
-      <button class="entry" onclick="openForm('expert')"><b>전문가 평가</b><span>강사 · 심사위원 · 5개 항목 100점</span></button>
-      <button class="entry" onclick="openForm('teacher')"><b>운영자</b><span>평가 만들기 · 진행 · 결과</span></button>
+  <div class="hero">
+    <div class="hero-t">디지털 자산 거래소 만들기</div>
+    <div class="hero-s">바이브코딩 캠프</div>
+  </div>
+  <div class="hwrap">
+    <div id="home-menu">
+      <button class="mcard" onclick="openForm('expert')"><span class="ic"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span><span><b>전문가 평가</b><em>전문가 코드로 입장</em></span></button>
+      <button class="mcard" onclick="openForm('peer')"><span class="ic"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span><b>팀 상호평가</b><em>팀 코드로 입장</em></span></button>
+      <button class="mcard slim" onclick="openForm('result')"><span class="ic or"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></span><span><b>최종 결과 보기</b></span></button>
+      <div class="rule">
+        <b>평가 기준 100점</b>
+        <p>문제정의 15 · 금융투자 반영 25 · 앱 완성도 20 · 창의성·독창성 20 · 발표력 20</p>
+        <p>최종점수 = 전문가 평균 × 0.6 + 상호평가 평균 × 0.4</p>
+      </div>
+      <p class="tiny" id="demo-note" style="text-align:center;margin-top:14px"></p>
+      <div style="text-align:center;margin:34px 0 20px"><a href="#" class="admin" onclick="openForm('teacher');return false">관리자</a></div>
     </div>
 
-    <div class="card" id="form-peer" style="display:none;margin-top:14px">
-      <h2>팀 상호평가 입장</h2>
+    <div id="code-wrap" style="display:none">
+      <label class="lb">평가 코드</label>
+      <input id="in-code" maxlength="4" placeholder="강사가 알려 준 4자리" autocomplete="off" style="text-transform:uppercase;font-size:1.3rem;font-weight:800;letter-spacing:4px;text-align:center">
+    </div>
+
+    <div class="mcard fcard" id="form-expert" style="display:none">
+      <div class="fhead"><span class="ic"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span><b>전문가 평가</b></div>
+      <div class="slot"></div>
+      <label class="lb">이름</label>
+      <input id="in-ename" maxlength="12" placeholder="예: 한여경" autocomplete="off">
+      <label class="lb">전문가 코드 (PIN)</label>
+      <input id="in-epin" maxlength="6" inputmode="numeric" placeholder="운영자에게 받은 4자리" autocomplete="off">
+      <button class="btn btn-p block" id="btn-expert">입장하기</button>
+      <a href="#" class="back" onclick="closeForm();return false">← 처음으로</a>
+    </div>
+    <div class="mcard fcard" id="form-peer" style="display:none">
+      <div class="fhead"><span class="ic"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><b>팀 상호평가</b></div>
+      <div class="slot"></div>
       <label class="lb">우리 팀</label>
       <select id="in-pteam"><option value="">평가 코드를 먼저 입력</option></select>
       <label class="lb">별명</label>
-      <input id="in-pnick" maxlength="12" placeholder="팀빌딩 때 쓴 별명">
-      <button class="btn btn-o block" id="btn-peer">입장하기</button>
+      <input id="in-pnick" maxlength="12" placeholder="팀빌딩 때 쓴 별명" autocomplete="off">
+      <button class="btn btn-p block" id="btn-peer">입장하기</button>
+      <a href="#" class="back" onclick="closeForm();return false">← 처음으로</a>
     </div>
-    <div class="card" id="form-expert" style="display:none;margin-top:14px">
-      <h2>전문가 평가 입장</h2>
-      <label class="lb">이름</label>
-      <input id="in-ename" maxlength="12" placeholder="예: 한여경">
-      <label class="lb">전문가 PIN</label>
-      <input id="in-epin" maxlength="6" inputmode="numeric" placeholder="운영자에게 받은 4자리">
-      <button class="btn btn-p block" id="btn-expert">입장하기</button>
+    <div class="mcard fcard" id="form-result" style="display:none">
+      <div class="fhead"><span class="ic or"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></span><b>최종 결과 보기</b></div>
+      <div class="slot"></div>
+      <p class="tiny" style="margin-bottom:8px">운영자가 결과를 공개하면 순위가 나옴</p>
+      <button class="btn btn-p block" id="btn-result">결과 보기</button>
+      <a href="#" class="back" onclick="closeForm();return false">← 처음으로</a>
     </div>
-    <div class="card" id="form-teacher" style="display:none;margin-top:14px">
-      <h2>새 평가 만들기</h2>
+    <div class="mcard fcard" id="form-teacher" style="display:none">
+      <div class="fhead"><span class="ic"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><b>관리자</b></div>
+      <h3>만든 평가로 다시 들어가기</h3>
+      <div class="slot"></div>
+      <input id="in-tpw2" type="password" placeholder="운영자 비밀번호" autocomplete="new-password">
+      <button class="btn btn-p block" id="btn-rejoin">다시 들어가기</button>
+      <hr style="border:none;border-top:1px solid var(--border);margin:18px 0">
+      <h3>새 평가 만들기</h3>
       <label class="lb">운영자 인증코드</label>
-      <input id="in-tkey" type="password">
+      <input id="in-tkey" type="password" autocomplete="new-password">
       <label class="lb">평가 이름</label>
       <input id="in-title" placeholder="예: 광주 IR Day" value="IR Day">
       <label class="lb">팀 이름 (한 줄에 한 팀)</label>
@@ -156,13 +210,9 @@ input[type=range]{padding:0;margin:10px 0 2px;accent-color:var(--orange);height:
 4팀
 5팀</textarea>
       <label class="lb">운영자 비밀번호 (다시 들어올 때 씀)</label>
-      <input id="in-tpw" type="password" placeholder="4자리 이상">
-      <button class="btn btn-p block" id="btn-create">평가 만들기</button>
-      <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
-      <h3>만든 평가로 다시 들어가기</h3>
-      <p class="tiny" style="margin-bottom:8px">위의 평가 코드 칸에 코드를 넣고 비밀번호 입력</p>
-      <input id="in-tpw2" type="password" placeholder="운영자 비밀번호">
-      <button class="btn btn-s block" id="btn-rejoin">다시 들어가기</button>
+      <input id="in-tpw" type="password" placeholder="4자리 이상" autocomplete="new-password">
+      <button class="btn btn-s block" id="btn-create">평가 만들기</button>
+      <a href="#" class="back" onclick="closeForm();return false">← 처음으로</a>
     </div>
   </div>
 </section>
@@ -170,7 +220,7 @@ input[type=range]{padding:0;margin:10px 0 2px;accent-color:var(--orange);height:
 <!-- 전문가 -->
 <section class="screen" id="screen-expert">
   <div class="wrap" style="max-width:760px">
-    <div class="between" style="margin-bottom:12px">
+    <div class="between band">
       <div><h1 id="e-title">전문가 평가</h1><p class="sub" id="e-who"></p></div>
       <button class="btn btn-s sm" onclick="logout()">나가기</button>
     </div>
@@ -192,7 +242,7 @@ input[type=range]{padding:0;margin:10px 0 2px;accent-color:var(--orange);height:
 <!-- 학생 상호평가 -->
 <section class="screen" id="screen-peer">
   <div class="wrap" style="max-width:760px">
-    <div class="between" style="margin-bottom:12px">
+    <div class="between band">
       <div><h1>기준마다 1,000만 원, 어느 팀에?</h1><p class="sub" id="p-who"></p></div>
       <button class="btn btn-s sm" onclick="logout()">나가기</button>
     </div>
@@ -214,7 +264,7 @@ input[type=range]{padding:0;margin:10px 0 2px;accent-color:var(--orange);height:
 <!-- 운영자 -->
 <section class="screen" id="screen-teacher">
   <div class="wrap">
-    <div class="between" style="margin-bottom:12px">
+    <div class="between band">
       <div><h1 id="t-title">운영자</h1><p class="sub">평가 코드 <b class="code-big" id="t-code" style="font-size:1.4rem;letter-spacing:3px"></b> · 전문가 PIN <b id="t-pin"></b></p></div>
       <div class="row"><button class="btn btn-o sm" onclick="openBoard()">큰 화면 열기</button><button class="btn btn-s sm" onclick="logout()">나가기</button></div>
     </div>
@@ -379,14 +429,16 @@ function compute(m){
 let role=null,code='',me='',myTeam='',M=null,pollIv=null,lastSig='',curTeam=null,draft={},pdraft=null,pdirty=false;
 function saveSess(){try{sessionStorage.setItem('ev_sess'+(DEMO?'_demo':''),JSON.stringify({role,code,me,myTeam}))}catch(e){}}
 function clearSess(){try{sessionStorage.removeItem('ev_sess'+(DEMO?'_demo':''))}catch(e){}}
-function openForm(w){['peer','expert','teacher'].forEach(x=>$('form-'+x).style.display=x===w?'block':'none');$('form-'+w).scrollIntoView({behavior:'smooth',block:'start'})}
+const FORMS=['peer','expert','teacher','result'];
+function openForm(w){$('home-menu').style.display='none';FORMS.forEach(x=>$('form-'+x).style.display=x===w?'block':'none');const cw=$('code-wrap');$('form-'+w).querySelector('.slot').appendChild(cw);cw.style.display='block';window.scrollTo(0,0);setTimeout(()=>{const f=$('form-'+w).querySelector('input:not([type=hidden])');if(f&&!f.value)f.focus()},50)}
+function closeForm(){FORMS.forEach(x=>$('form-'+x).style.display='none');$('home-menu').style.display='block';$('code-wrap').style.display='none';window.scrollTo(0,0)}
 async function loadTeamsFor(c){
   if(c.length!==4)return;
   let m=null;try{m=await db.get(ROOT(c))}catch(e){return}
   if(!m||!m.teams){$('in-pteam').innerHTML='<option value="">없는 평가 코드</option>';return}
   $('in-pteam').innerHTML='<option value="">우리 팀 선택</option>'+teams(m).map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
 }
-$('in-code').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase();const v=e.target.value.trim();loadTeamsFor(v);if(v.length===4&&['peer','expert','teacher'].every(x=>$('form-'+x).style.display==='none'))openForm('peer')});
+$('in-code').addEventListener('input',e=>{e.target.value=e.target.value.toUpperCase();const v=e.target.value.trim();loadTeamsFor(v);});
 if(DEMO)$('demo-note').textContent='체험 모드: 이 브라우저 안에서만 저장됨 (다른 기기와 연결되지 않음)';
 
 $('btn-create').onclick=async()=>{
@@ -400,10 +452,11 @@ $('btn-create').onclick=async()=>{
   code=c;role='teacher';saveSess();enterTeacher();
 };
 $('btn-rejoin').onclick=async()=>{
-  const c=$('in-code').value.trim().toUpperCase();if(c.length!==4)return toast('위 칸에 평가 코드 4자리를 입력');
+  const c=$('in-code').value.trim().toUpperCase();if(c.length!==4)return toast('평가 코드 4자리를 입력');
   const m=await db.get(ROOT(c));if(!m)return toast('없는 평가 코드');if(m.pw!==$('in-tpw2').value.trim())return toast('비밀번호가 다름');
   code=c;role='teacher';saveSess();enterTeacher();
 };
+$('btn-result').onclick=async()=>{const c=$('in-code').value.trim().toUpperCase();if(c.length!==4)return toast('평가 코드 4자리를 입력');const m=await db.get(ROOT(c));if(!m)return toast('없는 평가 코드');code=c;role='board';const u=new URL(location.href);u.search='';u.searchParams.set('code',c);if(DEMO)u.searchParams.set('demo','');u.hash='board';history.replaceState(null,'',u.toString().replace('demo=','demo'));show('board');startPoll()};
 $('btn-expert').onclick=async()=>{
   const c=$('in-code').value.trim().toUpperCase(),nm=$('in-ename').value.trim();
   if(c.length!==4)return toast('평가 코드 4자리를 입력');if(nm.length<2)return toast('이름은 2글자 이상');
@@ -420,7 +473,7 @@ $('btn-peer').onclick=async()=>{
   const ex=m.peers&&m.peers[me];if(!ex)await db.set(`${ROOT(c)}/peers/${me}`,{team:tm,nick:nk,joined:Date.now()});
   saveSess();enterPeer();
 };
-function logout(){clearInterval(pollIv);clearSess();role=null;M=null;lastSig='';draft={};pdraft=null;pdirty=false;history.replaceState(null,'',location.pathname+(DEMO?'?demo':''));show('home')}
+function logout(){clearInterval(pollIv);closeForm();clearSess();role=null;M=null;lastSig='';draft={};pdraft=null;pdirty=false;history.replaceState(null,'',location.pathname+(DEMO?'?demo':''));show('home')}
 
 async function poll(){let m;try{m=await db.get(ROOT(code))}catch(e){return}if(!m)return;M=m;const sig=JSON.stringify(m);if(sig===lastSig)return;lastSig=sig;
   ({teacher:renderTeacher,expert:renderExpert,peer:renderPeer,board:renderBoard})[role]()}
