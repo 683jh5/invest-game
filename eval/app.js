@@ -48,7 +48,7 @@ const CRIT=[
   {id:'c4',name:'창의성·독창성',max:20,desc:'다른 팀과 구별되는 우리만의 색깔'},
   {id:'c5',name:'발표력',max:20,desc:'전달력 · 시간 준수 · 팀워크'}
 ];
-const BUDGET=1000,STEP=100;
+const MAXP=10; // 상호평가: 기준마다 팀별 1~10점
 const PCRIT_DEFAULT=[
   {id:'k1',name:'팀워크',desc:'역할을 나눠 서로 도우며 함께 만들었는가'},
   {id:'k2',name:'현실 활용 가능성',desc:'만든 서비스를 실제로 쓸 수 있는가'},
@@ -63,12 +63,11 @@ function compute(E){
   const rows=T.map(t=>{
     const sums=Object.values(ex).map(e=>e.scores&&e.scores[t.id]).filter(Boolean).map(s=>CRIT.reduce((a,c)=>a+(+s[c.id]||0),0));
     const expert=sums.length?sums.reduce((a,b)=>a+b,0)/sums.length:null;
-    const voters=Object.values(pe).filter(v=>v.team!==t.id&&v.alloc&&v.at);
-    const by={};PC.forEach(k=>{const rc=voters.reduce((a,v)=>a+(+((v.alloc[k.id]||{})[t.id])||0),0);by[k.id]={received:rc,per:voters.length?rc/voters.length:null}});
+    const voters=Object.values(pe).filter(v=>v.team!==t.id&&v.scores&&v.at);
+    const by={};PC.forEach(k=>{const l=voters.map(v=>+((v.scores[k.id]||{})[t.id])).filter(x=>x>0);const avg=l.length?l.reduce((a,b)=>a+b,0)/l.length:null;by[k.id]={avg,score:avg==null?null:avg/MAXP*100}});
     return {id:t.id,name:t.name,expert,nExp:sums.length,nVoters:voters.length,by};
   });
-  PC.forEach(k=>{const mx=Math.max(0,...rows.map(r=>r.by[k.id].per||0));rows.forEach(r=>{const b=r.by[k.id];b.score=b.per==null?null:(mx>0?b.per/mx*100:0)})});
-  const top={};PC.forEach(k=>{const t=[...rows].sort((a,b)=>b.by[k.id].received-a.by[k.id].received)[0];top[k.id]=t&&t.by[k.id].received>0?t.id:null});
+  const top={};PC.forEach(k=>{const t=[...rows].filter(r=>r.by[k.id].avg!=null).sort((a,b)=>b.by[k.id].avg-a.by[k.id].avg)[0];top[k.id]=t?t.id:null});
   rows.forEach(r=>{const sc=PC.map(k=>r.by[k.id].score).filter(x=>x!=null);r.peer=sc.length?sc.reduce((a,b)=>a+b,0)/sc.length:null;
     r.final=(r.expert!=null&&r.peer!=null)?r.expert*wE+r.peer*(1-wE):null;r.badges=PC.filter(k=>top[k.id]===r.id).map(k=>k.name+' 1위')});
   return {rows,ranked:[...rows].sort((a,b)=>(b.final??-1)-(a.final??-1)),PC,wE};
@@ -146,43 +145,40 @@ function pageTeam(){
     $('who').textContent=`${e.title||'IR Day'} · ${tName(e,myTeam)} · ${mine.nick||''}`;
     const open=!!e.peerOpen;$('wait').classList.toggle('hidden',open);$('body').classList.toggle('hidden',!open);
     if(!open){
-      $('wait-t').textContent=mine.at?'투자 완료! 고마워요':'아직 투표 시간이 아님';
-      $('wait-s').textContent=mine.at?'투표가 닫혔음 · 결과는 큰 화면에서 함께 봐요':'발표가 모두 끝나면 열려요 · 이 화면을 켜 두면 자동으로 바뀜';return;
+      $('wait-t').textContent=mine.at?'평가 완료! 고마워요':'아직 평가 시간이 아님';
+      $('wait-s').textContent=mine.at?'평가가 닫혔음 · 결과는 큰 화면에서 함께 봐요':'발표가 모두 끝나면 열려요 · 이 화면을 켜 두면 자동으로 바뀜';return;
     }
-    if(!pd){pd={alloc:{},praise:{}};PC.forEach(k=>{pd.alloc[k.id]={};T.forEach(t=>pd.alloc[k.id][t.id]=mine.at?+(((mine.alloc||{})[k.id]||{})[t.id])||0:0)});T.forEach(t=>pd.praise[t.id]=(mine.praise||{})[t.id]||'')}
+    if(!pd){pd={sc:{},praise:{}};PC.forEach(k=>{pd.sc[k.id]={};T.forEach(t=>pd.sc[k.id][t.id]=mine.at?+(((mine.scores||{})[k.id]||{})[t.id])||0:0)});T.forEach(t=>pd.praise[t.id]=(mine.praise||{})[t.id]||'')}
     if(!pk||!(PC.some(k=>k.id===pk)||pk==='praise'))pk=PC[0].id;
     if(dirty&&$('teams').children.length&&$('teams').dataset.k===pk)return sum();
     $('myteam').innerHTML=`우리 팀 <b>${esc(tName(e,myTeam))}</b>은 목록에 없음 · 우리 팀은 평가할 수 없어요`;
-    const used=k=>Object.values(pd.alloc[k]||{}).reduce((a,b)=>a+(+b||0),0);
-    $('ptabs').innerHTML=PC.map((k,i)=>`<button class="tab ${pk===k.id?'active':''} ${used(k.id)===BUDGET?'done':''}" data-k="${k.id}">${i+1}. ${esc(k.name)}</button>`).join('')+`<button class="tab ${pk==='praise'?'active':''}" data-k="praise">칭찬 한 줄</button>`;
+    const done=k=>T.every(t=>(pd.sc[k]||{})[t.id]>0);
+    $('ptabs').innerHTML=PC.map((k,i)=>`<button class="tab ${pk===k.id?'active':''} ${done(k.id)?'done':''}" data-k="${k.id}">${i+1}. ${esc(k.name)}</button>`).join('')+`<button class="tab ${pk==='praise'?'active':''}" data-k="praise">칭찬 한 줄</button>`;
     $('ptabs').querySelectorAll('.tab').forEach(b=>b.onclick=()=>{pk=b.dataset.k;$('teams').innerHTML='';watch.now()});
     $('teams').dataset.k=pk;const isP=pk==='praise',K=PC.find(k=>k.id===pk),ix=PC.findIndex(k=>k.id===pk);
-    $('cdesc').innerHTML=isP?'<b>칭찬 한 줄 (선택)</b><div class="sub" style="margin-top:4px">팀마다 좋았던 점을 짧게 남겨요</div>':`<b>${esc(K.name)}</b><div class="sub" style="margin-top:4px">${esc(K.desc||'')}</div><div class="tiny" style="margin-top:6px">이 기준으로 1,000만 원을 다른 팀에 나눠 투자 · 한 팀에 몰아도 됨 · 100만 원 단위</div>`;
+    $('cdesc').innerHTML=isP?'<b>칭찬 한 줄 (선택)</b><div class="sub" style="margin-top:4px">팀마다 좋았던 점을 짧게 남겨요</div>':`<b>${esc(K.name)}</b><div class="sub" style="margin-top:4px">${esc(K.desc||'')}</div><div class="tiny" style="margin-top:6px">팀마다 1~10점을 눌러 주세요 · 10점이 가장 좋음</div>`;
     $('rlabel').style.visibility=isP?'hidden':'visible';$('btn-next').classList.toggle('hidden',isP);$('btn-next').textContent=ix<PC.length-1?'다음 기준':'칭찬 쓰기';
     if(isP){
       $('teams').innerHTML=T.map(t=>`<div class="team-card"><h2 style="margin:0 0 8px">${esc(t.name)}</h2><input id="pr-${t.id}" maxlength="60" placeholder="칭찬 한 줄 (선택)" value="${esc(pd.praise[t.id])}" style="margin:0"></div>`).join('');
       $('teams').querySelectorAll('input[id^=pr-]').forEach(i=>i.oninput=()=>{pd.praise[i.id.slice(3)]=i.value;dirty=true});
     }else{
-      const A=pd.alloc[pk];
-      $('teams').innerHTML=T.map(t=>`<div class="team-card" id="tc-${t.id}"><div class="between"><h2 style="margin:0">${esc(t.name)}</h2><div class="stepper"><button class="btn btn-s sm" data-d="-1" data-t="${t.id}">−100</button><input id="a-${t.id}" inputmode="numeric" value="${A[t.id]||0}" data-t="${t.id}"><span class="tiny">만 원</span><button class="btn btn-s sm" data-d="1" data-t="${t.id}">+100</button></div></div></div>`).join('');
-      $('teams').querySelectorAll('[data-d]').forEach(b=>b.onclick=()=>{const t=b.dataset.t;A[t]=Math.max(0,Math.min(BUDGET,(A[t]||0)+STEP*+b.dataset.d));$('a-'+t).value=A[t];dirty=true;sum()});
-      $('teams').querySelectorAll('input[id^=a-]').forEach(i=>i.oninput=()=>{A[i.dataset.t]=Math.max(0,Math.min(BUDGET,parseInt(i.value.replace(/\D/g,''))||0));dirty=true;sum()});
+      const A=pd.sc[pk];
+      $('teams').innerHTML=T.map(t=>`<div class="team-card ${A[t.id]>0?'full':''}" id="tc-${t.id}"><div class="between"><h2 style="margin:0">${esc(t.name)}</h2><span class="pscore" id="ps-${t.id}">${A[t.id]>0?A[t.id]+'점':'—'}</span></div><div class="nums" data-t="${t.id}">${Array.from({length:MAXP},(_,i)=>`<button class="num ${A[t.id]===i+1?'on':''}" data-n="${i+1}">${i+1}</button>`).join('')}</div></div>`).join('');
+      $('teams').querySelectorAll('.nums').forEach(g=>g.querySelectorAll('.num').forEach(b=>b.onclick=()=>{const t=g.dataset.t;A[t]=+b.dataset.n;g.querySelectorAll('.num').forEach(x=>x.classList.toggle('on',x===b));$('ps-'+t).textContent=A[t]+'점';$('tc-'+t).classList.add('full');dirty=true;sum()}));
     }
-    $('saved').textContent=mine.at?'이미 투자했음 · 투표가 열려 있는 동안 고쳐서 다시 확정할 수 있음':'';sum();
+    $('saved').textContent=mine.at?'이미 제출했음 · 평가가 열려 있는 동안 고쳐서 다시 제출할 수 있음':'';sum();
   }
-  function sum(){if(pk==='praise')return;const A=pd.alloc[pk]||{},u=Object.values(A).reduce((a,b)=>a+(+b||0),0),r=BUDGET-u,el=$('remain');
-    el.textContent=(r<0?'−':'')+man(Math.abs(r))+(r<0?' 초과':'');el.className='remain '+(r===0?'zero':r<0?'neg':'');
-    Object.keys(A).forEach(t=>{const c=$('tc-'+t);if(c)c.classList.toggle('full',A[t]>0)});const tb=$('ptabs').querySelector(`[data-k="${pk}"]`);if(tb)tb.classList.toggle('done',u===BUDGET)}
+  function sum(){if(pk==='praise')return;const A=pd.sc[pk]||{},ids=Object.keys(A),n=ids.filter(t=>A[t]>0).length,el=$('remain');
+    el.textContent=`${n} / ${ids.length}팀`;el.className='remain '+(n===ids.length?'zero':'');const tb=$('ptabs').querySelector(`[data-k="${pk}"]`);if(tb)tb.classList.toggle('done',n===ids.length)}
   $('btn-next').onclick=()=>{const PC=pcrit(E),ix=PC.findIndex(k=>k.id===pk);pk=ix<PC.length-1?PC[ix+1].id:'praise';$('teams').innerHTML='';window.scrollTo(0,0);watch.now()};
   $('btn-save').onclick=async()=>{
-    if(!E.peerOpen)return toast('투표가 닫혀 있음');
+    if(!E.peerOpen)return toast('평가가 닫혀 있음');
     const PC=pcrit(E),T=teams(E).filter(t=>t.id!==myTeam).map(t=>t.id);
-    for(const k of PC){const A=pd.alloc[k.id]||{},u=T.reduce((a,t)=>a+(+A[t]||0),0);
-      if(u!==BUDGET){pk=k.id;$('teams').innerHTML='';watch.now();return toast(`「${k.name}」 ${u<BUDGET?man(BUDGET-u)+'이 남았음':man(u-BUDGET)+' 초과'}`)}
-      if(T.some(t=>(+A[t]||0)%STEP))return toast('100만 원 단위로 나눠 주세요')}
-    const alloc={};PC.forEach(k=>{alloc[k.id]={};T.forEach(t=>alloc[k.id][t]=+pd.alloc[k.id][t]||0)});
+    for(const k of PC){const A=pd.sc[k.id]||{},miss=T.filter(t=>!(A[t]>=1&&A[t]<=MAXP));
+      if(miss.length){pk=k.id;$('teams').innerHTML='';watch.now();return toast(`「${k.name}」 ${miss.map(t=>tName(E,t)).join(', ')} 점수를 눌러 주세요`)}}
+    const scores={};PC.forEach(k=>{scores[k.id]={};T.forEach(t=>scores[k.id][t]=+pd.sc[k.id][t])});
     const praise={};Object.entries(pd.praise).forEach(([t,v])=>{if(t!==myTeam&&v&&v.trim())praise[t]=v.trim().slice(0,60)});
-    await db.update(`${P.ev(EVID)}/peers/${me}`,{alloc,praise,at:Date.now()});dirty=false;toast('투자 확정!');watch.now();
+    await db.update(`${P.ev(EVID)}/peers/${me}`,{scores,praise,alloc:null,at:Date.now()});dirty=false;toast('평가 제출!');watch.now();
   };
 }
 
@@ -199,16 +195,16 @@ async function pageResults(){
     $('b-title').textContent=(e.title||'IR Day')+' · 평가';
     $('live').classList.toggle('hidden',rv!=='hidden');$('rank').classList.toggle('hidden',rv==='hidden');
     if(rv==='hidden'){
-      $('b-sub').textContent=e.peerOpen?`기준마다 1,000만 원, 어느 팀에 투자할까? · ${R.PC.map(k=>k.name).join(' · ')} · 투자 완료 ${pe.filter(p=>p.at).length}명`:`전문가 평가 진행 중 · 전문가 ${ex.length}명`;
+      $('b-sub').textContent=e.peerOpen?`팀 상호평가 · ${R.PC.map(k=>k.name).join(' · ')} · 제출 ${pe.filter(p=>p.at).length}명`:`전문가 평가 진행 중 · 전문가 ${ex.length}명`;
       $('bteams').innerHTML=T.map(t=>{const d=pe.filter(p=>p.team===t.id&&p.at).length,a=pe.filter(p=>p.team===t.id).length,es=ex.filter(x=>x.scores&&x.scores[t.id]).length;
-        return `<div class="bteam"><b>${esc(t.name)}</b>${e.peerOpen?`<div class="bn">투자 완료 ${d} / ${a}명</div><div class="bar"><i style="width:${a?d/a*100:0}%"></i></div>`:`<div class="bn">전문가 채점 ${es} / ${ex.length}명</div><div class="bar"><i style="width:${ex.length?es/ex.length*100:0}%"></i></div>`}</div>`}).join('');
+        return `<div class="bteam"><b>${esc(t.name)}</b>${e.peerOpen?`<div class="bn">제출 ${d} / ${a}명</div><div class="bar"><i style="width:${a?d/a*100:0}%"></i></div>`:`<div class="bn">전문가 채점 ${es} / ${ex.length}명</div><div class="bar"><i style="width:${ex.length?es/ex.length*100:0}%"></i></div>`}</div>`}).join('');
       $('bqr').classList.toggle('hidden',!e.peerOpen);
       const l=link('team');if(qrDone!==l){drawQR($('qr'),l,Math.min(280,Math.round(innerHeight*.36)));qrDone=l}
       $('qrt').innerHTML=`팀 상호평가<br>책상 위 <b>팀 코드</b>로 입장`;return;
     }
     $('b-sub').textContent=`전문가 ${Math.round(R.wE*100)}% + 다른 팀 ${Math.round(100-R.wE*100)}%`;
     const list=R.ranked.filter(r=>r.final!=null).slice(0,rv==='top3'?3:99);
-    $('rank').innerHTML=list.length?list.map((r,i)=>`<div class="rank" style="animation-delay:${i*.12}s"><div class="no">${i+1}</div><div><div class="nm">${esc(r.name)}${r.badges.map(b=>`<span class="award">${esc(b)}</span>`).join('')}</div><div class="dt">전문가 ${f1(r.expert)} · 다른 팀 ${f1(r.peer)} · ${R.PC.map(k=>esc(k.name)+' '+man(r.by[k.id].received)).join(' · ')}</div></div><div class="sc">${f1(r.final)}</div></div>`).join(''):'<p class="bs">아직 계산할 점수가 없음</p>';
+    $('rank').innerHTML=list.length?list.map((r,i)=>`<div class="rank" style="animation-delay:${i*.12}s"><div class="no">${i+1}</div><div><div class="nm">${esc(r.name)}${r.badges.map(b=>`<span class="award">${esc(b)}</span>`).join('')}</div><div class="dt">전문가 ${f1(r.expert)} · 다른 팀 ${f1(r.peer)} · ${R.PC.map(k=>esc(k.name)+' '+f1(r.by[k.id].avg)+'점').join(' · ')}</div></div><div class="sc">${f1(r.final)}</div></div>`).join(''):'<p class="bs">아직 계산할 점수가 없음</p>';
   });
 }
 
@@ -256,14 +252,14 @@ function pageAdmin(){
   $('btn-sw').onclick=()=>{U({wE:Math.max(0,Math.min(100,+$('s-we').value||0))});toast('비율 저장')};
   $('btn-steams').onclick=()=>{const T={};teams(E).forEach(t=>T[t.id]={name:$('sn-'+t.id).value.trim()||t.name,order:t.order,code:t.code});U({teams:T});toast('팀 이름 저장')};
   $('btn-spcrit').onclick=()=>{const L=$('s-pcrit').value.split('\n').map(x=>x.trim()).filter(Boolean).map((x,i)=>{const [n,...d]=x.split('|');return {id:'k'+(i+1),name:n.trim(),desc:d.join('|').trim()}}).filter(x=>x.name);
-    if(L.length<2||L.length>5)return toast('기준은 2~5개');if(Object.values(E.peers||{}).some(p=>p.at)&&!confirm('이미 투자한 학생이 있어요. 기준을 바꾸면 다시 투자해야 할 수 있어요. 바꿀까요?'))return;U({pcrit:L});toast('기준 저장')};
+    if(L.length<2||L.length>5)return toast('기준은 2~5개');if(Object.values(E.peers||{}).some(p=>p.at)&&!confirm('이미 제출한 학생이 있어요. 기준을 바꾸면 다시 제출해야 할 수 있어요. 바꿀까요?'))return;U({pcrit:L});toast('기준 저장')};
   $('btn-del-ev').onclick=async()=>{if(!confirm(`「${E.title}」 평가와 모든 점수를 지울까요? 되돌릴 수 없어요.`))return;if(prompt('지우려면 "삭제"라고 입력')!=='삭제')return;
     clearInterval(pollIv);await db.del(P.code(E.expertCode));for(const t of teams(E))if(t.code)await db.del(P.code(t.code));await db.del(`${P.list}/${EVID}`);const C=await db.get(P.cur);if(C&&C.ev===EVID)await db.del(P.cur);await db.del(P.ev(EVID));ss('adminEv',null);toast('지웠음');showList()};
   window.delItem=async(p,label)=>{if(!confirm(label+' 제출을 지울까요?'))return;await db.del(`${P.ev(EVID)}/${p}`);toast('지움');watch.now()};
   window.csv=kind=>{const R=compute(E),rows=[];
-    if(kind==='final'){rows.push(['순위','팀','전문가 평균','전문가 수','투자한 학생 수',...R.PC.flatMap(k=>[k.name+' 받은 투자(만원)',k.name+' 점수']),'상호평가','최종','기준별 1위']);R.ranked.forEach((r,i)=>rows.push([r.final!=null?i+1:'',r.name,f1(r.expert),r.nExp,r.nVoters,...R.PC.flatMap(k=>[r.by[k.id].received,f1(r.by[k.id].score)]),f1(r.peer),f1(r.final),r.badges.join(' · ')]))}
+    if(kind==='final'){rows.push(['순위','팀','전문가 평균','전문가 수','투자한 학생 수',...R.PC.map(k=>k.name+' 평균(10점)'),'상호평가','최종','기준별 1위']);R.ranked.forEach((r,i)=>rows.push([r.final!=null?i+1:'',r.name,f1(r.expert),r.nExp,r.nVoters,...R.PC.map(k=>f1(r.by[k.id].avg)),f1(r.peer),f1(r.final),r.badges.join(' · ')]))}
     if(kind==='expert'){rows.push(['전문가','팀',...CRIT.map(c=>`${c.name}(${c.max})`),'합계','의견']);Object.values(E.experts||{}).forEach(x=>teams(E).forEach(t=>{const s=x.scores&&x.scores[t.id];if(s)rows.push([x.name,t.name,...CRIT.map(c=>s[c.id]),CRIT.reduce((a,c)=>a+(+s[c.id]||0),0),s.memo||''])}))}
-    if(kind==='peer'){rows.push(['투자한 학생 팀','별명','받은 팀',...R.PC.map(k=>k.name+'(만원)'),'칭찬']);Object.values(E.peers||{}).filter(p=>p.at).forEach(p=>teams(E).filter(t=>t.id!==p.team).forEach(t=>rows.push([tName(E,p.team),p.nick,t.name,...R.PC.map(k=>((p.alloc||{})[k.id]||{})[t.id]||0),(p.praise||{})[t.id]||''])))}
+    if(kind==='peer'){rows.push(['평가한 학생 팀','별명','평가받은 팀',...R.PC.map(k=>k.name+'(10점)'),'칭찬']);Object.values(E.peers||{}).filter(p=>p.at).forEach(p=>teams(E).filter(t=>t.id!==p.team).forEach(t=>rows.push([tName(E,p.team),p.nick,t.name,...R.PC.map(k=>((p.scores||{})[k.id]||{})[t.id]||''),(p.praise||{})[t.id]||''])))}
     const body='﻿'+rows.map(r=>r.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([body],{type:'text/csv'}));a.download=`평가_${{final:'최종',expert:'전문가',peer:'상호평가'}[kind]}_${E.title}.csv`;a.click()};
   let printSig='';
   function render(e){
@@ -279,9 +275,9 @@ function pageAdmin(){
       T.forEach(t=>drawQR($('pq-'+t.id),link('team',{c:t.code}),200));drawQR($('pq-ex'),link('expert',{c:e.expertCode}),200)}
     $('ematrix').innerHTML=ex.length?`<div style="overflow-x:auto"><table><tr><th class="l">전문가</th>${T.map(t=>`<th>${esc(t.name)}</th>`).join('')}</tr>${ex.map(([k,x])=>`<tr><td class="l">${esc(x.name)}</td>${T.map(t=>{const s=x.scores&&x.scores[t.id];return `<td>${s?'<b>'+CRIT.reduce((a,c)=>a+(+s[c.id]||0),0)+'</b>':'<span class="tiny">—</span>'}</td>`}).join('')}</tr>`).join('')}</table></div>`:`<p class="sub">아직 들어온 전문가가 없음 · 전문가 코드 <b>${e.expertCode}</b></p>`;
     const P2=pe.map(([k,p])=>({k,...p}));
-    $('pstat').innerHTML=`<table><tr><th class="l">팀</th><th>입장</th><th>투자 완료</th><th class="l">별명</th></tr>${T.map(t=>{const a=P2.filter(p=>p.team===t.id),d=a.filter(p=>p.at);return `<tr><td class="l"><b>${esc(t.name)}</b></td><td>${a.length}</td><td>${d.length}</td><td class="l"><div class="chips">${a.map(p=>`<span class="chip ${p.at?'ok':''}">${esc(p.nick)}</span>`).join('')}</div></td></tr>`}).join('')}</table><p class="tiny" style="margin-top:8px">전체 ${P2.filter(p=>p.at).length} / ${P2.length}명 완료</p>`;
-    $('result').innerHTML=`<table><tr><th>순위</th><th class="l">팀</th><th>전문가 평균<br><span class="tiny">(채점 인원)</span></th>${R.PC.map(k=>`<th>${esc(k.name)}<br><span class="tiny">받은 투자 · 점수</span></th>`).join('')}<th>상호평가</th><th>최종</th></tr>${R.ranked.map((r,i)=>`<tr><td><b>${r.final!=null?i+1:'—'}</b></td><td class="l"><b>${esc(r.name)}</b>${r.badges.map(b=>` <span class="pill or">${esc(b)}</span>`).join('')}</td><td>${f1(r.expert)} <span class="tiny">(${r.nExp})</span></td>${R.PC.map(k=>`<td>${man(r.by[k.id].received)}<br><span class="tiny">${f1(r.by[k.id].score)}</span></td>`).join('')}<td>${f1(r.peer)} <span class="tiny">(${r.nVoters}명)</span></td><td><b>${f1(r.final)}</b></td></tr>`).join('')}</table>`;
-    $('formula').textContent=`최종 = 전문가 평균 × ${Math.round(R.wE*100)}% + 상호평가 × ${Math.round(100-R.wE*100)}% · 상호평가 = 기준별 투자 점수의 평균 · 기준별 투자 점수 = (그 기준에서 1인당 받은 투자금 ÷ 가장 많이 받은 팀의 1인당 투자금) × 100 · 학생은 우리 팀에 투자하지 못하므로 투자할 수 있었던 학생 수로 나눠 비교함 · 전문가 점수나 상호평가가 없으면 최종 점수를 내지 않음`;
+    $('pstat').innerHTML=`<table><tr><th class="l">팀</th><th>입장</th><th>제출 완료</th><th class="l">별명</th></tr>${T.map(t=>{const a=P2.filter(p=>p.team===t.id),d=a.filter(p=>p.at);return `<tr><td class="l"><b>${esc(t.name)}</b></td><td>${a.length}</td><td>${d.length}</td><td class="l"><div class="chips">${a.map(p=>`<span class="chip ${p.at?'ok':''}">${esc(p.nick)}</span>`).join('')}</div></td></tr>`}).join('')}</table><p class="tiny" style="margin-top:8px">전체 ${P2.filter(p=>p.at).length} / ${P2.length}명 완료</p>`;
+    $('result').innerHTML=`<table><tr><th>순위</th><th class="l">팀</th><th>전문가 평균<br><span class="tiny">(채점 인원)</span></th>${R.PC.map(k=>`<th>${esc(k.name)}<br><span class="tiny">평균 (10점)</span></th>`).join('')}<th>상호평가</th><th>최종</th></tr>${R.ranked.map((r,i)=>`<tr><td><b>${r.final!=null?i+1:'—'}</b></td><td class="l"><b>${esc(r.name)}</b>${r.badges.map(b=>` <span class="pill or">${esc(b)}</span>`).join('')}</td><td>${f1(r.expert)} <span class="tiny">(${r.nExp})</span></td>${R.PC.map(k=>`<td>${f1(r.by[k.id].avg)}</td>`).join('')}<td>${f1(r.peer)} <span class="tiny">(${r.nVoters}명)</span></td><td><b>${f1(r.final)}</b></td></tr>`).join('')}</table>`;
+    $('formula').textContent=`최종 = 전문가 평균 × ${Math.round(R.wE*100)}% + 상호평가 × ${Math.round(100-R.wE*100)}% · 상호평가 = 다른 팀 학생들이 준 기준별 점수(1~10점) 평균 ÷ 10 × 100, 기준 여러 개는 평균 · 학생은 우리 팀을 평가하지 못함 · 전문가 점수나 상호평가가 없으면 최종 점수를 내지 않음`;
     const pr=[];P2.forEach(p=>Object.entries(p.praise||{}).forEach(([t,v])=>pr.push({t,v,from:tName(e,p.team)})));
     $('praise').innerHTML=pr.length?T.map(t=>{const l=pr.filter(x=>x.t===t.id);return l.length?`<h3 style="margin-top:8px">${esc(t.name)}</h3><ul style="margin:0 0 8px 18px">${l.map(x=>`<li class="sub">${esc(x.v)} <span class="tiny">· ${esc(x.from)}</span></li>`).join('')}</ul>`:''}).join(''):'<p class="sub">아직 없음</p>';
     if(document.activeElement!==$('s-we'))$('s-we').value=e.wE??60;

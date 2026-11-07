@@ -126,3 +126,9 @@ body.board{background:#0b2545;color:#fff}
   .card{padding:20px}.rule{padding:20px}
   .bgrid{grid-template-columns:1fr}.rank{grid-template-columns:60px 1fr 90px;padding:14px}
 }
+.nums{display:grid;grid-template-columns:repeat(10,1fr);gap:6px;margin-top:12px}
+.num{padding:11px 0;border-radius:10px;border:1px solid #d6deea;background:#fff;font-weight:800;font-size:1rem;cursor:pointer;font-family:inherit;color:var(--ink)}
+.num:hover{border-color:var(--navy)}
+.num.on{background:var(--orange);border-color:var(--orange);color:#fff}
+.pscore{font-size:1.4rem;font-weight:900;color:var(--orange2)}
+@media (max-width:560px){.nums{grid-template-columns:repeat(5,1fr)}}
