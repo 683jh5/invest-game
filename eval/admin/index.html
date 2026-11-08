@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap">
-<link rel="stylesheet" href="../app.css?v=7">
+<link rel="stylesheet" href="../app.css?v=8">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body data-page="admin">
@@ -22,7 +22,7 @@
 <div class="wrap wide">
   <div class="card" id="auth" style="max-width:520px;margin:0 auto 20px">
     <div class="fhead"><span class="ic"><svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v3M12 20v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1 12h3M20 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></span><b>관리자 입장</b></div>
-    <label class="lb">운영자 인증코드</label><input id="in-key" type="password" autocomplete="new-password">
+    <label class="lb">관리자 코드 (숫자 4자리)</label><input id="in-key" class="code" type="password" maxlength="4" inputmode="numeric" placeholder="••••" autocomplete="new-password">
     <button class="btn btn-p block" id="btn-auth">입장하기</button>
   </div>
   <div id="list" class="hidden">
@@ -37,6 +37,9 @@
       <p class="tiny">만들면 전문가 코드 1개와 팀마다 팀 코드(4자리)가 자동으로 생김</p>
       <button class="btn btn-p block" id="btn-create">평가 만들기</button>
     </div>
+    <div class="card"><h2>관리자 코드 바꾸기</h2>
+      <div class="row" style="flex-wrap:nowrap;align-items:flex-end"><div style="flex:1"><label class="lb">지금 코드</label><input id="ap-now" class="codein" type="password" maxlength="4" inputmode="numeric" autocomplete="new-password"></div><div style="flex:1"><label class="lb">새 코드 (숫자 4자리)</label><input id="ap-new" class="codein" maxlength="4" inputmode="numeric" autocomplete="off"></div><button class="btn btn-p" id="btn-admin-pin" style="margin-bottom:10px">바꾸기</button></div>
+      <p class="tiny">바꾸면 다음부터 새 코드로 들어옴 · 전체 초기화할 때도 이 코드를 씀</p></div>
   </div>
   <div id="manage" class="hidden">
     <div class="card" style="padding:18px 24px"><div class="between"><div><h1 id="m-title"></h1><div class="sub">전문가 코드 <b class="codebig" id="m-ecode" style="font-size:1.2rem"></b></div></div>
@@ -73,8 +76,8 @@
         <p class="tiny" style="margin:6px 0 10px">전문가마다 개인 코드를 주면 이름 입력 없이 코드만으로 입장 · 공용 코드는 이름을 직접 입력</p>
         <div id="sys-shared" class="row" style="flex-wrap:nowrap;margin-bottom:12px"><span class="sub" style="white-space:nowrap">공용 전문가 코드</span><input id="shared-code" class="codein" maxlength="4" inputmode="numeric" style="margin:0;max-width:130px"><button class="btn btn-s sm" id="btn-shared-save">저장</button></div>
         <div id="sys-experts" style="overflow-x:auto"></div></div>
-      <div class="card"><h2 style="color:var(--red)">전체 평가 초기화</h2><p class="sub" style="margin-bottom:10px">전문가 점수와 학생 평가가 모두 지워지며 되돌릴 수 없음 · 팀·코드·전문가 명단은 남고, 상태는 ‘평가 진행 중’으로 돌아감 · 계속하려면 운영자 인증코드를 입력</p>
-        <input id="reset-pw" type="password" placeholder="초기화 비밀번호 (운영자 인증코드)" autocomplete="new-password"><button class="btn btn-s" id="btn-reset" style="color:var(--red);border-color:rgba(255,122,114,.5)">전체 초기화</button></div>
+      <div class="card"><h2 style="color:var(--red)">전체 평가 초기화</h2><p class="sub" style="margin-bottom:10px">전문가 점수와 학생 평가가 모두 지워지며 되돌릴 수 없음 · 팀·코드·전문가 명단은 남고, 상태는 ‘평가 진행 중’으로 돌아감 · 계속하려면 관리자 코드를 입력</p>
+        <input id="reset-pw" type="password" placeholder="관리자 코드 4자리" maxlength="4" inputmode="numeric" autocomplete="new-password"><button class="btn btn-s" id="btn-reset" style="color:var(--red);border-color:rgba(255,122,114,.5)">전체 초기화</button></div>
       <div class="card"><h2>작업 기록</h2><div id="sys-log"></div></div>
     </div>
   </div>
@@ -82,6 +85,6 @@
 <div id="print-area"></div>
 <div id="net-bar">서버에 연결할 수 없음 · 인터넷 연결을 확인해 주세요 (잠시 뒤 자동으로 다시 시도)</div>
 <div class="toast" id="toast"></div>
-<script src="../app.js?v=7"></script>
+<script src="../app.js?v=8"></script>
 </body>
 </html>

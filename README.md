@@ -43,7 +43,7 @@
 
 ## 바이브코딩 캠프 평가 시스템 (eval/)
 eval.html을 화면별 주소로 나눈 버전. 디자인은 기존 러버블 평가 앱 시안 기준.
-- `eval/` 첫 화면 · `eval/expert/` 전문가(전문가 코드) · `eval/team/` 팀 상호평가(팀 코드, 기준마다 다른 팀에 1~10점) · `eval/results/` 최종 결과 · `eval/admin/` 관리자(인증코드 hot2026)
+- `eval/` 첫 화면 · `eval/expert/` 전문가(전문가 코드) · `eval/team/` 팀 상호평가(팀 코드, 기준마다 다른 팀에 1~10점) · `eval/results/` 최종 결과 · `eval/admin/` 관리자(관리자 코드 기본 9802, 관리자 화면에서 변경 → classes/EV-ADMIN)
 - 평가를 만들면 전문가 코드 1개 + 팀마다 팀 코드(4자리)가 생김. 팀 코드로 팀이 정해지므로 자기 팀 평가 불가
 - 관리자 시스템 관리: 참가팀(번호·이름·코드·인원) 추가·수정·삭제, 전문가 개인 코드, 평가 마감, 전체 초기화, 작업 기록
 - 데이터: classes/EVX-{id}, classes/EVC-{코드}, classes/EV-LIST, classes/EV-CURRENT · 연습: 주소 끝에 ?demo

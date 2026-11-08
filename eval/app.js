@@ -5,9 +5,9 @@
 // classes/EV-LIST       {평가id:{title,created}}
 // classes/EV-CURRENT    {ev}
 const FB_URL='https://geang-invest-default-rtdb.firebaseio.com';
-const ADMIN_KEY='hot2026';
+const ADMIN_DEFAULT='9802'; // 관리자 코드 기본값 · 관리자 화면에서 바꾸면 classes/EV-ADMIN에 저장
 let DEMO=new URLSearchParams(location.search).has('demo');
-const P={ev:id=>`classes/EVX-${id}`,code:c=>`classes/EVC-${c}`,list:'classes/EV-LIST',cur:'classes/EV-CURRENT'};
+const P={admin:'classes/EV-ADMIN',ev:id=>`classes/EVX-${id}`,code:c=>`classes/EVC-${c}`,list:'classes/EV-LIST',cur:'classes/EV-CURRENT'};
 
 // ───── 저장소 ─────
 const demoKey='evx_demo_tree';
@@ -220,7 +220,12 @@ async function pageResults(){
 // ═════════ 관리자 ═════════
 function pageAdmin(){
   if(ss('admin')){showList()}
-  $('btn-auth').onclick=()=>{if($('in-key').value.trim()!==ADMIN_KEY)return toast('인증코드가 맞지 않음');ss('admin',true);showList()};
+  async function adminPin(){try{const a=await db.get(P.admin);return (a&&a.pin)||ADMIN_DEFAULT}catch(e){return null}}
+  $('btn-auth').onclick=async()=>{const pin=await adminPin();if(pin==null)return toast('인터넷 연결을 확인해 주세요');if($('in-key').value.trim()!==pin)return toast('관리자 코드가 맞지 않음');ss('admin',true);showList()};
+  $('in-key').onkeydown=e=>{if(e.key==='Enter')$('btn-auth').click()};
+  $('btn-admin-pin').onclick=async()=>{const now=$('ap-now').value.trim(),nw=$('ap-new').value.trim(),pin=await adminPin();
+    if(now!==pin)return toast('지금 관리자 코드가 맞지 않음');if(!/^\d{4}$/.test(nw))return toast('새 코드는 숫자 4자리');if(nw===pin)return toast('지금 코드와 같음');
+    await db.set(P.admin,{pin:nw,at:Date.now()});$('ap-now').value='';$('ap-new').value='';toast('관리자 코드를 '+nw+'(으)로 바꿨음')};
   $('btn-out').onclick=()=>{ss('admin',null);ss('adminEv',null);location.reload()};
   async function uniqueCode(taken){for(let i=0;i<30;i++){const c=num4();if(taken.has(c))continue;if(!(await db.get(P.code(c))))return c}throw new Error('코드 생성 실패')}
   async function showList(){
@@ -284,7 +289,7 @@ function pageAdmin(){
     LOG('EXPERT_ADD',`${nm} 추가`);['xa-name','xa-code'].forEach(i=>$(i).value='');toast(nm+' 추가');watch.now()};
   $('btn-shared-save').onclick=async()=>{const cd=$('shared-code').value.trim();if(cd===E.expertCode)return toast('바뀐 코드가 없음');const er=await codeFree(cd,E.expertCode);if(er)return toast(er);
     await db.del(P.code(E.expertCode));await db.set(P.code(cd),{ev:EVID,role:'expert'});await U({expertCode:cd});LOG('CODE_CHANGE',`공용 전문가 코드 ${E.expertCode} → ${cd}`);toast('공용 코드 저장')};
-  $('btn-reset').onclick=async()=>{if($('reset-pw').value.trim()!==ADMIN_KEY)return toast('초기화 비밀번호가 맞지 않음');if(!confirm('전문가 점수와 학생 평가를 모두 지울까요? 되돌릴 수 없어요.\n(팀·코드·전문가 명단은 그대로 남아요)'))return;
+  $('btn-reset').onclick=async()=>{if($('reset-pw').value.trim()!==(await adminPin()))return toast('관리자 코드가 맞지 않음');if(!confirm('전문가 점수와 학생 평가를 모두 지울까요? 되돌릴 수 없어요.\n(팀·코드·전문가 명단은 그대로 남아요)'))return;
     await U({experts:null,peers:null,expertOpen:true,peerOpen:false,reveal:'hidden'});LOG('RESET_ALL','모든 평가 데이터 초기화 · 평가 진행 중으로 되돌림');$('reset-pw').value='';toast('초기화함')};
   $('btn-results').onclick=()=>window.open(link('results',{e:EVID}),'_blank');
   $('btn-print').onclick=()=>{window.print()};
