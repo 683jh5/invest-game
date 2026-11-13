@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IR Day 평가</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{--bg:#0d1730;--card:#16233f;--line:#2a3a5e;--text:#eef2fb;--sub:#9fb0d0;--accent:#ff8a3d;--ok:#3ecf8e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Pretendard,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;word-break:keep-all;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:520px;margin:0 auto;padding:28px 20px 60px}
+header{margin-bottom:28px}
+header small{color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:13px}
+header h1{font-size:28px;margin-top:4px}
+h2{font-size:20px;margin-bottom:16px}
+p.sub{color:var(--sub);font-size:15px;margin:-8px 0 18px}
+.btn{display:block;width:100%;padding:18px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--text);font:inherit;font-size:18px;font-weight:700;text-align:left;cursor:pointer;margin-bottom:12px}
+.btn:active{transform:scale(.99)}
+.btn.main{background:var(--accent);border-color:var(--accent);color:#1a1205;text-align:center}
+.btn.main:disabled{opacity:.35;cursor:default}
+.btn.done{opacity:.55}
+.btn .r{float:right;font-weight:600;color:var(--sub);font-size:15px}
+.btn.done .r{color:var(--ok)}
+.link{background:none;border:0;color:var(--sub);font:inherit;font-size:15px;cursor:pointer;padding:8px 0;margin-bottom:12px}
+input,textarea{width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);background:#0a1226;color:var(--text);font:inherit;font-size:17px;margin-bottom:14px}
+textarea{min-height:90px;resize:vertical}
+.crit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+.crit b{font-size:17px}
+.crit span{display:block;color:var(--sub);font-size:14px;margin:2px 0 12px}
+.pts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.pts button{padding:12px 0;border-radius:10px;border:1px solid var(--line);background:#0a1226;color:var(--text);font:inherit;font-size:18px;font-weight:700;cursor:pointer}
+.pts button.on{background:var(--accent);border-color:var(--accent);color:#1a1205}
+.scale{display:flex;font-style:normal;justify-content:space-between;color:var(--sub);font-size:12px;margin-top:6px}
+.scale span{display:inline;margin:0;font-size:12px;color:var(--sub)}
+.team-big{font-size:26px;font-weight:800;margin-bottom:4px}
+.msg{text-align:center;padding:40px 0}
+.msg .ico{font-size:52px;margin-bottom:12px}
+.msg p{color:var(--sub);margin:8px 0 24px}
+.warn{background:#3a1f1f;border:1px solid #7a3a3a;border-radius:12px;padding:16px;color:#ffd2d2;font-size:15px;line-height:1.6}
+.gear{position:fixed;right:16px;bottom:16px;background:none;border:0;font-size:22px;opacity:.35;cursor:pointer}
+.qr{display:block;margin:6px auto 14px;background:#fff;padding:10px;border-radius:12px;width:220px;height:220px}
+.out{font-size:13px;color:var(--sub);word-break:break-all;margin-bottom:14px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><small>IR DAY</small><h1>발표 평가</h1></header>
+  <main id="app"></main>
+</div>
+<button class="gear" id="gear" aria-label="설정">⚙</button>
+
+<script>
+const CRITERIA=[
+  ['문제 정의','해결하려는 문제가 분명한가'],
+  ['금융 이해도','금융 개념이 서비스에 잘 담겼는가'],
+  ['서비스 완성도','앱이 실제로 작동하는가'],
+  ['창의성','아이디어가 새로운가'],
+  ['발표력','내용을 잘 전달했는가']
+];
+const PASS='9802';
+const $app=document.getElementById('app');
+
+// 설정은 링크 뒤(#)에 담김: f=폼 키, e=문항 번호 9개, t=팀 이름
+const h=new URLSearchParams(location.hash.slice(1));
+const cfg={f:h.get('f')||'',e:(h.get('e')||'').split(',').filter(Boolean),t:(h.get('t')||'').split(',').map(s=>s.trim()).filter(Boolean)};
+const ready=cfg.f&&cfg.e.length===9&&cfg.t.length>0;
+
+const st={role:'',who:'',team:'',score:{}};
+const key=()=>'ir:'+cfg.f+':'+st.role+':'+st.who;
+const doneList=()=>{try{return JSON.parse(localStorage.getItem(key())||'[]')}catch(e){return[]}};
+const markDone=t=>{try{const d=doneList();if(!d.includes(t))d.push(t);localStorage.setItem(key(),JSON.stringify(d))}catch(e){}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function home(){
+  if(!ready){
+    $app.innerHTML='<div class="warn">구글폼이 연결되지 않은 링크입니다.<br>운영진에게 받은 평가 링크(QR)로 다시 열어 주세요.</div>';
+    return;
+  }
+  st.role=st.who=st.team='';
+  $app.innerHTML=`<h2>누가 평가하나요?</h2>
+    <button class="btn" data-r="학생">🙋 학생</button>
+    <button class="btn" data-r="전문가">🏅 전문가 심사위원</button>`;
+  $app.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>{st.role=b.dataset.r;st.role==='학생'?pickMyTeam():expertName()});
+}
+
+function pickMyTeam(){
+  $app.innerHTML=`<h2>우리 팀은?</h2><p class="sub">우리 팀은 평가하지 않아요</p>
+    ${cfg.t.map(t=>`<button class="btn" data-t="${esc(t)}">${esc(t)}</button>`).join('')}
+    <button class="link" id="back">← 처음으로</button>`;
+  $app.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{st.who=b.dataset.t;teamList()});
+  document.getElementById('back').onclick=home;
+}
+
+function expertName(){
+  $app.innerHTML=`<h2>심사위원 이름</h2><p class="sub">비워 두어도 됩니다</p>
+    <input id="nm" placeholder="예: 김OO" autocomplete="off">
+    <button class="btn main" id="go">다음</button>
+    <button class="link" id="back">← 처음으로</button>`;
+  document.getElementById('go').onclick=()=>{st.who=document.getElementById('nm').value.trim()||'전문가';teamList()};
+  document.getElementById('back').onclick=home;
+}
+
+function teamList(){
+  const done=doneList();
+  const teams=cfg.t.filter(t=>!(st.role==='학생'&&t===st.who));
+  const left=teams.filter(t=>!done.includes(t)).length;
+  $app.innerHTML=`<h2>평가할 팀</h2><p class="sub">${left?`남은 팀 ${left}개`:'모든 팀 평가 완료! 감사합니다 👏'}</p>
+    ${teams.map(t=>{const d=done.includes(t);return `<button class="btn ${d?'done':''}" data-t="${esc(t)}">${esc(t)}<span class="r">${d?'✓ 완료':'평가하기'}</span></button>`}).join('')}
+    <button class="link" id="back">← 처음으로</button>`;
+  $app.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
+    if(b.classList.contains('done')&&!confirm('이미 평가한 팀입니다. 다시 평가할까요?'))return;
+    st.team=b.dataset.t;st.score={};scoreForm();
+  });
+  document.getElementById('back').onclick=home;
+}
+
+function scoreForm(){
+  $app.innerHTML=`<div class="team-big">${esc(st.team)}</div><p class="sub" style="margin:0 0 18px">항목마다 1~5점을 눌러 주세요</p>
+    ${CRITERIA.map((c,i)=>`<div class="crit"><b>${c[0]}</b><span>${c[1]}</span>
+      <div class="pts">${[1,2,3,4,5].map(n=>`<button data-i="${i}" data-n="${n}">${n}</button>`).join('')}</div>
+      <div class="scale"><span>아쉬워요</span><span>훌륭해요</span></div></div>`).join('')}
+    <textarea id="note" placeholder="${st.role==='학생'?'칭찬 한 줄 (선택)':'한마디 (선택)'}"></textarea>
+    <button class="btn main" id="send" disabled>제출하기</button>
+    <button class="link" id="back">← 팀 목록</button>`;
+  const send=document.getElementById('send');
+  $app.querySelectorAll('.pts button').forEach(b=>b.onclick=()=>{
+    const i=b.dataset.i;st.score[i]=+b.dataset.n;
+    b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+    const n=Object.keys(st.score).length;
+    send.disabled=n<5;send.textContent=n<5?`제출하기 (${n}/5)`:'제출하기';
+  });
+  send.textContent='제출하기 (0/5)';
+  send.onclick=submit;
+  document.getElementById('back').onclick=teamList;
+}
+
+async function submit(){
+  const send=document.getElementById('send');
+  send.disabled=true;send.textContent='보내는 중…';
+  const v=[st.role,st.who,st.team,...CRITERIA.map((_,i)=>st.score[i]),document.getElementById('note').value.trim()];
+  const body=new URLSearchParams();
+  cfg.e.forEach((id,i)=>body.append('entry.'+id,v[i]));
+  try{
+    await fetch(`https://docs.google.com/forms/d/e/${cfg.f}/formResponse`,{method:'POST',mode:'no-cors',body});
+    markDone(st.team);
+    const total=CRITERIA.reduce((s,_,i)=>s+st.score[i],0)*4;
+    $app.innerHTML=`<div class="msg"><div class="ico">✅</div><h2>${esc(st.team)} 평가 완료</h2><p>${total}점 / 100점</p>
+      <button class="btn main" id="next">다음 팀 평가</button></div>`;
+    document.getElementById('next').onclick=teamList;
+  }catch(e){
+    send.disabled=false;send.textContent='전송 실패 · 다시 누르기';
+    alert('인터넷 연결을 확인하고 다시 눌러 주세요.');
+  }
+}
+
+// 운영진 설정: 팀 이름 바꾸고 새 링크·QR 만들기
+document.getElementById('gear').onclick=()=>{
+  $app.innerHTML=`<h2>운영진 설정</h2>
+    <input id="pw" type="password" inputmode="numeric" maxlength="4" placeholder="비밀번호 4자리">
+    <div id="cfgbox" class="hide">
+      <p class="sub" style="margin:0 0 8px">팀 이름 (한 줄에 하나)</p>
+      <textarea id="tm">${esc(cfg.t.join('\n'))}</textarea>
+      <button class="btn main" id="mk">평가 링크 만들기</button>
+      <div id="res"></div>
+    </div>
+    <button class="link" id="back">← 처음으로</button>`;
+  document.getElementById('back').onclick=home;
+  document.getElementById('pw').oninput=e=>{if(e.target.value===PASS){document.getElementById('cfgbox').classList.remove('hide');e.target.classList.add('hide')}};
+  document.getElementById('mk').onclick=()=>{
+    if(!cfg.f||cfg.e.length!==9){document.getElementById('res').innerHTML='<div class="warn">구글폼 연결 정보가 없습니다. 스크립트가 만든 앱 링크로 열어서 다시 해 주세요.</div>';return}
+    const teams=document.getElementById('tm').value.split('\n').map(s=>s.trim().replace(/,/g,' ')).filter(Boolean);
+    const url=location.origin+location.pathname+'#f='+cfg.f+'&e='+cfg.e.join(',')+'&t='+encodeURIComponent(teams.join(','));
+    document.getElementById('res').innerHTML=`<img class="qr" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=0&data=${encodeURIComponent(url)}">
+      <div class="out">${esc(url)}</div>
+      <button class="btn" id="cp">링크 복사</button>
+      <button class="btn" id="op">이 링크로 열기</button>`;
+    document.getElementById('cp').onclick=()=>navigator.clipboard.writeText(url).then(()=>document.getElementById('cp').textContent='복사됨 ✓');
+    document.getElementById('op').onclick=()=>{location.href=url;location.reload()};
+  };
+};
+
+home();
+</script>
+</body>
+</html>
