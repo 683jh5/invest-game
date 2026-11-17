@@ -60,6 +60,9 @@ input.code{font-size:36px;font-weight:800;text-align:center;letter-spacing:.4em;
 .row3 input,.lbl input{margin-top:6px}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hide{display:none}
+.status{border-radius:12px;padding:14px 16px;font-size:16px;font-weight:700;margin-bottom:12px}
+.status.on{background:#123a2a;border:1px solid #2e7a55;color:#c9f5df}
+.status.off{background:#3a1f1f;border:1px solid #7a3a3a;color:#ffd2d2}
 .chead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .val{color:var(--sub);font-size:15px;white-space:nowrap}
 .val strong{color:var(--accent);font-size:24px}
@@ -163,7 +166,7 @@ const LINK=location.origin+location.pathname+location.hash;
 
 // 저장된 설정: Firebase (invest-game 다른 앱과 같은 DB) → 링크·QR은 그대로, 설정만 바뀜
 const FB='https://geang-invest-default-rtdb.firebaseio.com/classes/IR-'+encodeURIComponent(cfg.f)+'.json';
-const KEYS=['t','n','c','x','r','p','k'];
+const KEYS=['t','n','c','x','r','p','k','closed'];
 function applyRemote(d){
   if(!d||!Array.isArray(d.t)||!d.t.length||!Array.isArray(d.c)||d.c.length!==d.t.length+1)return false;
   KEYS.forEach(k=>{if(d[k]!==undefined)cfg[k]=d[k]});
@@ -189,12 +192,17 @@ const markDone=t=>{try{const d=doneList();if(!d.includes(t))d.push(t);localStora
 const seatLabel=(g,n)=>g.role==='학생'?g.name+'-'+n:'전문가'+n;
 
 // ── 입장: 팀 코드 → 자리 번호 ──
+function closedScreen(){
+  $wrap.classList.remove('wide');
+  $app.innerHTML=`<div class="msg"><div class="ico">🔒</div><h2>평가가 마감되었어요</h2><p>참여해 주셔서 고마워요!</p></div>`;
+}
 function home(){
   $wrap.classList.remove('wide');
   if(!ready){
     $app.innerHTML='<div class="warn">구글폼이 연결되지 않은 링크입니다.<br>운영진에게 받은 평가 링크(QR)로 다시 열어 주세요.</div>';
     return;
   }
+  if(cfg.closed)return closedScreen();
   try{const me=JSON.parse(sessionStorage.getItem(meKey)||'null');if(me){Object.assign(st,me);return teamList()}}catch(e){}
   st.role=st.who=st.mine=st.team='';
   loadRemote();
@@ -224,6 +232,7 @@ function home(){
 function logout(){try{sessionStorage.removeItem(meKey)}catch(e){}home()}
 
 function teamList(){
+  if(cfg.closed)return closedScreen();
   const done=doneList();
   const teams=cfg.t.filter(t=>t!==st.mine);
   const left=teams.filter(t=>!done.includes(t)).length;
@@ -286,6 +295,8 @@ function scoreForm(){
 async function submit(){
   const send=document.getElementById('send');
   send.disabled=true;send.textContent='보내는 중…';
+  await loadRemote();
+  if(cfg.closed)return closedScreen();
   const K=cfg.k,total=K.reduce((s,_,i)=>s+st.score[i],0);
   const v=[st.role,st.who,st.team,...K.map((_,i)=>st.score[i]),total,document.getElementById('note').value.trim()];
   const body=new URLSearchParams();
@@ -313,6 +324,11 @@ function admin(view=cfg){
   draft=JSON.parse(JSON.stringify(view));
   $app.innerHTML=`<div class="me">🔧 관리자 모드</div>
     ${saved?'<div class="ok">✓ 저장됐어요. 링크·QR은 그대로이고, 모든 기기에 새 설정이 적용됩니다.</div>':''}
+    <div class="panel"><h3>평가 진행</h3>
+      <div class="status ${view.closed?'off':'on'}">${view.closed?'🔒 마감됨 · 지금은 아무도 제출할 수 없어요':'🟢 평가 중 · 코드로 들어와 제출할 수 있어요'}</div>
+      <button class="btn ${view.closed?'sm':'main'}" id="toggle">${view.closed?'평가 다시 열기':'평가 마감하기'}</button>
+      <p id="terr" class="err"></p>
+    </div>
     <div class="panel"><h3>코드표</h3>
       <table class="ctable"><tr><th>구분</th><th>코드</th><th>자리 번호</th><th>기록되는 이름</th></tr>
       ${groups.map(g=>`<tr><td>${esc(g.name)}</td><td class="c">${g.code}</td><td>1~${g.seats}</td><td>${esc(seatLabel(g,1))} ~ ${esc(seatLabel(g,g.seats))}</td></tr>`).join('')}</table>
@@ -325,7 +341,7 @@ function admin(view=cfg){
     </div>
     <div class="panel"><h3>결과</h3>
       ${view.r?`<a class="btn sm" href="https://docs.google.com/spreadsheets/d/${esc(view.r)}/edit" target="_blank" rel="noopener">결과 시트 열기 (팀별 점수·순위)</a>`:'<p class="sub" style="margin:0 0 8px">결과 시트 주소를 아래 설정에 넣으면 여기서 바로 열 수 있어요</p>'}
-      <p class="sub" style="margin:4px 0 0">평가 마감은 구글폼에서 '응답 받기'를 끄면 됩니다</p>
+      <p class="sub" style="margin:4px 0 0">마감 후 결과 시트에서 팀별 최종 점수와 순위를 확인하세요</p>
     </div>
     <div class="panel"><h3>설정 수정</h3><div id="setbox"></div></div>
     <button class="link" id="out">관리자 모드 나가기</button>`;
@@ -333,6 +349,13 @@ function admin(view=cfg){
   document.getElementById('out').onclick=()=>{document.body.classList.remove('admin');(back||home)()};
   document.getElementById('cp').onclick=e=>navigator.clipboard.writeText(url).then(()=>e.target.textContent='복사됨 ✓');
   document.getElementById('pr').onclick=()=>{printSlips(groups);window.print()};
+  document.getElementById('toggle').onclick=async()=>{
+    const close=!cfg.closed;
+    if(close&&!confirm('평가를 마감할까요? 마감하면 학생·전문가 모두 더 이상 제출할 수 없어요.'))return;
+    const b=document.getElementById('toggle');b.disabled=true;b.textContent='저장하는 중…';
+    try{await saveRemote({...cfg,closed:close});cfg.closed=close;admin(cfg)}
+    catch(e){b.disabled=false;b.textContent=close?'평가 마감하기':'평가 다시 열기';document.getElementById('terr').textContent='저장하지 못했어요. 인터넷 연결을 확인해 주세요'}
+  };
   saved=false;
 }
 
