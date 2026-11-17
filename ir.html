@@ -126,19 +126,20 @@ function fnv(str){let h=2166136261;for(const c of str){h^=c.codePointAt(0);h=Mat
 function readCfg(hash){
   const h=new URLSearchParams(hash.replace(/^#/,''));
   const t=(h.get('t')||'').split(',').map(s=>s.trim()).filter(Boolean);
-  const s=Math.min(9,+h.get('s')||3);
+  const s=Math.min(9,+h.get('s')||4);
   const n=(h.get('n')||'').split(',').map(Number);
   const c={f:h.get('f')||'',e:(h.get('e')||'').split(',').filter(Boolean),t,
     n:t.map((_,i)=>Math.min(9,Math.max(1,n[i]||s))),
-    x:h.has('x')?Math.min(9,Math.max(0,+h.get('x')||0)):3,
+    x:h.has('x')?Math.min(9,Math.max(0,+h.get('x')||0)):4,
     c:(h.get('c')||'').split(',').filter(Boolean),r:h.get('r')||'',p:h.get('p')||'',k:JSON.parse(JSON.stringify(DEFAULT_K))};
   if(c.c.length!==c.t.length+1)c.c=autoCodes(c);
   return c;
 }
+// 기본 코드: 1팀 1000 · 2팀 2000 · … · 전문가 9800 (10팀부터는 겹치지 않는 4자리)
 function autoCodes(c){
-  const used=new Set([DEFAULT_PW]);
-  const pick=seed=>{let n=0,code;do{code=String(1000+fnv(c.f+'|'+seed+'|'+n)%9000);n++}while(used.has(code));used.add(code);return code};
-  return [...c.t.map((_,i)=>pick('t'+i)),pick('x')];
+  const used=new Set([DEFAULT_PW,'9800']);
+  const out=c.t.map((_,i)=>{let code=i<8?String((i+1)*1000):'';if(!code||used.has(code)){let n=0;do{code=String(1000+fnv(c.f+'|t'+i+'|'+n)%9000);n++}while(used.has(code))}used.add(code);return code});
+  return [...out,'9800'];
 }
 function buildUrl(c){
   return location.origin+location.pathname+'#f='+c.f+'&e='+c.e.join(',')+'&t='+encodeURIComponent(c.t.join(','))
@@ -162,7 +163,7 @@ const KEYS=['t','n','c','x','r','p','k'];
 function applyRemote(d){
   if(!d||!Array.isArray(d.t)||!d.t.length||!Array.isArray(d.c)||d.c.length!==d.t.length+1)return false;
   KEYS.forEach(k=>{if(d[k]!==undefined)cfg[k]=d[k]});
-  if(!Array.isArray(cfg.n)||cfg.n.length!==cfg.t.length)cfg.n=cfg.t.map(()=>3);
+  if(!Array.isArray(cfg.n)||cfg.n.length!==cfg.t.length)cfg.n=cfg.t.map(()=>4);
   if(!Array.isArray(cfg.k)||cfg.k.length!==5)cfg.k=JSON.parse(JSON.stringify(DEFAULT_K));
   GROUPS=groupCodes(cfg);return true;
 }
@@ -343,8 +344,8 @@ function renderSettings(){
   const box=document.getElementById('setbox');
   box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{collect();const i=+b.dataset.del;draft.t.splice(i,1);draft.n.splice(i,1);draft.c.splice(i,1);renderSettings()});
   document.getElementById('addt').onclick=()=>{
-    collect();const used=new Set(draft.c);let code;do{code=String(1000+Math.floor(Math.random()*9000))}while(used.has(code)||pwOk(code,draft));
-    draft.t.push((draft.t.length+1)+'팀');draft.n.push(draft.n[draft.n.length-1]||3);draft.c.splice(draft.t.length-1,0,code);renderSettings();
+    collect();const used=new Set(draft.c);let code=String((draft.t.length+1)*1000);if(draft.t.length>=8||used.has(code)||pwOk(code,draft)){do{code=String(1000+Math.floor(Math.random()*9000))}while(used.has(code)||pwOk(code,draft))}
+    draft.t.push((draft.t.length+1)+'팀');draft.n.push(draft.n[draft.n.length-1]||4);draft.c.splice(draft.t.length-1,0,code);renderSettings();
   };
   document.getElementById('apply').onclick=apply;
   box.querySelectorAll('[data-k="km"]').forEach(el=>el.oninput=()=>{document.getElementById('ksum').textContent=[...box.querySelectorAll('[data-k="km"]')].reduce((s,x)=>s+(+x.value||0),0)});

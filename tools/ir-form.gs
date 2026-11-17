@@ -70,7 +70,7 @@ function makeIRForm() {
   book.moveActiveSheet(1);
 
   // 4. 앱 링크
-  const link = APP_URL + '#f=' + formKey + '&e=' + ids.join(',') + '&t=' + encodeURIComponent(TEAMS.join(',')) + '&s=3&x=3&r=' + book.getId();
+  const link = APP_URL + '#f=' + formKey + '&e=' + ids.join(',') + '&t=' + encodeURIComponent(TEAMS.join(',')) + '&s=4&x=4&r=' + book.getId();
   res.getRange('I4:J4').setValues([['앱 링크', link]]);
   res.getRange('I5:J5').setValues([['폼 수정', form.getEditUrl()]]);
 
