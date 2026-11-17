@@ -145,7 +145,7 @@ let GROUPS=ready?groupCodes(cfg):[];
 const LINK=location.origin+location.pathname+location.hash;
 
 // 저장된 설정: Firebase (invest-game 다른 앱과 같은 DB) → 링크·QR은 그대로, 설정만 바뀜
-const FB='https://geang-invest-default-rtdb.firebaseio.com/ir/'+encodeURIComponent(cfg.f)+'.json';
+const FB='https://geang-invest-default-rtdb.firebaseio.com/classes/IR-'+encodeURIComponent(cfg.f)+'.json';
 const KEYS=['t','n','c','x','r','p'];
 function applyRemote(d){
   if(!d||!Array.isArray(d.t)||!d.t.length||!Array.isArray(d.c)||d.c.length!==d.t.length+1)return false;
