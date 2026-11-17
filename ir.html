@@ -60,6 +60,7 @@ input.code{font-size:36px;font-weight:800;text-align:center;letter-spacing:.4em;
 .row3 input,.lbl input{margin-top:6px}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hide{display:none}
+.ok{background:#123a2a;border:1px solid #2e7a55;border-radius:12px;padding:14px 16px;color:#c9f5df;font-size:15px;margin-bottom:12px}
 .etable{width:100%;border-collapse:collapse}
 .etable th{color:var(--sub);font-weight:600;font-size:13px;text-align:left;padding:0 6px 6px}
 .etable td{padding:4px 6px;vertical-align:middle}
@@ -140,7 +141,27 @@ function groupCodes(c){
 }
 const cfg=readCfg(location.hash);
 const ready=cfg.f&&cfg.e.length===9&&cfg.t.length>0;
-const GROUPS=ready?groupCodes(cfg):[];
+let GROUPS=ready?groupCodes(cfg):[];
+const LINK=location.origin+location.pathname+location.hash;
+
+// 저장된 설정: Firebase (invest-game 다른 앱과 같은 DB) → 링크·QR은 그대로, 설정만 바뀜
+const FB='https://geang-invest-default-rtdb.firebaseio.com/ir/'+encodeURIComponent(cfg.f)+'.json';
+const KEYS=['t','n','c','x','r','p'];
+function applyRemote(d){
+  if(!d||!Array.isArray(d.t)||!d.t.length||!Array.isArray(d.c)||d.c.length!==d.t.length+1)return false;
+  KEYS.forEach(k=>{if(d[k]!==undefined)cfg[k]=d[k]});
+  if(!Array.isArray(cfg.n)||cfg.n.length!==cfg.t.length)cfg.n=cfg.t.map(()=>3);
+  GROUPS=groupCodes(cfg);return true;
+}
+async function loadRemote(){
+  if(!ready)return;
+  try{const r=await fetch(FB,{cache:'no-store'});if(r.ok)applyRemote(await r.json())}catch(e){}
+}
+async function saveRemote(d){
+  const body={};KEYS.forEach(k=>body[k]=d[k]);body.saved=new Date().toISOString();
+  const r=await fetch(FB,{method:'PUT',body:JSON.stringify(body)});
+  if(!r.ok)throw new Error('save');
+}
 
 const st={role:'',who:'',mine:'',team:'',score:{}};
 const meKey='ir:me:'+cfg.f;
@@ -158,6 +179,7 @@ function home(){
   }
   try{const me=JSON.parse(sessionStorage.getItem(meKey)||'null');if(me){Object.assign(st,me);return teamList()}}catch(e){}
   st.role=st.who=st.mine=st.team='';
+  loadRemote();
   $app.innerHTML=`<h2>팀 코드</h2><p class="sub">테이블에 있는 코드 4자리를 입력해 주세요</p>
     <input id="code" class="code" type="tel" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
     <p id="err" class="err"></p><div id="seat"></div>`;
@@ -238,15 +260,15 @@ async function submit(){
 
 // ── 관리자 모드 ──
 let draft=null;
+let saved=false;
 function admin(view=cfg){
   document.body.classList.add('admin');
   $wrap.classList.add('wide');
   const groups=groupCodes(view);
-  const url=buildUrl(view);
-  const changed=url!==buildUrl(cfg);
+  const url=LINK;
   draft=JSON.parse(JSON.stringify(view));
   $app.innerHTML=`<div class="me">🔧 관리자 모드</div>
-    ${changed?'<div class="warn">설정을 바꿔서 새 링크가 만들어졌습니다. 아래 새 QR·링크를 써 주세요.</div>':''}
+    ${saved?'<div class="ok">✓ 저장됐어요. 링크·QR은 그대로이고, 모든 기기에 새 설정이 적용됩니다.</div>':''}
     <div class="panel"><h3>코드표</h3>
       <table class="ctable"><tr><th>구분</th><th>코드</th><th>자리 번호</th><th>기록되는 이름</th></tr>
       ${groups.map(g=>`<tr><td>${esc(g.name)}</td><td class="c">${g.code}</td><td>1~${g.seats}</td><td>${esc(seatLabel(g,1))} ~ ${esc(seatLabel(g,g.seats))}</td></tr>`).join('')}</table>
@@ -254,7 +276,7 @@ function admin(view=cfg){
     </div>
     <div class="panel"><h3>평가 링크 · QR</h3>
       <div class="qrrow"><img class="qr" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=0&data=${encodeURIComponent(url)}"><div class="out">${esc(url)}</div></div>
-      ${changed?'<button class="btn sm" id="open" style="margin-top:12px">새 링크로 열기</button>':''}
+      <p class="sub" style="margin:10px 0 0">설정을 바꿔도 이 링크·QR은 바뀌지 않아요</p>
     </div>
     <div class="panel"><h3>결과</h3>
       ${view.r?`<a class="btn sm" href="https://docs.google.com/spreadsheets/d/${esc(view.r)}/edit" target="_blank" rel="noopener">결과 시트 열기 (팀별 점수·순위)</a>`:'<p class="sub" style="margin:0 0 8px">결과 시트 주소를 아래 설정에 넣으면 여기서 바로 열 수 있어요</p>'}
@@ -266,8 +288,7 @@ function admin(view=cfg){
   document.getElementById('out').onclick=()=>{document.body.classList.remove('admin');(back||home)()};
   document.getElementById('cp').onclick=e=>navigator.clipboard.writeText(url).then(()=>e.target.textContent='복사됨 ✓');
   document.getElementById('pr').onclick=()=>{printSlips(groups);window.print()};
-  const op=document.getElementById('open');
-  if(op)op.onclick=()=>{try{sessionStorage.removeItem(meKey)}catch(e){}location.href=url;location.reload()};
+  saved=false;
 }
 
 function renderSettings(){
@@ -289,7 +310,7 @@ function renderSettings(){
       <label>결과 시트 주소<input id="rs" placeholder="https://docs.google.com/spreadsheets/d/…" value="${d.r?'https://docs.google.com/spreadsheets/d/'+esc(d.r)+'/edit':''}"></label>
     </div>
     <p id="serr" class="err"></p>
-    <button class="btn main" id="apply">저장하고 새 링크 만들기</button>
+    <button class="btn main" id="apply">저장하기</button>
     <p class="sub" style="margin:4px 0 0">팀 코드 4자리 · 자리 수 1~9 · 전문가 수 0이면 전문가 평가 없음</p>`;
   const box=document.getElementById('setbox');
   box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{collect();const i=+b.dataset.del;draft.t.splice(i,1);draft.n.splice(i,1);draft.c.splice(i,1);renderSettings()});
@@ -312,7 +333,7 @@ function collect(){
   const m=(document.getElementById('rs').value||'').match(/\/d\/([\w-]{20,})/);
   d.r=m?m[1]:'';
 }
-function apply(){
+async function apply(){
   collect();
   const d=draft,err=document.getElementById('serr'),T=d.t.length;
   const fail=m=>{err.textContent=m;return false};
@@ -325,7 +346,12 @@ function apply(){
   const np=document.getElementById('npw').value.trim();
   if(np){if(!/^\d{4}$/.test(np))return fail('비밀번호는 숫자 4자리로 넣어 주세요');d.p=pwHash(np)}
   if(d.c.some(c=>pwOk(c,d)))return fail('관리자 비밀번호와 같은 코드는 쓸 수 없어요');
-  admin(d);
+  const btn=document.getElementById('apply');btn.disabled=true;btn.textContent='저장하는 중…';
+  try{await saveRemote(d)}catch(e){btn.disabled=false;btn.textContent='저장하기';return fail('저장하지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요')}
+  KEYS.forEach(k=>cfg[k]=JSON.parse(JSON.stringify(d[k]??'')));
+  if(!d.p)cfg.p='';
+  GROUPS=groupCodes(cfg);
+  saved=true;admin(cfg);window.scrollTo(0,0);
 }
 
 let back=null;
@@ -351,7 +377,7 @@ function printSlips(groups){
   document.getElementById('print').innerHTML=`<div class="pslips">${slips.join('')}</div>`;
 }
 
-home();
+(async()=>{if(ready){$app.innerHTML='<p class="sub">불러오는 중…</p>';await loadRemote()}home()})();
 </script>
 </body>
 </html>
