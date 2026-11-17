@@ -62,8 +62,25 @@ function makeIRForm() {
   const book = SpreadsheetApp.openById(ss.getId());
   const res = book.getSheets().find(s => !s.getFormUrl()) || book.insertSheet();
   res.setName('결과');
-  const R = "'" + resp.getName() + "'!";
-  const col = c => R + '$' + c + '$2:$' + c;
+  writeResults(book);
+  book.setActiveSheet(res);
+  book.moveActiveSheet(1);
+
+  // 4. 앱 링크
+  const link = APP_URL + '#f=' + formKey + '&e=' + ids.join(',') + '&t=' + encodeURIComponent(TEAMS.join(','));
+  res.getRange('I4:J4').setValues([['앱 링크', link]]);
+  res.getRange('I5:J5').setValues([['폼 수정', form.getEditUrl()]]);
+
+  Logger.log('앱 링크: ' + link);
+  Logger.log('결과 시트: ' + book.getUrl());
+  Logger.log('폼 수정: ' + form.getEditUrl());
+}
+
+/** 결과 탭 계산식 (응답이 들어와도 범위가 밀리지 않게 INDIRECT 사용) */
+function writeResults(book) {
+  const resp = book.getSheets().find(s => s.getFormUrl());
+  const res = book.getSheetByName('결과');
+  const col = c => 'INDIRECT("\'' + resp.getName() + '\'!' + c + '2:' + c + '")';
   const sum = '(' + ['E', 'F', 'G', 'H', 'I'].map(col).join('+') + ')';
 
   res.getRange('A1:G1').setValues([['팀', '전문가 점수', '전문가 수', '학생 점수', '학생 수', '최종 점수', '순위']])
@@ -79,19 +96,8 @@ function makeIRForm() {
     res.getRange('F' + r).setFormula('=IF($A' + r + '="","",IF(AND(C' + r + '>0,E' + r + '>0),ROUND(B' + r + '*$J$1+D' + r + '*(1-$J$1),1),IF(C' + r + '>0,B' + r + ',IF(E' + r + '>0,D' + r + ',"-"))))');
     res.getRange('G' + r).setFormula('=IF(OR($A' + r + '="",NOT(ISNUMBER(F' + r + '))),"",RANK(F' + r + ',$F$2:$F$21))');
   }
-  res.getRange('I1:J1').setValues([['전문가 비율', EXPERT_WEIGHT]]);
+  if (!res.getRange('J1').getValue()) res.getRange('I1:J1').setValues([['전문가 비율', EXPERT_WEIGHT]]);
   res.getRange('I2').setValue('점수는 100점 만점 (5개 항목 × 5점 × 4)');
   res.setColumnWidth(1, 140);
   res.setFrozenRows(1);
-  book.setActiveSheet(res);
-  book.moveActiveSheet(1);
-
-  // 4. 앱 링크
-  const link = APP_URL + '#f=' + formKey + '&e=' + ids.join(',') + '&t=' + encodeURIComponent(TEAMS.join(','));
-  res.getRange('I4:J4').setValues([['앱 링크', link]]);
-  res.getRange('I5:J5').setValues([['폼 수정', form.getEditUrl()]]);
-
-  Logger.log('앱 링크: ' + link);
-  Logger.log('결과 시트: ' + book.getUrl());
-  Logger.log('폼 수정: ' + form.getEditUrl());
 }
