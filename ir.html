@@ -60,6 +60,19 @@ input.code{font-size:36px;font-weight:800;text-align:center;letter-spacing:.4em;
 .row3 input,.lbl input{margin-top:6px}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hide{display:none}
+.rub{margin:-4px 0 12px}
+.rub summary{cursor:pointer;color:var(--accent);font-size:14px;font-weight:700;list-style:none;display:inline-block;padding:4px 0}
+.rub summary::-webkit-details-marker{display:none}
+.rub summary::before{content:'▸ '}
+.rub[open] summary::before{content:'▾ '}
+.rub .lv{display:grid;grid-template-columns:44px 64px 1fr;gap:6px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.rub .lv:first-of-type{margin-top:6px}
+.rub .lv b{color:var(--text);font-size:14px}
+.rub .lv em{font-style:normal;color:var(--accent);font-weight:700}
+.rub .lv p{color:var(--sub);margin:0;line-height:1.5}
+.grow td{padding-top:0!important}
+.grow summary{cursor:pointer;color:var(--sub);font-size:13px;padding:2px 2px 8px}
+.grow textarea{min-height:110px;font-size:14px;margin:0 0 8px}
 /* 배경 이미지 */
 body{background:#0b1430}
 body::before{content:'';position:fixed;inset:0;z-index:-1;
@@ -127,12 +140,38 @@ body.admin .adm{display:none}
 <script>
 // 평가 항목 5개 (이름·설명·배점은 관리자 모드에서 수정 → 저장)
 const DEFAULT_K=[
-  {name:'문제 정의',desc:'거래 자산의 매력도 · 문제 정의',max:15},
-  {name:'금융투자 반영',desc:'금융 원칙과 원리 반영',max:25},
-  {name:'앱 완성도',desc:'핵심 기능이 모두 작동하는가',max:20},
-  {name:'창의성 · 독창성',desc:'다른 팀과 구별되는 우리만의 색깔',max:20},
-  {name:'발표력',desc:'전달력 · 시간 준수 · 팀워크',max:20}
+  {name:'문제 정의',desc:'거래 자산의 매력도 · 문제 정의',max:15,g:[
+    '누가 어떤 불편을 겪는지 구체적이고, 우리 앱이 왜 필요한지 근거(경험·조사)가 분명함',
+    '해결하려는 문제는 있지만 대상이나 근거가 조금 흐림',
+    '문제보다 기능 소개가 중심이라 왜 필요한지 잘 안 보임',
+    '해결하려는 문제를 찾기 어려움']},
+  {name:'금융투자 반영',desc:'금융 원칙과 원리 반영',max:25,g:[
+    '분산투자 · 위험과 수익 · 장기투자 같은 금융 원칙이 기능에 정확히 담겨 있고 설명할 수 있음',
+    '금융 개념이 들어 있지만 일부가 부정확하거나 기능과 따로 놂',
+    '금융 용어는 나오지만 원리를 이해했는지 드러나지 않음',
+    '금융 · 투자 내용이 거의 없음']},
+  {name:'앱 완성도',desc:'핵심 기능이 모두 작동하는가',max:20,g:[
+    '핵심 기능이 시연에서 끝까지 작동하고 화면 흐름이 자연스러움',
+    '주요 기능은 작동하지만 일부 버튼이나 화면이 미완성',
+    '화면은 있으나 실제로 작동하는 기능이 적음',
+    '시연이 어렵거나 작동하는 화면이 거의 없음']},
+  {name:'창의성 · 독창성',desc:'다른 팀과 구별되는 우리만의 색깔',max:20,g:[
+    '다른 팀과 확실히 다른 아이디어 · 디자인이 있고 그렇게 만든 이유가 분명함',
+    '익숙한 아이디어지만 우리 팀만의 포인트가 하나 이상 있음',
+    '흔한 앱과 비슷하고 차별점이 약함',
+    '예시를 그대로 따라 한 수준']},
+  {name:'발표력',desc:'전달력 · 시간 준수 · 팀워크',max:20,g:[
+    '시간 안에 핵심을 또렷하게 전달하고 질문에 팀원이 함께 답함',
+    '내용은 전달되지만 시간 조절이나 역할 분담이 아쉬움',
+    '읽기 위주라 전달이 약하거나 시간을 크게 넘김',
+    '발표 준비가 거의 안 됨']}
 ];
+const LEVELS=['우수','보통','노력','부족'];
+// 단계별 점수 구간: 85% 이상 · 60% 이상 · 30% 이상 · 그 아래
+function bands(max){
+  const a=Math.ceil(max*.85),b=Math.ceil(max*.6),c=Math.ceil(max*.3);
+  return [[a,max],[b,a-1],[c,b-1],[0,c-1]];
+}
 const sumMax=k=>k.reduce((s,c)=>s+(+c.max||0),0);
 const DEFAULT_PW='9802';
 const $app=document.getElementById('app');
@@ -184,6 +223,7 @@ function applyRemote(d){
   KEYS.forEach(k=>{if(d[k]!==undefined)cfg[k]=d[k]});
   if(!Array.isArray(cfg.n)||cfg.n.length!==cfg.t.length)cfg.n=cfg.t.map(()=>4);
   if(!Array.isArray(cfg.k)||cfg.k.length!==5)cfg.k=JSON.parse(JSON.stringify(DEFAULT_K));
+  cfg.k.forEach((c,i)=>{if(!Array.isArray(c.g)||c.g.length!==4)c.g=DEFAULT_K[i].g.slice()});
   GROUPS=groupCodes(cfg);return true;
 }
 async function loadRemote(){
@@ -265,6 +305,9 @@ function scoreForm(){
     ${K.map((c,i)=>`<div class="crit" data-c="${i}">
       <div class="chead"><b>${esc(c.name)}</b><div class="val"><input id="v${i}" data-i="${i}" class="num" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="–" autocomplete="off"> / ${c.max}점</div></div>
       <span>${esc(c.desc)}</span>
+      <details class="rub"><summary>채점 기준 보기</summary>
+        ${bands(c.max).map(([lo,hi],l)=>`<div class="lv"><b>${LEVELS[l]}</b><em>${lo}~${hi}점</em><p>${esc(c.g[l]||'')}</p></div>`).join('')}
+      </details>
       <div class="sl"><button class="pm" data-pm="-1" data-i="${i}">−</button>
         <input type="range" min="0" max="${c.max}" step="1" value="${Math.round(c.max/2)}" data-i="${i}" class="untouched">
         <button class="pm" data-pm="1" data-i="${i}">+</button></div>
@@ -386,7 +429,8 @@ function renderSettings(){
     </table>
     <button class="btn sm" id="addt" style="margin:10px 0 16px">+ 팀 추가</button>
     <table class="etable ktable"><tr><th>평가 항목</th><th>설명</th><th>배점</th></tr>
-    ${d.k.map((c,i)=>`<tr><td><input data-k="kn" data-i="${i}" value="${esc(c.name)}"></td><td><input data-k="kd" data-i="${i}" value="${esc(c.desc)}"></td><td><input data-k="km" data-i="${i}" type="number" min="1" max="100" value="${c.max}"></td></tr>`).join('')}
+    ${d.k.map((c,i)=>`<tr><td><input data-k="kn" data-i="${i}" value="${esc(c.name)}"></td><td><input data-k="kd" data-i="${i}" value="${esc(c.desc)}"></td><td><input data-k="km" data-i="${i}" type="number" min="1" max="100" value="${c.max}"></td></tr>
+      <tr class="grow"><td colspan="3"><details><summary>채점 기준 수정 (우수 · 보통 · 노력 · 부족, 한 줄에 하나)</summary><textarea data-k="kg" data-i="${i}" rows="4">${esc((c.g||[]).join('\n'))}</textarea></details></td></tr>`).join('')}
     </table>
     <p class="sub" style="margin:6px 0 16px">배점 합계 <b id="ksum">${sumMax(d.k)}</b>점</p>
     <div class="row3">
@@ -417,6 +461,7 @@ function collect(){
     if(k==='kn')d.k[i].name=v;
     if(k==='kd')d.k[i].desc=v;
     if(k==='km')d.k[i].max=+v;
+    if(k==='kg')d.k[i].g=[0,1,2,3].map(n=>(el.value.split('\n')[n]||'').trim());
   });
   const m=(document.getElementById('rs').value||'').match(/\/d\/([\w-]{20,})/);
   d.r=m?m[1]:'';
