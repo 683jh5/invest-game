@@ -60,6 +60,15 @@ input.code{font-size:36px;font-weight:800;text-align:center;letter-spacing:.4em;
 .row3 input,.lbl input{margin-top:6px}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hide{display:none}
+.etable{width:100%;border-collapse:collapse}
+.etable th{color:var(--sub);font-weight:600;font-size:13px;text-align:left;padding:0 6px 6px}
+.etable td{padding:4px 6px;vertical-align:middle}
+.etable input{margin:0;padding:10px;font-size:16px}
+.etable input.cin{font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.etable td:nth-child(2),.etable td:nth-child(3){width:22%}
+.etable td:nth-child(4){width:40px}
+.etable .xrow td:first-child{color:var(--sub);font-weight:700;padding-left:12px}
+.del{background:none;border:1px solid var(--line);color:var(--sub);border-radius:8px;width:34px;height:34px;cursor:pointer}
 .adm{position:fixed;right:14px;bottom:14px;background:var(--card);border:1px solid var(--line);color:var(--sub);font:inherit;font-size:13px;padding:8px 12px;border-radius:99px;cursor:pointer;opacity:.8}
 .adm:hover{opacity:1}
 body.admin .adm{display:none}
@@ -93,33 +102,44 @@ const CRITERIA=[
   ['창의성','아이디어가 새로운가'],
   ['발표력','내용을 잘 전달했는가']
 ];
-const ADMIN='9802';
+const DEFAULT_PW='9802';
 const $app=document.getElementById('app');
 const $wrap=document.getElementById('wrap');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function fnv(str){let h=2166136261;for(const c of str){h^=c.codePointAt(0);h=Math.imul(h,16777619)>>>0}return h}
 
-// 설정은 링크 뒤(#)에 담김: f=폼 키, e=문항 번호 9개, t=팀 이름, s=팀당 자리 수, x=전문가 수, r=결과 시트 ID
+// 설정은 링크 뒤(#)에 담김
+// f=폼 키 · e=문항 번호 9개 · t=팀 이름 · n=팀별 자리 수 · c=팀 코드들+전문가 코드 · x=전문가 수 · r=결과 시트 ID · p=관리자 비밀번호(암호화)
 function readCfg(hash){
   const h=new URLSearchParams(hash.replace(/^#/,''));
-  return {f:h.get('f')||'',e:(h.get('e')||'').split(',').filter(Boolean),
-    t:(h.get('t')||'').split(',').map(s=>s.trim()).filter(Boolean),
-    s:Math.min(9,+h.get('s')||3),x:Math.min(9,+h.get('x')||3),r:h.get('r')||''};
+  const t=(h.get('t')||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const s=Math.min(9,+h.get('s')||3);
+  const n=(h.get('n')||'').split(',').map(Number);
+  const c={f:h.get('f')||'',e:(h.get('e')||'').split(',').filter(Boolean),t,
+    n:t.map((_,i)=>Math.min(9,Math.max(1,n[i]||s))),
+    x:h.has('x')?Math.min(9,Math.max(0,+h.get('x')||0)):3,
+    c:(h.get('c')||'').split(',').filter(Boolean),r:h.get('r')||'',p:h.get('p')||''};
+  if(c.c.length!==c.t.length+1)c.c=autoCodes(c);
+  return c;
+}
+function autoCodes(c){
+  const used=new Set([DEFAULT_PW.slice(0,3)]);
+  const pick=seed=>{let n=0,code;do{code=String(100+fnv(c.f+'|'+seed+'|'+n)%900);n++}while(used.has(code));used.add(code);return code};
+  return [...c.t.map((_,i)=>pick('t'+i)),pick('x')];
 }
 function buildUrl(c){
-  return location.origin+location.pathname+'#f='+c.f+'&e='+c.e.join(',')+'&t='+encodeURIComponent(c.t.join(','))+'&s='+c.s+'&x='+c.x+(c.r?'&r='+c.r:'');
+  return location.origin+location.pathname+'#f='+c.f+'&e='+c.e.join(',')+'&t='+encodeURIComponent(c.t.join(','))
+    +'&n='+c.n.join(',')+'&c='+c.c.join(',')+'&x='+c.x+(c.r?'&r='+c.r:'')+(c.p?'&p='+c.p:'');
+}
+const pwHash=v=>fnv('ir-pw|'+v).toString(36);
+const pwOk=(v,c=cfg)=>c.p?pwHash(v)===c.p:v===DEFAULT_PW;
+function groupCodes(c){
+  const g=c.t.map((t,i)=>({code:c.c[i],role:'학생',name:t,seats:c.n[i]}));
+  if(c.x>0)g.push({code:c.c[c.t.length],role:'전문가',name:'전문가',seats:c.x});
+  return g;
 }
 const cfg=readCfg(location.hash);
 const ready=cfg.f&&cfg.e.length===9&&cfg.t.length>0;
-
-// 팀 코드 3자리: 폼 키 + 팀 순서로 정해짐 (팀 이름을 바꿔도 그대로). 개인 = 팀 코드 + 자리 번호
-function fnv(str){let h=2166136261;for(const c of str){h^=c.codePointAt(0);h=Math.imul(h,16777619)>>>0}return h}
-function groupCodes(c){
-  const used=new Set([ADMIN.slice(0,3)]);
-  const pick=seed=>{let n=0,code;do{code=String(100+fnv(c.f+'|'+seed+'|'+n)%900);n++}while(used.has(code));used.add(code);return code};
-  const g=c.t.map((t,i)=>({code:pick('t'+i),role:'학생',name:t,seats:c.s}));
-  if(c.x>0)g.push({code:pick('x'),role:'전문가',name:'전문가',seats:c.x});
-  return g;
-}
 const GROUPS=ready?groupCodes(cfg):[];
 
 const st={role:'',who:'',mine:'',team:'',score:{}};
@@ -142,14 +162,15 @@ function home(){
     <input id="code" class="code" type="tel" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="000">
     <p id="err" class="err"></p><div id="seat"></div>`;
   const inp=document.getElementById('code');inp.focus();
+  let tmr=null;
   inp.oninput=()=>{
     inp.value=inp.value.replace(/\D/g,'');
     const v=inp.value,err=document.getElementById('err'),seat=document.getElementById('seat');
-    err.textContent='';seat.innerHTML='';
-    if(v===ADMIN)return admin();
+    err.textContent='';seat.innerHTML='';clearTimeout(tmr);
+    if(v.length===4){if(pwOk(v))return admin();err.textContent='없는 코드예요. 다시 확인해 주세요';return}
     if(v.length<3)return;
     const g=GROUPS.find(x=>x.code===v);
-    if(!g){if(v.length>=3&&!(v.length===3&&ADMIN.startsWith(v)))err.textContent='없는 코드예요. 다시 확인해 주세요';return}
+    if(!g){tmr=setTimeout(()=>{if(inp.value===v)err.textContent='없는 코드예요. 다시 확인해 주세요'},900);return}
     seat.innerHTML=`<div class="found">${g.role==='학생'?'🙋':'🏅'} ${esc(g.name)}</div>
       <p class="sub" style="margin:0 0 12px">${g.role==='학생'?'내 자리 번호를 눌러 주세요':'내 번호를 눌러 주세요'}</p>
       <div class="seats">${Array.from({length:g.seats},(_,i)=>`<button data-n="${i+1}">${i+1}</button>`).join('')}</div>`;
@@ -216,15 +237,17 @@ async function submit(){
   }
 }
 
-// ── 관리자 모드 (코드 칸에 9802) ──
+// ── 관리자 모드 ──
+let draft=null;
 function admin(view=cfg){
   document.body.classList.add('admin');
   $wrap.classList.add('wide');
   const groups=groupCodes(view);
   const url=buildUrl(view);
   const changed=url!==buildUrl(cfg);
+  draft=JSON.parse(JSON.stringify(view));
   $app.innerHTML=`<div class="me">🔧 관리자 모드</div>
-    ${changed?'<div class="warn">설정을 바꿔서 새 링크가 만들어졌습니다. 아래 QR·링크를 써 주세요. (팀 코드는 팀 순서가 같으면 그대로)</div>':''}
+    ${changed?'<div class="warn">설정을 바꿔서 새 링크가 만들어졌습니다. 아래 새 QR·링크를 써 주세요.</div>':''}
     <div class="panel"><h3>코드표</h3>
       <table class="ctable"><tr><th>구분</th><th>코드</th><th>자리 번호</th><th>기록되는 이름</th></tr>
       ${groups.map(g=>`<tr><td>${esc(g.name)}</td><td class="c">${g.code}</td><td>1~${g.seats}</td><td>${esc(seatLabel(g,1))} ~ ${esc(seatLabel(g,g.seats))}</td></tr>`).join('')}</table>
@@ -232,35 +255,77 @@ function admin(view=cfg){
     </div>
     <div class="panel"><h3>평가 링크 · QR</h3>
       <div class="qrrow"><img class="qr" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=0&data=${encodeURIComponent(url)}"><div class="out">${esc(url)}</div></div>
+      ${changed?'<button class="btn sm" id="open" style="margin-top:12px">새 링크로 열기</button>':''}
     </div>
     <div class="panel"><h3>결과</h3>
       ${view.r?`<a class="btn sm" href="https://docs.google.com/spreadsheets/d/${esc(view.r)}/edit" target="_blank" rel="noopener">결과 시트 열기 (팀별 점수·순위)</a>`:'<p class="sub" style="margin:0 0 8px">결과 시트 주소를 아래 설정에 넣으면 여기서 바로 열 수 있어요</p>'}
       <p class="sub" style="margin:4px 0 0">평가 마감은 구글폼에서 '응답 받기'를 끄면 됩니다</p>
     </div>
-    <div class="panel"><h3>설정</h3>
-      <label class="lbl">팀 이름 (한 줄에 하나, 순서대로)<textarea id="tm">${esc(view.t.join('\n'))}</textarea></label>
-      <div class="row3">
-        <label>팀당 자리 수<input id="ns" type="number" min="1" max="9" value="${view.s}"></label>
-        <label>전문가 수<input id="nx" type="number" min="0" max="9" value="${view.x}"></label>
-      </div>
-      <label class="lbl">결과 시트 주소 (선택)<input id="rs" placeholder="https://docs.google.com/spreadsheets/d/…" value="${view.r?'https://docs.google.com/spreadsheets/d/'+esc(view.r)+'/edit':''}"></label>
-      <button class="btn main" id="apply">설정 적용 · 새 링크 만들기</button>
-      ${changed?'<button class="btn sm" id="open">새 링크로 열기</button>':''}
-    </div>
+    <div class="panel"><h3>설정 수정</h3><div id="setbox"></div></div>
     <button class="link" id="out">관리자 모드 나가기</button>`;
-  document.getElementById('out').onclick=()=>{document.body.classList.remove('admin');home()};
+  renderSettings();
+  document.getElementById('out').onclick=()=>{document.body.classList.remove('admin');(back||home)()};
   document.getElementById('cp').onclick=e=>navigator.clipboard.writeText(url).then(()=>e.target.textContent='복사됨 ✓');
   document.getElementById('pr').onclick=()=>{printSlips(groups);window.print()};
-  document.getElementById('apply').onclick=()=>{
-    const t=document.getElementById('tm').value.split('\n').map(s=>s.trim().replace(/[,|]/g,' ')).filter(Boolean);
-    if(!t.length)return alert('팀 이름을 한 개 이상 넣어 주세요');
-    const s=Math.max(1,Math.min(9,+document.getElementById('ns').value||3));
-    const x=Math.max(0,Math.min(9,+document.getElementById('nx').value||0));
-    const m=document.getElementById('rs').value.match(/\/d\/([\w-]{20,})/);
-    admin({...cfg,t,s,x,r:m?m[1]:''});
-  };
   const op=document.getElementById('open');
-  if(op)op.onclick=()=>{location.href=url;location.reload()};
+  if(op)op.onclick=()=>{try{sessionStorage.removeItem(meKey)}catch(e){}location.href=url;location.reload()};
+}
+
+function renderSettings(){
+  const d=draft,T=d.t.length;
+  document.getElementById('setbox').innerHTML=`
+    <table class="etable"><tr><th>팀 이름</th><th>팀 코드</th><th>자리 수</th><th></th></tr>
+    ${d.t.map((t,i)=>`<tr>
+      <td><input data-k="t" data-i="${i}" value="${esc(t)}"></td>
+      <td><input data-k="c" data-i="${i}" value="${esc(d.c[i])}" inputmode="numeric" maxlength="3" class="cin"></td>
+      <td><input data-k="n" data-i="${i}" value="${d.n[i]}" type="number" min="1" max="9"></td>
+      <td>${T>1?`<button class="del" data-del="${i}" title="팀 삭제">✕</button>`:''}</td></tr>`).join('')}
+    <tr class="xrow"><td>전문가</td>
+      <td><input data-k="xc" value="${esc(d.c[T])}" inputmode="numeric" maxlength="3" class="cin"></td>
+      <td><input data-k="x" value="${d.x}" type="number" min="0" max="9"></td><td></td></tr>
+    </table>
+    <button class="btn sm" id="addt" style="margin:10px 0 16px">+ 팀 추가</button>
+    <div class="row3">
+      <label>관리자 비밀번호 바꾸기<input id="npw" inputmode="numeric" maxlength="4" placeholder="숫자 4자리 (비우면 그대로)"></label>
+      <label>결과 시트 주소<input id="rs" placeholder="https://docs.google.com/spreadsheets/d/…" value="${d.r?'https://docs.google.com/spreadsheets/d/'+esc(d.r)+'/edit':''}"></label>
+    </div>
+    <p id="serr" class="err"></p>
+    <button class="btn main" id="apply">저장하고 새 링크 만들기</button>
+    <p class="sub" style="margin:4px 0 0">팀 코드 3자리 · 자리 수 1~9 · 전문가 수 0이면 전문가 평가 없음</p>`;
+  const box=document.getElementById('setbox');
+  box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{collect();const i=+b.dataset.del;draft.t.splice(i,1);draft.n.splice(i,1);draft.c.splice(i,1);renderSettings()});
+  document.getElementById('addt').onclick=()=>{
+    collect();const used=new Set(draft.c);let code;do{code=String(100+Math.floor(Math.random()*900))}while(used.has(code));
+    draft.t.push((draft.t.length+1)+'팀');draft.n.push(draft.n[draft.n.length-1]||3);draft.c.splice(draft.t.length-1,0,code);renderSettings();
+  };
+  document.getElementById('apply').onclick=apply;
+}
+function collect(){
+  const box=document.getElementById('setbox'),d=draft,T=d.t.length;
+  box.querySelectorAll('[data-k]').forEach(el=>{
+    const k=el.dataset.k,i=+el.dataset.i,v=el.value.trim();
+    if(k==='t')d.t[i]=v.replace(/[,|]/g,' ');
+    if(k==='c')d.c[i]=v;
+    if(k==='n')d.n[i]=+v;
+    if(k==='xc')d.c[T]=v;
+    if(k==='x')d.x=+v;
+  });
+  const m=(document.getElementById('rs').value||'').match(/\/d\/([\w-]{20,})/);
+  d.r=m?m[1]:'';
+}
+function apply(){
+  collect();
+  const d=draft,err=document.getElementById('serr'),T=d.t.length;
+  const fail=m=>{err.textContent=m;return false};
+  if(d.t.some(t=>!t))return fail('비어 있는 팀 이름이 있어요');
+  if(new Set(d.t).size!==T)return fail('같은 팀 이름이 두 번 있어요');
+  if(d.c.some(c=>!/^\d{3}$/.test(c)))return fail('코드는 숫자 3자리로 넣어 주세요');
+  if(new Set(d.c).size!==d.c.length)return fail('같은 코드가 두 번 있어요');
+  if(d.n.some(n=>!(n>=1&&n<=9)))return fail('자리 수는 1~9로 넣어 주세요');
+  if(!(d.x>=0&&d.x<=9))return fail('전문가 수는 0~9로 넣어 주세요');
+  const np=document.getElementById('npw').value.trim();
+  if(np){if(!/^\d{4}$/.test(np))return fail('비밀번호는 숫자 4자리로 넣어 주세요');d.p=pwHash(np)}
+  admin(d);
 }
 
 let back=null;
@@ -275,7 +340,7 @@ function adminLogin(){
   const i=document.getElementById('apw');i.focus();
   i.oninput=()=>{i.value=i.value.replace(/\D/g,'');document.getElementById('aerr').textContent='';
     if(i.value.length<4)return;
-    if(i.value===ADMIN)admin();else{document.getElementById('aerr').textContent='비밀번호가 맞지 않아요';i.select()}};
+    if(pwOk(i.value))admin();else{document.getElementById('aerr').textContent='비밀번호가 맞지 않아요';i.select()}};
   document.getElementById('aback').onclick=()=>(back||home)();
 }
 document.getElementById('adm').onclick=adminLogin;
