@@ -63,6 +63,10 @@ input.code{font-size:36px;font-weight:800;text-align:center;letter-spacing:.4em;
 .chead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .val{color:var(--sub);font-size:15px;white-space:nowrap}
 .val strong{color:var(--accent);font-size:24px}
+.val input.num{width:64px;margin:0;padding:6px 4px;text-align:center;font-size:24px;font-weight:800;color:var(--accent);background:#0a1226;border:1px solid var(--line);border-radius:10px}
+.val input.num:focus{outline:none;border-color:var(--accent)}
+.val input.num.over{border-color:#ff6b6b;animation:shake .25s}
+@keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 .sl{display:flex;align-items:center;gap:10px}
 .sl input[type=range]{flex:1;margin:0;padding:0;height:36px;accent-color:var(--accent);background:none;border:0}
 .sl input.untouched{opacity:.35}
@@ -238,7 +242,7 @@ function scoreForm(){
   const K=cfg.k,total=sumMax(K);
   $app.innerHTML=`<div class="team-big">${esc(st.team)}</div><p class="sub" style="margin:0 0 18px">항목마다 점수를 정해 주세요 · 총 ${total}점</p>
     ${K.map((c,i)=>`<div class="crit" data-c="${i}">
-      <div class="chead"><b>${esc(c.name)}</b><div class="val"><strong id="v${i}">–</strong> / ${c.max}점</div></div>
+      <div class="chead"><b>${esc(c.name)}</b><div class="val"><input id="v${i}" data-i="${i}" class="num" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="–" autocomplete="off"> / ${c.max}점</div></div>
       <span>${esc(c.desc)}</span>
       <div class="sl"><button class="pm" data-pm="-1" data-i="${i}">−</button>
         <input type="range" min="0" max="${c.max}" step="1" value="${Math.round(c.max/2)}" data-i="${i}" class="untouched">
@@ -249,16 +253,32 @@ function scoreForm(){
     <button class="btn main" id="send" disabled>제출하기 (0/5)</button>
     <button class="link" id="back">← 팀 목록</button>`;
   const send=document.getElementById('send');
-  const set=(i,v)=>{
-    const c=K[i];v=Math.max(0,Math.min(c.max,v));st.score[i]=v;
-    const r=$app.querySelector(`input[data-i="${i}"]`);r.value=v;r.classList.remove('untouched');
-    document.getElementById('v'+i).textContent=v;
+  const refresh=()=>{
     const n=Object.keys(st.score).length;
     document.getElementById('tot').textContent=Object.values(st.score).reduce((a,b)=>a+b,0);
     send.disabled=n<5;send.textContent=n<5?`제출하기 (${n}/5)`:'제출하기';
   };
+  const set=(i,v,typed)=>{
+    const c=K[i];v=Math.max(0,Math.min(c.max,Math.round(v)));st.score[i]=v;
+    const r=$app.querySelector(`input[type=range][data-i="${i}"]`);r.value=v;r.classList.remove('untouched');
+    const box=document.getElementById('v'+i);if(!typed||+box.value!==v)box.value=v;box.dataset.prev=String(v);
+    refresh();
+  };
   $app.querySelectorAll('input[type=range]').forEach(r=>r.oninput=()=>set(+r.dataset.i,+r.value));
   $app.querySelectorAll('[data-pm]').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;const cur=st.score[i]??Math.round(K[i].max/2);set(i,st.score[i]===undefined?cur:cur+(+b.dataset.pm))});
+  // 숫자 직접 입력: 정수만 (소수점·음수 불가), 배점을 넘으면 배점으로 맞춤
+  $app.querySelectorAll('input.num').forEach(box=>{
+    const i=+box.dataset.i;
+    box.onkeydown=e=>{if(['.',',','e','E','-','+'].includes(e.key))e.preventDefault()};
+    box.oninput=()=>{
+      const v=box.value.replace(/\D/g,'').replace(/^0+(?=\d)/,'');
+      if(v!==box.value)box.value=v;
+      if(v===''){delete st.score[i];box.dataset.prev='';$app.querySelector(`input[type=range][data-i="${i}"]`).classList.add('untouched');return refresh()}
+      if(+v>K[i].max){box.value=box.dataset.prev||'';box.classList.add('over');box.title='최대 '+K[i].max+'점';setTimeout(()=>box.classList.remove('over'),700);return}
+      box.dataset.prev=v;set(i,+v,true);
+    };
+    box.onfocus=()=>box.select();
+  });
   send.onclick=submit;
   document.getElementById('back').onclick=teamList;
 }
