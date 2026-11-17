@@ -60,6 +60,18 @@ input.code{font-size:36px;font-weight:800;text-align:center;letter-spacing:.4em;
 .row3 input,.lbl input{margin-top:6px}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hide{display:none}
+/* 배경 이미지 */
+body{background:#0b1430}
+body::before{content:'';position:fixed;inset:0;z-index:-1;
+  background:linear-gradient(180deg,rgba(8,14,34,.10) 0%,rgba(8,14,34,.25) 45%,rgba(8,14,34,.45) 100%),url(img/ir-bg.jpg) center center/cover no-repeat}
+@media (max-width:700px){body::before{background:linear-gradient(180deg,rgba(8,14,34,.15) 0%,rgba(8,14,34,.30) 50%,rgba(8,14,34,.50) 100%),url(img/ir-bg-m.jpg) center bottom/cover no-repeat}}
+.btn,.crit,.panel,.me,.adm{background:rgba(16,27,52,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.btn.main{background:var(--accent)}
+input,textarea{background:rgba(8,14,34,.82)}
+.pts button,.pm,.seats button{background:rgba(8,14,34,.82)}
+header{padding-top:24px}
+header h1,h2,p.sub,.found,.team-big,.sum{text-shadow:0 1px 10px rgba(0,0,0,.7)}
+@media print{body::before{display:none}}
 .status{border-radius:12px;padding:14px 16px;font-size:16px;font-weight:700;margin-bottom:12px}
 .status.on{background:#123a2a;border:1px solid #2e7a55;color:#c9f5df}
 .status.off{background:#3a1f1f;border:1px solid #7a3a3a;color:#ffd2d2}
