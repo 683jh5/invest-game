@@ -1,13 +1,13 @@
 /**
- * IR Day 평가 · 구글폼 자동 만들기
+ * IR Day 평가 · 구글폼 자동 만들기 (배점형)
  *
  * 사용법
  * 1) script.google.com → 새 프로젝트 → 이 코드 전체 붙여넣기
- * 2) 아래 TEAMS에 팀 이름 입력 (현장에서 앱 ⚙ 설정으로도 바꿀 수 있음)
- * 3) 위쪽 함수 선택에서 makeIRForm 선택 → ▶ 실행 → 권한 허용
- * 4) 실행 로그에 나온 "앱 링크"를 열고 코드 칸에 9802 → 관리자 모드에서 코드표·QR 확인
+ * 2) 함수 선택에서 makeIRForm → ▶ 실행 → 권한 허용
+ * 3) 실행 로그에 나온 "앱 링크"를 열고 🔧 관리자(9802) → 팀·코드·배점 설정 후 저장
  *
  * 만들어지는 것: 구글폼 1개 + 결과 시트 1개(응답 시트 + '결과' 탭)
+ * 항목 이름·배점은 앱 관리자 모드에서 바꿀 수 있음 (폼은 항목1~5 점수와 총점을 받음)
  */
 
 const TITLE = 'IR Day 평가';
@@ -16,36 +16,39 @@ const EXPERT_WEIGHT = 0.6; // 전문가 60% · 학생 40%
 const APP_URL = 'https://683jh5.github.io/invest-game/ir.html';
 
 const CRITERIA = [
-  ['문제 정의', '해결하려는 문제가 분명한가'],
-  ['금융 이해도', '금융 개념이 서비스에 잘 담겼는가'],
-  ['서비스 완성도', '앱이 실제로 작동하는가'],
-  ['창의성', '아이디어가 새로운가'],
-  ['발표력', '내용을 잘 전달했는가'],
+  ['문제 정의', 15],
+  ['금융투자 반영', 25],
+  ['앱 완성도', 20],
+  ['창의성 · 독창성', 20],
+  ['발표력', 20],
 ];
 
 function makeIRForm() {
   // 1. 폼
   const form = FormApp.create(TITLE);
   form.setDescription('IR Day 평가 앱에서 보낸 점수가 모이는 폼입니다. 폼을 직접 작성하지 않아도 됩니다.');
-  try { form.setRequireLogin(false); } catch (e) {}           // 회사 계정: 로그인 없이 제출
+  try { form.setRequireLogin(false); } catch (e) {}
   try { form.setCollectEmail(false); } catch (e) {}
 
+  const num = FormApp.createTextValidation().requireNumberBetween(0, 100).build();
   const qRole = form.addMultipleChoiceItem().setTitle('구분').setChoiceValues(['전문가', '학생']);
   const qWho = form.addTextItem().setTitle('평가자');
   const qTeam = form.addTextItem().setTitle('평가 팀');
-  const qScores = CRITERIA.map(c =>
-    form.addScaleItem().setTitle(c[0]).setHelpText(c[1]).setBounds(1, 5));
+  const qScores = CRITERIA.map((c, i) =>
+    form.addTextItem().setTitle('항목' + (i + 1) + ' ' + c[0]).setHelpText(c[1] + '점 만점').setValidation(num));
+  const qTotal = form.addTextItem().setTitle('총점').setValidation(num);
   const qNote = form.addParagraphTextItem().setTitle('한마디');
 
-  try { form.setPublished(true); } catch (e) {}                // 2025년 이후 폼 게시 설정
+  try { form.setPublished(true); } catch (e) {}
 
-  // 2. 앱이 쓸 문항 번호(entry ID) 뽑기
+  // 2. 앱이 쓸 문항 번호(entry ID)
   const entryOf = r => form.createResponse().withItemResponse(r).toPrefilledUrl().match(/entry\.(\d+)=/)[1];
   const ids = [
     entryOf(qRole.createResponse('전문가')),
     entryOf(qWho.createResponse('x')),
     entryOf(qTeam.createResponse('x')),
-    ...qScores.map(q => entryOf(q.createResponse(1))),
+    ...qScores.map(q => entryOf(q.createResponse('1'))),
+    entryOf(qTotal.createResponse('1')),
     entryOf(qNote.createResponse('x')),
   ];
   const formKey = form.getPublishedUrl().match(/\/d\/e\/([^/]+)\//)[1];
@@ -76,18 +79,20 @@ function makeIRForm() {
   Logger.log('폼 수정: ' + form.getEditUrl());
 }
 
-/** 결과 탭 계산식 (응답이 들어와도 범위가 밀리지 않게 INDIRECT 사용) */
+/**
+ * 결과 탭 계산식 — 응답 시트 열: A 타임스탬프 · B 구분 · C 평가자 · D 평가 팀 · E~I 항목1~5 · J 총점 · K 한마디
+ * 응답이 들어와도 범위가 밀리지 않게 INDIRECT 사용
+ */
 function writeResults(book) {
   const resp = book.getSheets().find(s => s.getFormUrl());
   const res = book.getSheetByName('결과');
   const col = c => 'INDIRECT("\'' + resp.getName() + '\'!' + c + '2:' + c + '")';
-  const sum = '(' + ['E', 'F', 'G', 'H', 'I'].map(col).join('+') + ')';
 
   res.getRange('A1:G1').setValues([['팀', '전문가 점수', '전문가 수', '학생 점수', '학생 수', '최종 점수', '순위']])
     .setFontWeight('bold').setBackground('#1b2a4a').setFontColor('#ffffff');
   res.getRange('A2').setFormula('=IFERROR(SORT(UNIQUE(FILTER(' + col('D') + ',' + col('D') + '<>""))),"")');
   for (let r = 2; r <= 21; r++) {
-    const avg = who => '=IF($A' + r + '="","",IFERROR(ROUND(SUMPRODUCT((' + col('D') + '=$A' + r + ')*(' + col('B') + '="' + who + '")*' + sum + ')*4/' + (who === '전문가' ? 'C' : 'E') + r + ',1),"-"))';
+    const avg = who => '=IF($A' + r + '="","",IFERROR(ROUND(SUMPRODUCT((' + col('D') + '=$A' + r + ')*(' + col('B') + '="' + who + '")*' + col('J') + ')/' + (who === '전문가' ? 'C' : 'E') + r + ',1),"-"))';
     const cnt = who => '=IF($A' + r + '="","",COUNTIFS(' + col('D') + ',$A' + r + ',' + col('B') + ',"' + who + '"))';
     res.getRange('B' + r).setFormula(avg('전문가'));
     res.getRange('C' + r).setFormula(cnt('전문가'));
@@ -97,7 +102,7 @@ function writeResults(book) {
     res.getRange('G' + r).setFormula('=IF(OR($A' + r + '="",NOT(ISNUMBER(F' + r + '))),"",RANK(F' + r + ',$F$2:$F$21))');
   }
   if (!res.getRange('J1').getValue()) res.getRange('I1:J1').setValues([['전문가 비율', EXPERT_WEIGHT]]);
-  res.getRange('I2').setValue('점수는 100점 만점 (5개 항목 × 5점 × 4)');
+  res.getRange('I2').setValue('점수 = 평가자들이 준 총점의 평균 (배점 합계 기준)');
   res.setColumnWidth(1, 140);
   res.setFrozenRows(1);
 }

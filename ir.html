@@ -60,6 +60,16 @@ input.code{font-size:36px;font-weight:800;text-align:center;letter-spacing:.4em;
 .row3 input,.lbl input{margin-top:6px}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hide{display:none}
+.chead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.val{color:var(--sub);font-size:15px;white-space:nowrap}
+.val strong{color:var(--accent);font-size:24px}
+.sl{display:flex;align-items:center;gap:10px}
+.sl input[type=range]{flex:1;margin:0;padding:0;height:36px;accent-color:var(--accent);background:none;border:0}
+.sl input.untouched{opacity:.35}
+.pm{width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:#0a1226;color:var(--text);font:inherit;font-size:22px;font-weight:700;cursor:pointer}
+.sum{text-align:right;color:var(--sub);margin:4px 0 12px;font-size:16px}
+.sum strong{color:var(--text);font-size:22px}
+.ktable td:nth-child(2){width:auto}.ktable td:nth-child(1){width:30%}.ktable td:nth-child(3){width:18%}
 .ok{background:#123a2a;border:1px solid #2e7a55;border-radius:12px;padding:14px 16px;color:#c9f5df;font-size:15px;margin-bottom:12px}
 .etable{width:100%;border-collapse:collapse}
 .etable th{color:var(--sub);font-weight:600;font-size:13px;text-align:left;padding:0 6px 6px}
@@ -96,13 +106,15 @@ body.admin .adm{display:none}
 <button class="adm" id="adm">🔧 관리자</button>
 
 <script>
-const CRITERIA=[
-  ['문제 정의','해결하려는 문제가 분명한가'],
-  ['금융 이해도','금융 개념이 서비스에 잘 담겼는가'],
-  ['서비스 완성도','앱이 실제로 작동하는가'],
-  ['창의성','아이디어가 새로운가'],
-  ['발표력','내용을 잘 전달했는가']
+// 평가 항목 5개 (이름·설명·배점은 관리자 모드에서 수정 → 저장)
+const DEFAULT_K=[
+  {name:'문제 정의',desc:'거래 자산의 매력도 · 문제 정의',max:15},
+  {name:'금융투자 반영',desc:'금융 원칙과 원리 반영',max:25},
+  {name:'앱 완성도',desc:'핵심 기능이 모두 작동하는가',max:20},
+  {name:'창의성 · 독창성',desc:'다른 팀과 구별되는 우리만의 색깔',max:20},
+  {name:'발표력',desc:'전달력 · 시간 준수 · 팀워크',max:20}
 ];
+const sumMax=k=>k.reduce((s,c)=>s+(+c.max||0),0);
 const DEFAULT_PW='9802';
 const $app=document.getElementById('app');
 const $wrap=document.getElementById('wrap');
@@ -119,7 +131,7 @@ function readCfg(hash){
   const c={f:h.get('f')||'',e:(h.get('e')||'').split(',').filter(Boolean),t,
     n:t.map((_,i)=>Math.min(9,Math.max(1,n[i]||s))),
     x:h.has('x')?Math.min(9,Math.max(0,+h.get('x')||0)):3,
-    c:(h.get('c')||'').split(',').filter(Boolean),r:h.get('r')||'',p:h.get('p')||''};
+    c:(h.get('c')||'').split(',').filter(Boolean),r:h.get('r')||'',p:h.get('p')||'',k:JSON.parse(JSON.stringify(DEFAULT_K))};
   if(c.c.length!==c.t.length+1)c.c=autoCodes(c);
   return c;
 }
@@ -140,17 +152,18 @@ function groupCodes(c){
   return g;
 }
 const cfg=readCfg(location.hash);
-const ready=cfg.f&&cfg.e.length===9&&cfg.t.length>0;
+const ready=cfg.f&&cfg.e.length===10&&cfg.t.length>0;
 let GROUPS=ready?groupCodes(cfg):[];
 const LINK=location.origin+location.pathname+location.hash;
 
 // 저장된 설정: Firebase (invest-game 다른 앱과 같은 DB) → 링크·QR은 그대로, 설정만 바뀜
 const FB='https://geang-invest-default-rtdb.firebaseio.com/classes/IR-'+encodeURIComponent(cfg.f)+'.json';
-const KEYS=['t','n','c','x','r','p'];
+const KEYS=['t','n','c','x','r','p','k'];
 function applyRemote(d){
   if(!d||!Array.isArray(d.t)||!d.t.length||!Array.isArray(d.c)||d.c.length!==d.t.length+1)return false;
   KEYS.forEach(k=>{if(d[k]!==undefined)cfg[k]=d[k]});
   if(!Array.isArray(cfg.n)||cfg.n.length!==cfg.t.length)cfg.n=cfg.t.map(()=>3);
+  if(!Array.isArray(cfg.k)||cfg.k.length!==5)cfg.k=JSON.parse(JSON.stringify(DEFAULT_K));
   GROUPS=groupCodes(cfg);return true;
 }
 async function loadRemote(){
@@ -221,20 +234,30 @@ function teamList(){
 }
 
 function scoreForm(){
-  $app.innerHTML=`<div class="team-big">${esc(st.team)}</div><p class="sub" style="margin:0 0 18px">항목마다 1~5점을 눌러 주세요</p>
-    ${CRITERIA.map((c,i)=>`<div class="crit"><b>${c[0]}</b><span>${c[1]}</span>
-      <div class="pts">${[1,2,3,4,5].map(n=>`<button data-i="${i}" data-n="${n}">${n}</button>`).join('')}</div>
-      <div class="scale"><em style="font-style:normal">아쉬워요</em><em style="font-style:normal">훌륭해요</em></div></div>`).join('')}
+  const K=cfg.k,total=sumMax(K);
+  $app.innerHTML=`<div class="team-big">${esc(st.team)}</div><p class="sub" style="margin:0 0 18px">항목마다 점수를 정해 주세요 · 총 ${total}점</p>
+    ${K.map((c,i)=>`<div class="crit" data-c="${i}">
+      <div class="chead"><b>${esc(c.name)}</b><div class="val"><strong id="v${i}">–</strong> / ${c.max}점</div></div>
+      <span>${esc(c.desc)}</span>
+      <div class="sl"><button class="pm" data-pm="-1" data-i="${i}">−</button>
+        <input type="range" min="0" max="${c.max}" step="1" value="${Math.round(c.max/2)}" data-i="${i}" class="untouched">
+        <button class="pm" data-pm="1" data-i="${i}">+</button></div>
+      <div class="scale"><em style="font-style:normal">0</em><em style="font-style:normal">${c.max}</em></div></div>`).join('')}
+    <div class="sum">합계 <strong id="tot">0</strong> / ${total}점</div>
     <textarea id="note" placeholder="${st.role==='학생'?'칭찬 한 줄 (선택)':'한마디 (선택)'}"></textarea>
     <button class="btn main" id="send" disabled>제출하기 (0/5)</button>
     <button class="link" id="back">← 팀 목록</button>`;
   const send=document.getElementById('send');
-  $app.querySelectorAll('.pts button').forEach(b=>b.onclick=()=>{
-    st.score[b.dataset.i]=+b.dataset.n;
-    b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+  const set=(i,v)=>{
+    const c=K[i];v=Math.max(0,Math.min(c.max,v));st.score[i]=v;
+    const r=$app.querySelector(`input[data-i="${i}"]`);r.value=v;r.classList.remove('untouched');
+    document.getElementById('v'+i).textContent=v;
     const n=Object.keys(st.score).length;
+    document.getElementById('tot').textContent=Object.values(st.score).reduce((a,b)=>a+b,0);
     send.disabled=n<5;send.textContent=n<5?`제출하기 (${n}/5)`:'제출하기';
-  });
+  };
+  $app.querySelectorAll('input[type=range]').forEach(r=>r.oninput=()=>set(+r.dataset.i,+r.value));
+  $app.querySelectorAll('[data-pm]').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;const cur=st.score[i]??Math.round(K[i].max/2);set(i,st.score[i]===undefined?cur:cur+(+b.dataset.pm))});
   send.onclick=submit;
   document.getElementById('back').onclick=teamList;
 }
@@ -242,14 +265,14 @@ function scoreForm(){
 async function submit(){
   const send=document.getElementById('send');
   send.disabled=true;send.textContent='보내는 중…';
-  const v=[st.role,st.who,st.team,...CRITERIA.map((_,i)=>st.score[i]),document.getElementById('note').value.trim()];
+  const K=cfg.k,total=K.reduce((s,_,i)=>s+st.score[i],0);
+  const v=[st.role,st.who,st.team,...K.map((_,i)=>st.score[i]),total,document.getElementById('note').value.trim()];
   const body=new URLSearchParams();
   cfg.e.forEach((id,i)=>body.append('entry.'+id,v[i]));
   try{
     await fetch(`https://docs.google.com/forms/d/e/${cfg.f}/formResponse`,{method:'POST',mode:'no-cors',body});
     markDone(st.team);
-    const total=CRITERIA.reduce((s,_,i)=>s+st.score[i],0)*4;
-    $app.innerHTML=`<div class="msg"><div class="ico">✅</div><h2>${esc(st.team)} 평가 완료</h2><p>${total}점 / 100점</p>
+    $app.innerHTML=`<div class="msg"><div class="ico">✅</div><h2>${esc(st.team)} 평가 완료</h2><p>${total}점 / ${sumMax(K)}점</p>
       <button class="btn main" id="next">다음 팀 평가</button></div>`;
     document.getElementById('next').onclick=teamList;
   }catch(e){
@@ -274,6 +297,7 @@ function admin(view=cfg){
       ${groups.map(g=>`<tr><td>${esc(g.name)}</td><td class="c">${g.code}</td><td>1~${g.seats}</td><td>${esc(seatLabel(g,1))} ~ ${esc(seatLabel(g,g.seats))}</td></tr>`).join('')}</table>
       <div class="btns" style="margin-top:14px"><button class="btn sm" id="pr">자리별 코드 카드 인쇄</button><button class="btn sm" id="cp">평가 링크 복사</button></div>
     </div>
+    <div class="panel"><h3>평가 항목</h3><p class="sub" style="margin:0">${view.k.map(c=>esc(c.name)+' '+c.max).join(' · ')} = ${sumMax(view.k)}점</p></div>
     <div class="panel"><h3>평가 링크 · QR</h3>
       <div class="qrrow"><img class="qr" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=0&data=${encodeURIComponent(url)}"><div class="out">${esc(url)}</div></div>
       <p class="sub" style="margin:10px 0 0">설정을 바꿔도 이 링크·QR은 바뀌지 않아요</p>
@@ -305,6 +329,10 @@ function renderSettings(){
       <td><input data-k="x" value="${d.x}" type="number" min="0" max="9"></td><td></td></tr>
     </table>
     <button class="btn sm" id="addt" style="margin:10px 0 16px">+ 팀 추가</button>
+    <table class="etable ktable"><tr><th>평가 항목</th><th>설명</th><th>배점</th></tr>
+    ${d.k.map((c,i)=>`<tr><td><input data-k="kn" data-i="${i}" value="${esc(c.name)}"></td><td><input data-k="kd" data-i="${i}" value="${esc(c.desc)}"></td><td><input data-k="km" data-i="${i}" type="number" min="1" max="100" value="${c.max}"></td></tr>`).join('')}
+    </table>
+    <p class="sub" style="margin:6px 0 16px">배점 합계 <b id="ksum">${sumMax(d.k)}</b>점</p>
     <div class="row3">
       <label>관리자 비밀번호 바꾸기<input id="npw" inputmode="numeric" maxlength="4" placeholder="숫자 4자리 (비우면 그대로)"></label>
       <label>결과 시트 주소<input id="rs" placeholder="https://docs.google.com/spreadsheets/d/…" value="${d.r?'https://docs.google.com/spreadsheets/d/'+esc(d.r)+'/edit':''}"></label>
@@ -319,6 +347,7 @@ function renderSettings(){
     draft.t.push((draft.t.length+1)+'팀');draft.n.push(draft.n[draft.n.length-1]||3);draft.c.splice(draft.t.length-1,0,code);renderSettings();
   };
   document.getElementById('apply').onclick=apply;
+  box.querySelectorAll('[data-k="km"]').forEach(el=>el.oninput=()=>{document.getElementById('ksum').textContent=[...box.querySelectorAll('[data-k="km"]')].reduce((s,x)=>s+(+x.value||0),0)});
 }
 function collect(){
   const box=document.getElementById('setbox'),d=draft,T=d.t.length;
@@ -329,6 +358,9 @@ function collect(){
     if(k==='n')d.n[i]=+v;
     if(k==='xc')d.c[T]=v;
     if(k==='x')d.x=+v;
+    if(k==='kn')d.k[i].name=v;
+    if(k==='kd')d.k[i].desc=v;
+    if(k==='km')d.k[i].max=+v;
   });
   const m=(document.getElementById('rs').value||'').match(/\/d\/([\w-]{20,})/);
   d.r=m?m[1]:'';
@@ -343,6 +375,9 @@ async function apply(){
   if(new Set(d.c).size!==d.c.length)return fail('같은 코드가 두 번 있어요');
   if(d.n.some(n=>!(n>=1&&n<=9)))return fail('자리 수는 1~9로 넣어 주세요');
   if(!(d.x>=0&&d.x<=9))return fail('전문가 수는 0~9로 넣어 주세요');
+  if(d.k.some(c=>!c.name))return fail('비어 있는 평가 항목 이름이 있어요');
+  if(d.k.some(c=>!(Number.isInteger(c.max)&&c.max>=1&&c.max<=100)))return fail('배점은 1~100 사이 정수로 넣어 주세요');
+  if(sumMax(d.k)>100)return fail('배점 합계가 100점을 넘어요');
   const np=document.getElementById('npw').value.trim();
   if(np){if(!/^\d{4}$/.test(np))return fail('비밀번호는 숫자 4자리로 넣어 주세요');d.p=pwHash(np)}
   if(d.c.some(c=>pwOk(c,d)))return fail('관리자 비밀번호와 같은 코드는 쓸 수 없어요');
