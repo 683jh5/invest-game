@@ -5,7 +5,7 @@
  * 1) script.google.com → 새 프로젝트 → 이 코드 전체 붙여넣기
  * 2) 아래 TEAMS에 팀 이름 입력 (현장에서 앱 ⚙ 설정으로도 바꿀 수 있음)
  * 3) 위쪽 함수 선택에서 makeIRForm 선택 → ▶ 실행 → 권한 허용
- * 4) 실행 로그에 나온 "앱 링크"를 복사 → 이 링크(또는 QR)로 평가
+ * 4) 실행 로그에 나온 "앱 링크"를 열고 코드 칸에 9802 → 관리자 모드에서 코드표·QR 확인
  *
  * 만들어지는 것: 구글폼 1개 + 결과 시트 1개(응답 시트 + '결과' 탭)
  */
@@ -67,7 +67,7 @@ function makeIRForm() {
   book.moveActiveSheet(1);
 
   // 4. 앱 링크
-  const link = APP_URL + '#f=' + formKey + '&e=' + ids.join(',') + '&t=' + encodeURIComponent(TEAMS.join(','));
+  const link = APP_URL + '#f=' + formKey + '&e=' + ids.join(',') + '&t=' + encodeURIComponent(TEAMS.join(',')) + '&s=3&x=3&r=' + book.getId();
   res.getRange('I4:J4').setValues([['앱 링크', link]]);
   res.getRange('I5:J5').setValues([['폼 수정', form.getEditUrl()]]);
 

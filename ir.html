@@ -10,61 +10,76 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Pretendard,system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;word-break:keep-all;-webkit-tap-highlight-color:transparent}
 .wrap{max-width:520px;margin:0 auto;padding:28px 20px 60px}
+.wrap.wide{max-width:860px}
 header{margin-bottom:28px}
 header small{color:var(--accent);font-weight:700;letter-spacing:.08em;font-size:13px}
 header h1{font-size:28px;margin-top:4px}
 h2{font-size:20px;margin-bottom:16px}
+h3{font-size:17px;margin-bottom:12px}
 p.sub{color:var(--sub);font-size:15px;margin:-8px 0 18px}
-.btn{display:block;width:100%;padding:18px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--text);font:inherit;font-size:18px;font-weight:700;text-align:left;cursor:pointer;margin-bottom:12px}
+.btn{display:block;width:100%;padding:18px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--text);font:inherit;font-size:18px;font-weight:700;text-align:left;cursor:pointer;margin-bottom:12px;text-decoration:none}
 .btn:active{transform:scale(.99)}
 .btn.main{background:var(--accent);border-color:var(--accent);color:#1a1205;text-align:center}
 .btn.main:disabled{opacity:.35;cursor:default}
+.btn.sm{padding:12px 14px;font-size:15px;text-align:center}
 .btn.done{opacity:.55}
 .btn .r{float:right;font-weight:600;color:var(--sub);font-size:15px}
 .btn.done .r{color:var(--ok)}
 .link{background:none;border:0;color:var(--sub);font:inherit;font-size:15px;cursor:pointer;padding:8px 0;margin-bottom:12px}
 input,textarea{width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);background:#0a1226;color:var(--text);font:inherit;font-size:17px;margin-bottom:14px}
-textarea{min-height:90px;resize:vertical}
+textarea{min-height:110px;resize:vertical}
+input.code{font-size:36px;font-weight:800;text-align:center;letter-spacing:.4em;padding:18px}
+.err{color:#ff9b9b;min-height:22px;font-size:15px;margin-bottom:8px}
+.found{font-size:20px;font-weight:800;margin:4px 0 12px}
+.seats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.seats button{padding:20px 0;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--text);font:inherit;font-size:22px;font-weight:800;cursor:pointer}
+.seats button:active{background:var(--accent);color:#1a1205}
+.me{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:14px;color:var(--sub);margin-bottom:14px}
 .crit{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
 .crit b{font-size:17px}
 .crit span{display:block;color:var(--sub);font-size:14px;margin:2px 0 12px}
 .pts{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .pts button{padding:12px 0;border-radius:10px;border:1px solid var(--line);background:#0a1226;color:var(--text);font:inherit;font-size:18px;font-weight:700;cursor:pointer}
 .pts button.on{background:var(--accent);border-color:var(--accent);color:#1a1205}
-.scale{display:flex;font-style:normal;justify-content:space-between;color:var(--sub);font-size:12px;margin-top:6px}
-.scale span{display:inline;margin:0;font-size:12px;color:var(--sub)}
+.scale{display:flex;justify-content:space-between;color:var(--sub);font-size:12px;margin-top:6px}
 .team-big{font-size:26px;font-weight:800;margin-bottom:4px}
 .msg{text-align:center;padding:40px 0}
 .msg .ico{font-size:52px;margin-bottom:12px}
 .msg p{color:var(--sub);margin:8px 0 24px}
-.warn{background:#3a1f1f;border:1px solid #7a3a3a;border-radius:12px;padding:16px;color:#ffd2d2;font-size:15px;line-height:1.6}
-.gear{position:fixed;right:16px;bottom:16px;background:none;border:0;font-size:22px;opacity:.35;cursor:pointer}
-.qr{display:block;margin:6px auto 14px;background:#fff;padding:10px;border-radius:12px;width:220px;height:220px}
-.out{font-size:13px;color:var(--sub);word-break:break-all;margin-bottom:14px}
+.warn{background:#3a1f1f;border:1px solid #7a3a3a;border-radius:12px;padding:16px;color:#ffd2d2;font-size:15px;line-height:1.6;margin-bottom:12px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px}
+.ctable{width:100%;border-collapse:collapse;font-size:16px}
+.ctable th,.ctable td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left}
+.ctable th{color:var(--sub);font-weight:600;font-size:14px}
+.ctable td.c{font-size:22px;font-weight:800;letter-spacing:.12em;color:var(--accent)}
+.qrrow{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.qr{background:#fff;padding:10px;border-radius:12px;width:180px;height:180px}
+.out{font-size:12px;color:var(--sub);word-break:break-all;flex:1;min-width:200px}
+.row3{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row3 label,.lbl{font-size:14px;color:var(--sub);display:block}
+.row3 input,.lbl input{margin-top:6px}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hide{display:none}
-input.code{font-size:36px;font-weight:800;text-align:center;letter-spacing:.4em;padding:18px}
-.err{color:#ff9b9b;min-height:22px;font-size:15px}
-.me{display:inline-block;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:6px 14px;font-size:14px;color:var(--sub);margin-bottom:14px}
-.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.row2 label{font-size:14px;color:var(--sub)}
-.row2 input{margin-top:6px}
-#codes{background:#fff;color:#111;border-radius:12px;padding:16px;margin-bottom:12px}
-#codes h3{font-size:16px;margin-bottom:10px}
-.grp{margin-bottom:10px}
-.grp b{font-size:14px}
-.slips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
-.slip{border:1px dashed #999;border-radius:8px;padding:8px;text-align:center}
-.slip span{display:block;font-size:12px;color:#555}
-.slip strong{font-size:22px;letter-spacing:.1em}
-@media print{body{background:#fff}body *{visibility:hidden}#codes,#codes *{visibility:visible}#codes{position:absolute;left:0;top:0;width:100%}.gear{display:none}}
+#print{display:none}
+@media print{
+  body{background:#fff;color:#000}
+  .wrap{display:none}
+  #print{display:block;font-family:Pretendard,sans-serif}
+  .pslips{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+  .pslip{border:1px dashed #888;padding:18px 10px;text-align:center;page-break-inside:avoid}
+  .pslip .t{font-size:16px;font-weight:700}
+  .pslip .c{font-size:30px;font-weight:800;letter-spacing:.15em;margin:6px 0}
+  .pslip .s{font-size:16px}
+  .pslip .h{font-size:11px;color:#555;margin-top:6px}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
+<div class="wrap" id="wrap">
   <header><small>IR DAY</small><h1>발표 평가</h1></header>
   <main id="app"></main>
 </div>
-<button class="gear" id="gear" aria-label="설정">⚙</button>
+<div id="print"></div>
 
 <script>
 const CRITERIA=[
@@ -74,60 +89,82 @@ const CRITERIA=[
   ['창의성','아이디어가 새로운가'],
   ['발표력','내용을 잘 전달했는가']
 ];
-const PASS='9802';
+const ADMIN='9802';
 const $app=document.getElementById('app');
-
-// 설정은 링크 뒤(#)에 담김: f=폼 키, e=문항 번호 9개, t=팀 이름
-const h=new URLSearchParams(location.hash.slice(1));
-const cfg={f:h.get('f')||'',e:(h.get('e')||'').split(',').filter(Boolean),t:(h.get('t')||'').split(',').map(s=>s.trim()).filter(Boolean),s:+h.get('s')||3,x:+h.get('x')||3};
-const ready=cfg.f&&cfg.e.length===9&&cfg.t.length>0;
-
-const st={role:'',who:'',mine:'',team:'',score:{}};
-const key=()=>'ir:'+cfg.f+':'+st.who;
-const doneList=()=>{try{return JSON.parse(localStorage.getItem(key())||'[]')}catch(e){return[]}};
-const markDone=t=>{try{const d=doneList();if(!d.includes(t))d.push(t);localStorage.setItem(key(),JSON.stringify(d))}catch(e){}};
+const $wrap=document.getElementById('wrap');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-// 개인 코드: 폼 키 + 팀 순서 + 번호로 정해지는 4자리 (팀 이름을 바꿔도 코드는 그대로)
-function fnv(str){let h=2166136261;for(const c of str){h^=c.codePointAt(0);h=Math.imul(h,16777619)>>>0}return h}
-function makeCodes(c=cfg){
-  const list=[],used=new Set();
-  const pick=seed=>{let n=0,code;do{code=String(1000+fnv(c.f+'|'+seed+'|'+n)%9000);n++}while(used.has(code));used.add(code);return code};
-  c.t.forEach((t,i)=>{for(let j=1;j<=c.s;j++)list.push({code:pick('s'+i+'-'+j),role:'학생',who:t+'-'+j,mine:t})});
-  for(let j=1;j<=c.x;j++)list.push({code:pick('x'+j),role:'전문가',who:'전문가'+j,mine:''});
-  return list;
+// 설정은 링크 뒤(#)에 담김: f=폼 키, e=문항 번호 9개, t=팀 이름, s=팀당 자리 수, x=전문가 수, r=결과 시트 ID
+function readCfg(hash){
+  const h=new URLSearchParams(hash.replace(/^#/,''));
+  return {f:h.get('f')||'',e:(h.get('e')||'').split(',').filter(Boolean),
+    t:(h.get('t')||'').split(',').map(s=>s.trim()).filter(Boolean),
+    s:Math.min(9,+h.get('s')||3),x:Math.min(9,+h.get('x')||3),r:h.get('r')||''};
 }
-const CODES=ready?makeCodes():[];
+function buildUrl(c){
+  return location.origin+location.pathname+'#f='+c.f+'&e='+c.e.join(',')+'&t='+encodeURIComponent(c.t.join(','))+'&s='+c.s+'&x='+c.x+(c.r?'&r='+c.r:'');
+}
+const cfg=readCfg(location.hash);
+const ready=cfg.f&&cfg.e.length===9&&cfg.t.length>0;
 
+// 팀 코드 3자리: 폼 키 + 팀 순서로 정해짐 (팀 이름을 바꿔도 그대로). 개인 = 팀 코드 + 자리 번호
+function fnv(str){let h=2166136261;for(const c of str){h^=c.codePointAt(0);h=Math.imul(h,16777619)>>>0}return h}
+function groupCodes(c){
+  const used=new Set([ADMIN.slice(0,3)]);
+  const pick=seed=>{let n=0,code;do{code=String(100+fnv(c.f+'|'+seed+'|'+n)%900);n++}while(used.has(code));used.add(code);return code};
+  const g=c.t.map((t,i)=>({code:pick('t'+i),role:'학생',name:t,seats:c.s}));
+  if(c.x>0)g.push({code:pick('x'),role:'전문가',name:'전문가',seats:c.x});
+  return g;
+}
+const GROUPS=ready?groupCodes(cfg):[];
+
+const st={role:'',who:'',mine:'',team:'',score:{}};
+const meKey='ir:me:'+cfg.f;
+const doneKey=()=>'ir:'+cfg.f+':'+st.who;
+const doneList=()=>{try{return JSON.parse(localStorage.getItem(doneKey())||'[]')}catch(e){return[]}};
+const markDone=t=>{try{const d=doneList();if(!d.includes(t))d.push(t);localStorage.setItem(doneKey(),JSON.stringify(d))}catch(e){}};
+const seatLabel=(g,n)=>g.role==='학생'?g.name+'-'+n:'전문가'+n;
+
+// ── 입장: 팀 코드 → 자리 번호 ──
 function home(){
+  $wrap.classList.remove('wide');
   if(!ready){
     $app.innerHTML='<div class="warn">구글폼이 연결되지 않은 링크입니다.<br>운영진에게 받은 평가 링크(QR)로 다시 열어 주세요.</div>';
     return;
   }
-  try{const me=JSON.parse(sessionStorage.getItem('ir:me:'+cfg.f)||'null');if(me&&CODES.some(c=>c.code===me.code)){Object.assign(st,me);return teamList()}}catch(e){}
+  try{const me=JSON.parse(sessionStorage.getItem(meKey)||'null');if(me){Object.assign(st,me);return teamList()}}catch(e){}
   st.role=st.who=st.mine=st.team='';
-  $app.innerHTML=`<h2>개인 코드</h2><p class="sub">받은 코드 4자리를 입력해 주세요</p>
-    <input id="code" class="code" type="tel" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="0000">
-    <p id="err" class="err"></p>`;
+  $app.innerHTML=`<h2>팀 코드</h2><p class="sub">테이블에 있는 코드 3자리를 입력해 주세요</p>
+    <input id="code" class="code" type="tel" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="000">
+    <p id="err" class="err"></p><div id="seat"></div>`;
   const inp=document.getElementById('code');inp.focus();
   inp.oninput=()=>{
     inp.value=inp.value.replace(/\D/g,'');
-    document.getElementById('err').textContent='';
-    if(inp.value.length<4)return;
-    const me=CODES.find(c=>c.code===inp.value);
-    if(!me){document.getElementById('err').textContent='없는 코드예요. 다시 확인해 주세요';inp.select();return}
-    Object.assign(st,me);
-    try{sessionStorage.setItem('ir:me:'+cfg.f,JSON.stringify(me))}catch(e){}
-    teamList();
+    const v=inp.value,err=document.getElementById('err'),seat=document.getElementById('seat');
+    err.textContent='';seat.innerHTML='';
+    if(v===ADMIN)return admin();
+    if(v.length<3)return;
+    const g=GROUPS.find(x=>x.code===v);
+    if(!g){if(v.length>=3&&!(v.length===3&&ADMIN.startsWith(v)))err.textContent='없는 코드예요. 다시 확인해 주세요';return}
+    seat.innerHTML=`<div class="found">${g.role==='학생'?'🙋':'🏅'} ${esc(g.name)}</div>
+      <p class="sub" style="margin:0 0 12px">${g.role==='학생'?'내 자리 번호를 눌러 주세요':'내 번호를 눌러 주세요'}</p>
+      <div class="seats">${Array.from({length:g.seats},(_,i)=>`<button data-n="${i+1}">${i+1}</button>`).join('')}</div>`;
+    seat.querySelectorAll('[data-n]').forEach(b=>b.onclick=()=>{
+      const me={role:g.role,who:seatLabel(g,b.dataset.n),mine:g.role==='학생'?g.name:''};
+      Object.assign(st,me);
+      try{sessionStorage.setItem(meKey,JSON.stringify(me))}catch(e){}
+      teamList();
+    });
   };
 }
-function logout(){try{sessionStorage.removeItem('ir:me:'+cfg.f)}catch(e){}home()}
+function logout(){try{sessionStorage.removeItem(meKey)}catch(e){}home()}
 
 function teamList(){
   const done=doneList();
   const teams=cfg.t.filter(t=>t!==st.mine);
   const left=teams.filter(t=>!done.includes(t)).length;
-  $app.innerHTML=`<div class="me">${st.role==='학생'?'🙋':'🏅'} ${esc(st.who)}</div><h2>평가할 팀</h2><p class="sub">${left?`남은 팀 ${left}개`:'모든 팀 평가 완료! 감사합니다 👏'}</p>
+  $app.innerHTML=`<div class="me">${st.role==='학생'?'🙋':'🏅'} ${esc(st.who)}</div>
+    <h2>평가할 팀</h2><p class="sub">${left?`남은 팀 ${left}개`:'모든 팀 평가 완료! 감사합니다 👏'}</p>
     ${teams.map(t=>{const d=done.includes(t);return `<button class="btn ${d?'done':''}" data-t="${esc(t)}">${esc(t)}<span class="r">${d?'✓ 완료':'평가하기'}</span></button>`}).join('')}
     <button class="link" id="back">나가기</button>`;
   $app.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
@@ -141,18 +178,17 @@ function scoreForm(){
   $app.innerHTML=`<div class="team-big">${esc(st.team)}</div><p class="sub" style="margin:0 0 18px">항목마다 1~5점을 눌러 주세요</p>
     ${CRITERIA.map((c,i)=>`<div class="crit"><b>${c[0]}</b><span>${c[1]}</span>
       <div class="pts">${[1,2,3,4,5].map(n=>`<button data-i="${i}" data-n="${n}">${n}</button>`).join('')}</div>
-      <div class="scale"><span>아쉬워요</span><span>훌륭해요</span></div></div>`).join('')}
+      <div class="scale"><em style="font-style:normal">아쉬워요</em><em style="font-style:normal">훌륭해요</em></div></div>`).join('')}
     <textarea id="note" placeholder="${st.role==='학생'?'칭찬 한 줄 (선택)':'한마디 (선택)'}"></textarea>
-    <button class="btn main" id="send" disabled>제출하기</button>
+    <button class="btn main" id="send" disabled>제출하기 (0/5)</button>
     <button class="link" id="back">← 팀 목록</button>`;
   const send=document.getElementById('send');
   $app.querySelectorAll('.pts button').forEach(b=>b.onclick=()=>{
-    const i=b.dataset.i;st.score[i]=+b.dataset.n;
+    st.score[b.dataset.i]=+b.dataset.n;
     b.parentNode.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
     const n=Object.keys(st.score).length;
     send.disabled=n<5;send.textContent=n<5?`제출하기 (${n}/5)`:'제출하기';
   });
-  send.textContent='제출하기 (0/5)';
   send.onclick=submit;
   document.getElementById('back').onclick=teamList;
 }
@@ -176,44 +212,57 @@ async function submit(){
   }
 }
 
-// 운영진 설정: 팀 이름·인원 바꾸고 새 링크·QR·코드표 만들기
-document.getElementById('gear').onclick=()=>{
-  $app.innerHTML=`<h2>운영진 설정</h2>
-    <input id="pw" type="password" inputmode="numeric" maxlength="4" placeholder="비밀번호 4자리">
-    <div id="cfgbox" class="hide">
-      <p class="sub" style="margin:0 0 8px">팀 이름 (한 줄에 하나)</p>
-      <textarea id="tm">${esc(cfg.t.join('\n'))}</textarea>
-      <div class="row2">
-        <label>팀당 학생 수<input id="ns" type="number" min="1" max="10" value="${cfg.s}"></label>
-        <label>전문가 수<input id="nx" type="number" min="0" max="20" value="${cfg.x}"></label>
-      </div>
-      <button class="btn main" id="mk">링크·코드표 만들기</button>
-      <div id="res"></div>
+// ── 관리자 모드 (코드 칸에 9802) ──
+function admin(view=cfg){
+  $wrap.classList.add('wide');
+  const groups=groupCodes(view);
+  const url=buildUrl(view);
+  const changed=url!==buildUrl(cfg);
+  $app.innerHTML=`<div class="me">🔧 관리자 모드</div>
+    ${changed?'<div class="warn">설정을 바꿔서 새 링크가 만들어졌습니다. 아래 QR·링크를 써 주세요. (팀 코드는 팀 순서가 같으면 그대로)</div>':''}
+    <div class="panel"><h3>코드표</h3>
+      <table class="ctable"><tr><th>구분</th><th>코드</th><th>자리 번호</th><th>기록되는 이름</th></tr>
+      ${groups.map(g=>`<tr><td>${esc(g.name)}</td><td class="c">${g.code}</td><td>1~${g.seats}</td><td>${esc(seatLabel(g,1))} ~ ${esc(seatLabel(g,g.seats))}</td></tr>`).join('')}</table>
+      <div class="btns" style="margin-top:14px"><button class="btn sm" id="pr">자리별 코드 카드 인쇄</button><button class="btn sm" id="cp">평가 링크 복사</button></div>
     </div>
-    <button class="link" id="back">← 처음으로</button>`;
-  document.getElementById('back').onclick=home;
-  document.getElementById('pw').oninput=e=>{if(e.target.value===PASS){document.getElementById('cfgbox').classList.remove('hide');e.target.classList.add('hide')}};
-  document.getElementById('mk').onclick=()=>{
-    if(!cfg.f||cfg.e.length!==9){document.getElementById('res').innerHTML='<div class="warn">구글폼 연결 정보가 없습니다. 스크립트가 만든 앱 링크로 열어서 다시 해 주세요.</div>';return}
-    const teams=document.getElementById('tm').value.split('\n').map(s=>s.trim().replace(/[,|]/g,' ')).filter(Boolean);
-    const ns=Math.max(1,Math.min(10,+document.getElementById('ns').value||3));
-    const nx=Math.max(0,Math.min(20,+document.getElementById('nx').value||0));
-    const url=location.origin+location.pathname+'#f='+cfg.f+'&e='+cfg.e.join(',')+'&t='+encodeURIComponent(teams.join(','))+'&s='+ns+'&x='+nx;
-    const list=makeCodes({f:cfg.f,t:teams,s:ns,x:nx});
-    const groups=[...teams.map(t=>({name:t,items:list.filter(c=>c.mine===t)})),{name:'전문가',items:list.filter(c=>c.role==='전문가')}].filter(g=>g.items.length);
-    document.getElementById('res').innerHTML=`<img class="qr" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=0&data=${encodeURIComponent(url)}">
-      <div class="out">${esc(url)}</div>
-      <button class="btn" id="cp">링크 복사</button>
-      <div id="codes"><h3>IR Day 평가 · 개인 코드</h3>
-        ${groups.map(g=>`<div class="grp"><b>${esc(g.name)}</b><div class="slips">${g.items.map(c=>`<div class="slip"><span>${esc(c.who)}</span><strong>${c.code}</strong></div>`).join('')}</div></div>`).join('')}
+    <div class="panel"><h3>평가 링크 · QR</h3>
+      <div class="qrrow"><img class="qr" alt="QR" src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=0&data=${encodeURIComponent(url)}"><div class="out">${esc(url)}</div></div>
+    </div>
+    <div class="panel"><h3>결과</h3>
+      ${view.r?`<a class="btn sm" href="https://docs.google.com/spreadsheets/d/${esc(view.r)}/edit" target="_blank" rel="noopener">결과 시트 열기 (팀별 점수·순위)</a>`:'<p class="sub" style="margin:0 0 8px">결과 시트 주소를 아래 설정에 넣으면 여기서 바로 열 수 있어요</p>'}
+      <p class="sub" style="margin:4px 0 0">평가 마감은 구글폼에서 '응답 받기'를 끄면 됩니다</p>
+    </div>
+    <div class="panel"><h3>설정</h3>
+      <label class="lbl">팀 이름 (한 줄에 하나, 순서대로)<textarea id="tm">${esc(view.t.join('\n'))}</textarea></label>
+      <div class="row3">
+        <label>팀당 자리 수<input id="ns" type="number" min="1" max="9" value="${view.s}"></label>
+        <label>전문가 수<input id="nx" type="number" min="0" max="9" value="${view.x}"></label>
       </div>
-      <button class="btn" id="pr">코드표 인쇄</button>
-      <button class="btn" id="op">이 링크로 열기</button>`;
-    document.getElementById('cp').onclick=()=>navigator.clipboard.writeText(url).then(()=>document.getElementById('cp').textContent='복사됨 ✓');
-    document.getElementById('pr').onclick=()=>window.print();
-    document.getElementById('op').onclick=()=>{try{sessionStorage.removeItem('ir:me:'+cfg.f)}catch(e){}location.href=url;location.reload()};
+      <label class="lbl">결과 시트 주소 (선택)<input id="rs" placeholder="https://docs.google.com/spreadsheets/d/…" value="${view.r?'https://docs.google.com/spreadsheets/d/'+esc(view.r)+'/edit':''}"></label>
+      <button class="btn main" id="apply">설정 적용 · 새 링크 만들기</button>
+      ${changed?'<button class="btn sm" id="open">새 링크로 열기</button>':''}
+    </div>
+    <button class="link" id="out">관리자 모드 나가기</button>`;
+  document.getElementById('out').onclick=home;
+  document.getElementById('cp').onclick=e=>navigator.clipboard.writeText(url).then(()=>e.target.textContent='복사됨 ✓');
+  document.getElementById('pr').onclick=()=>{printSlips(groups);window.print()};
+  document.getElementById('apply').onclick=()=>{
+    const t=document.getElementById('tm').value.split('\n').map(s=>s.trim().replace(/[,|]/g,' ')).filter(Boolean);
+    if(!t.length)return alert('팀 이름을 한 개 이상 넣어 주세요');
+    const s=Math.max(1,Math.min(9,+document.getElementById('ns').value||3));
+    const x=Math.max(0,Math.min(9,+document.getElementById('nx').value||0));
+    const m=document.getElementById('rs').value.match(/\/d\/([\w-]{20,})/);
+    admin({...cfg,t,s,x,r:m?m[1]:''});
   };
-};
+  const op=document.getElementById('open');
+  if(op)op.onclick=()=>{location.href=url;location.reload()};
+}
+
+function printSlips(groups){
+  const slips=[];
+  groups.forEach(g=>{for(let n=1;n<=g.seats;n++)slips.push(`<div class="pslip"><div class="t">${esc(g.name)}</div><div class="c">${g.code}</div><div class="s">${g.role==='학생'?'자리':'번호'} ${n}</div><div class="h">QR → 코드 입력 → 번호 ${n} 누르기</div></div>`)});
+  document.getElementById('print').innerHTML=`<div class="pslips">${slips.join('')}</div>`;
+}
 
 home();
 </script>
