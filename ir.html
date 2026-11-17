@@ -60,6 +60,9 @@ input.code{font-size:36px;font-weight:800;text-align:center;letter-spacing:.4em;
 .row3 input,.lbl input{margin-top:6px}
 .btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .hide{display:none}
+.adm{position:fixed;right:14px;bottom:14px;background:var(--card);border:1px solid var(--line);color:var(--sub);font:inherit;font-size:13px;padding:8px 12px;border-radius:99px;cursor:pointer;opacity:.8}
+.adm:hover{opacity:1}
+body.admin .adm{display:none}
 #print{display:none}
 @media print{
   body{background:#fff;color:#000}
@@ -80,6 +83,7 @@ input.code{font-size:36px;font-weight:800;text-align:center;letter-spacing:.4em;
   <main id="app"></main>
 </div>
 <div id="print"></div>
+<button class="adm" id="adm">🔧 관리자</button>
 
 <script>
 const CRITERIA=[
@@ -214,6 +218,7 @@ async function submit(){
 
 // ── 관리자 모드 (코드 칸에 9802) ──
 function admin(view=cfg){
+  document.body.classList.add('admin');
   $wrap.classList.add('wide');
   const groups=groupCodes(view);
   const url=buildUrl(view);
@@ -243,7 +248,7 @@ function admin(view=cfg){
       ${changed?'<button class="btn sm" id="open">새 링크로 열기</button>':''}
     </div>
     <button class="link" id="out">관리자 모드 나가기</button>`;
-  document.getElementById('out').onclick=home;
+  document.getElementById('out').onclick=()=>{document.body.classList.remove('admin');home()};
   document.getElementById('cp').onclick=e=>navigator.clipboard.writeText(url).then(()=>e.target.textContent='복사됨 ✓');
   document.getElementById('pr').onclick=()=>{printSlips(groups);window.print()};
   document.getElementById('apply').onclick=()=>{
@@ -257,6 +262,23 @@ function admin(view=cfg){
   const op=document.getElementById('open');
   if(op)op.onclick=()=>{location.href=url;location.reload()};
 }
+
+let back=null;
+function adminLogin(){
+  if(!ready)return;
+  back=st.who?teamList:home;
+  $wrap.classList.remove('wide');
+  $app.innerHTML=`<h2>관리자 모드</h2><p class="sub">관리자 비밀번호 4자리</p>
+    <input id="apw" class="code" type="password" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••">
+    <p id="aerr" class="err"></p>
+    <button class="link" id="aback">← 돌아가기</button>`;
+  const i=document.getElementById('apw');i.focus();
+  i.oninput=()=>{i.value=i.value.replace(/\D/g,'');document.getElementById('aerr').textContent='';
+    if(i.value.length<4)return;
+    if(i.value===ADMIN)admin();else{document.getElementById('aerr').textContent='비밀번호가 맞지 않아요';i.select()}};
+  document.getElementById('aback').onclick=()=>(back||home)();
+}
+document.getElementById('adm').onclick=adminLogin;
 
 function printSlips(groups){
   const slips=[];
